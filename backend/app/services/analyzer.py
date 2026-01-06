@@ -1,31 +1,10 @@
-import json
 from app.schemas import AnalyzeRequest, AnalyzeResponse
+from app.services.utils import extract_json
 from app.services.llm import call_llm_json
-
-import json
-
-def extract_json(raw: str) -> dict:
-    # make sure valid json extracted
-    if not raw or not raw.strip():
-        raise ValueError("LLM returned empty output")
-
-    s = raw.strip()
-
-    # remove ```json ``` 
-    if s.startswith("```"):
-        s = s.strip("`")
-
-    start = s.find("{")
-    end = s.rfind("}")
-
-    if start == -1 or end == -1 or end <= start:
-        raise ValueError(f"No JSON object found in LLM output:\n{s}")
-
-    return json.loads(s[start:end+1])
-
 
 
 def analyze_text(req: AnalyzeRequest) -> AnalyzeResponse:
+    print("Analyzer working")
     print("=== Level ===")
     print(req.level)
     print("=== Level ===")
@@ -52,7 +31,6 @@ def analyze_text(req: AnalyzeRequest) -> AnalyzeResponse:
     print("=== RAW FROM LLM START ===")
     print(raw)
     print("=== RAW FROM LLM END ===")
-
 
     data = extract_json(raw) 
     return AnalyzeResponse(**data)
