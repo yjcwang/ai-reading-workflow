@@ -26,16 +26,26 @@ def extract_json(raw: str) -> dict:
 
 
 def analyze_text(req: AnalyzeRequest) -> AnalyzeResponse:
+    print("=== Level ===")
+    print(req.level)
+    print("=== Level ===")
     prompt = f"""
     You are an AI Japanese reading tutor.
-    Extract only the most worth-learning vocabulary and grammar from the given text.
+    The learner's level is: JLPT {req.level}.
+    STRICT REQUIREMENTS:
+    - Only extract vocabulary and grammar that are appropriate for JLPT {req.level}.
+    - If the text contains items that are TOO EASY or TOO DIFFICULT for JLPT {req.level}, DO NOT include them.
+    - Focus on items that are worth learning at this level.
+    Quality over Quantity.
+    R          eading must be hiragana only (no romaji, no katakana, no English).
+    Do NOT output generic patterns like "V1 + (te) + V2" or "N1 + N2". Only list named grammar patterns used in the text.
     Return ONLY valid JSON with this shape:
     {{
     "vocab": [{{"surface": "...", "reading": "...", "meaning_en": "...", "why": "..."}}],
     "grammar": [{{"pattern": "...", "explanation_en": "...", "example_from_text": "...", "notes": "..."}}]
     }}
 
-    Text:
+    Text: 
     {req.text}
     """
     raw = call_llm_json(prompt)
