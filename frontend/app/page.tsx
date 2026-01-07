@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { InputPanel } from "@/components/InputPanel";
 import { ResultPanel } from "@/components/ResultPanel";
 import { analyze } from "@/lib/api";
@@ -8,6 +8,9 @@ import type { AnalyzeResponse, Level } from "@/lib/types";
 import { explain } from "@/lib/api";
 import type { ExplainResponse } from "@/lib/types";
 import { ExplainModal } from "@/components/ExplainModal";
+
+type Theme = "light" | "dark";
+const THEME_KEY = "theme";
 
 export default function Page() {
   // create data and keep state
@@ -25,6 +28,30 @@ export default function Page() {
   const [explainError, setExplainError] = useState<string | null>(null);
   const [explainData, setExplainData] = useState<ExplainResponse | null>(null);
 
+  const [theme, setTheme] = useState<Theme>("light");
+
+  /* ---------- Switch theme ---------- */
+  useEffect(() => {
+    const saved = localStorage.getItem(THEME_KEY) as Theme | null;
+
+    const initial: Theme = saved === "dark" || saved === "light"
+      ? saved
+      : "light"; // 默认白色
+
+    setTheme(initial);
+    document.documentElement.dataset.theme = initial;
+  }, []);
+
+  function toggleTheme() {
+    setTheme((prev) => {
+      const next: Theme = prev === "light" ? "dark" : "light";
+      localStorage.setItem(THEME_KEY, next);
+      document.documentElement.dataset.theme = next;
+      return next;
+    });
+  }
+
+  /* ---------- Analyzer actions ---------- */
   async function onConfirm() {
     const text = draftText.trim();
     if (!text) return; // check no empty text
@@ -44,6 +71,7 @@ export default function Page() {
     }
   }
 
+  /* ---------- Explainer actions ---------- */
   async function handleExplainRequest(payload: { selectedText: string; context: string }) {
     // 打开 modal，先展示 loading
     setExplainOpen(true);
@@ -55,7 +83,7 @@ export default function Page() {
       const res = await explain(payload.selectedText, payload.context);
       setExplainData(res);
 
-      // ✅ 如果你未来要把结果也写进 ResultPanel：
+      // 如果你未来要把结果也写进 ResultPanel：
       // setData(prev => ({...prev, ...})) 或者维护 explainHistory
     } catch (e: any) {
       setExplainError(e?.message ?? "Unknown error");
@@ -63,7 +91,8 @@ export default function Page() {
       setExplainLoading(false);
     }
   }
-
+  
+  /* ---------- Clear all ---------- */
   function onClear() {
     // set all state back to initial
     setDraftText("");
@@ -77,6 +106,7 @@ export default function Page() {
     setExplainData(null);
   }
 
+  /* ---------- Render ---------- */
   return (
     <main style={page}>
       <div style={grid}>
@@ -90,6 +120,8 @@ export default function Page() {
           onConfirm={onConfirm}
           onClear={onClear}
           onExplainRequest={handleExplainRequest}
+          theme={theme}
+          onToggleTheme={toggleTheme}
         />
         <ResultPanel data={data} error={error} loading={loading} />
         <ExplainModal
@@ -100,20 +132,24 @@ export default function Page() {
           onClose={() => setExplainOpen(false)}
         />
       </div>
+
     </main>
   );
 }
 
+
+
 const page: React.CSSProperties = {
-  minHeight: "100vh",
-  padding: 20,
-  background: "#0b0c10",
-  color: "#e8e8ea",
-  fontFamily: "ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial",
+  height: "100vh",
+  overflow: "hidden",
+  padding: 16,
 };
 
 const grid: React.CSSProperties = {
+  height: "100%",
   display: "grid",
   gridTemplateColumns: "1fr 1fr",
-  gap: 14,
+  gap: 16,
+  minHeight: 0,
 };
+

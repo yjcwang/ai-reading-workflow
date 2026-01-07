@@ -71,10 +71,13 @@ export function ResultPanel({ data, error, loading}: Props) {
 }
 
 const card: React.CSSProperties = {
-  background: "#11131c",
-  border: "1px solid #23263a",
+  background: "var(--panel)",
+  border: "1px solid var(--border)",
   borderRadius: 16,
   padding: 14,
+  height: "100%",
+  overflowY: "auto",
+  minHeight: 0,
 };
 
 const rowBetween: React.CSSProperties = {
@@ -90,7 +93,7 @@ const twoCols: React.CSSProperties = {
   gap: 12,
 };
 
-const sectionTitle: React.CSSProperties = { fontWeight: 700, marginBottom: 8 };
+const sectionTitle: React.CSSProperties = { fontWeight: 500, marginBottom: 8 };
 
 const list: React.CSSProperties = {
   listStyle: "none",
@@ -102,8 +105,8 @@ const list: React.CSSProperties = {
 };
 
 const item: React.CSSProperties = {
-  border: "1px solid #23263a",
-  background: "#0d0f17",
+  border: "1px solid var(--border)",
+  background: "var(--surface)",
   borderRadius: 14,
   padding: 10,
 };

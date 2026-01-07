@@ -20,6 +20,9 @@ type Props = {
   onClear: () => void;
 
   onExplainRequest?: (payload: { selectedText: string; context: string }) => void;
+
+  theme: "light" | "dark";
+  onToggleTheme: () => void;
 };
 
 export function InputPanel({
@@ -31,7 +34,9 @@ export function InputPanel({
   loading,
   onConfirm,
   onClear,
-  onExplainRequest
+  onExplainRequest,
+  theme,
+  onToggleTheme
 }: Props) {
   const canConfirm = !loading && draftText.trim().length > 0; // control if can use confirm buttom
 
@@ -39,18 +44,29 @@ export function InputPanel({
     <div style={card}>
       <div style={rowBetween}>
         <div style={{ fontWeight: 700 }}>Input</div>
-        <select // level selcetion
-          value={level}
-          onChange={(e) => setLevel(e.target.value as Level)}
-          disabled={loading}
-          style={select}
-        >
-          {LEVELS.map((lv) => (
-            <option key={lv} value={lv}>
-              {lv}
-            </option>
-          ))}
-        </select>
+        <div style={rightTools}>
+          <button // toggle theme
+            style={ghostBtnSmall}
+            onClick={onToggleTheme}
+            disabled={loading}
+            className="btn-interactive"
+          >
+            {theme === "light" ? "Light" : "Dark"}
+          </button>
+          <select // level selcetion
+            value={level}
+            onChange={(e) => setLevel(e.target.value as Level)}
+            disabled={loading}
+            style={select}
+            className="btn-interactive"
+          >
+            {LEVELS.map((lv) => (
+              <option key={lv} value={lv}>
+                {lv}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       {!lockedText ? ( // two branch
@@ -82,11 +98,11 @@ export function InputPanel({
 
           <div style={{ marginTop: 10 }}>
             {loading ? (
-              <button style={ghostBtn} disabled>
+              <button style={ghostBtn} disabled >
                 Loading…
               </button>
             ) : (
-              <button style={ghostBtn} onClick={onClear}>
+              <button style={ghostBtn} onClick={onClear} className="btn-interactive">
                 Clear All
               </button>
             )}
@@ -97,9 +113,11 @@ export function InputPanel({
   );
 }
 
+
+
 const card: React.CSSProperties = {
-  background: "#11131c",
-  border: "1px solid #23263a",
+  background: "var(--panel)",
+  border: "1px solid var(--border)",
   borderRadius: 16,
   padding: 14,
 };
@@ -112,10 +130,10 @@ const rowBetween: React.CSSProperties = {
 };
 
 const select: React.CSSProperties = {
-  background: "#141622",
-  color: "#e8e8ea",
-  border: "1px solid #23263a",
-  borderRadius: 10,
+  background: "var(--surface)",
+  color: "var(--text)",
+  border: "1px solid var(--border)",
+  borderRadius: 14,
   padding: "8px 10px",
 };
 
@@ -125,9 +143,9 @@ const textarea: React.CSSProperties = {
   resize: "vertical",
   borderRadius: 14,
   padding: 12,
-  border: "1px solid #2a2d41",
-  background: "#0d0f17",
-  color: "#e8e8ea",
+  border: "1px solid var(--border-strong)",
+  background: "var(--surface)",
+  color: "var(--text)",
   outline: "none",
   lineHeight: 1.5,
 };
@@ -138,27 +156,39 @@ const lockedBox: React.CSSProperties = {
   overflow: "auto",
   borderRadius: 14,
   padding: 12,
-  border: "1px solid #2a2d41",
-  background: "#0d0f17",
+  border: "1px solid var(--border-strong)",
+  background: "var(--surface)",
   whiteSpace: "pre-wrap",
   lineHeight: 1.5,
 };
 
 const primaryBtn: React.CSSProperties = {
-  border: "1px solid #2a2d41",
-  background: "#e8e8ea",
-  color: "#0b0c10",
-  borderRadius: 12,
+  border: "1px solid var(--border-strong)",
+  background: "var(--text)",
+  color: "var(--text-invert)",
+  borderRadius: 14,
   padding: "10px 12px",
   cursor: "pointer",
   fontWeight: 700,
 };
 
 const ghostBtn: React.CSSProperties = {
-  border: "1px solid #2a2d41",
+  border: "1px solid var(--border-strong)",
   background: "transparent",
-  color: "#e8e8ea",
-  borderRadius: 12,
+  color: "var(--text)",
+  borderRadius: 14,
   padding: "10px 12px",
   cursor: "pointer",
+};
+
+const rightTools: React.CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  gap: 10,
+};
+
+const ghostBtnSmall: React.CSSProperties = {
+  ...ghostBtn,
+  padding: "8px 10px",
+  borderRadius: 14,
 };

@@ -129,6 +129,7 @@ export function LockedTextViewer({ text, style, onExplainRequest, disabled }: Pr
         <button
           onClick={handleExplainClick}
           disabled={disabled}
+          className="btn-interactive"
           style={{
             position: "fixed",
             top: btnPos.top,
@@ -136,9 +137,13 @@ export function LockedTextViewer({ text, style, onExplainRequest, disabled }: Pr
             zIndex: 9999,
 
             padding: "6px 10px",
-            borderRadius: 8,
-            border: "1px solid #ccc",
-            background: "white",
+            borderRadius: 12,
+            border: "1px solid var(--border)",
+            background: "rgba(var(--accent-rgb), 0.1)",
+            backdropFilter: "blur(3px)",
+            WebkitBackdropFilter: "blur(3px)",
+
+            color: "var(--text)",
             cursor: "pointer",
             boxShadow: "0 6px 18px rgba(0,0,0,0.12)",
           }}

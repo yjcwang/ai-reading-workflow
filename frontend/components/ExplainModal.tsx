@@ -12,7 +12,7 @@ type Props = {
 };
 
 export function ExplainModal({ open, loading, error, data, onClose }: Props) {
-  // ESC 关闭（可选但很好用）
+  // ESC 关闭
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
       if (e.key === "Escape") onClose();
@@ -24,58 +24,21 @@ export function ExplainModal({ open, loading, error, data, onClose }: Props) {
   if (!open) return null;
 
   return (
-    <div
-      onMouseDown={onClose} // 点背景关闭
-      style={{
-        position: "fixed",
-        inset: 0,
-        zIndex: 9998,
-        // 遮罩层颜色
-        background: "rgba(0, 0, 0, 0)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: 16,
-      }}
-    >
-      <div
-        onMouseDown={(e) => e.stopPropagation()} // 防止点卡片内部也关闭
-        style={{
-          width: "min(720px, 100%)",
-          borderRadius: 14,
-          // 悬浮窗背景
-          background: "rgba(0,0,0,0.35)",
-          // 毛玻璃模糊效果
-          backdropFilter: "blur(8px)", 
-          // 兼容性：为了适配 Safari 浏览器
-          WebkitBackdropFilter: "blur(8px)",
-          border: "1px solid #ddd",
-          boxShadow: "0 10px 30px rgba(0,0,0,0.18)",
-          padding: 16,
-        }}
-      >
-        <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
-          <div style={{ fontWeight: 800 }}>Explain</div>
-          <button
-            onClick={onClose}
-            style={{
-              border: "1px solid #ccc",
-              borderRadius: 8,
-              padding: "4px 10px",
-              background: "white",
-              cursor: "pointer",
-            }}
-          >
+    <div onMouseDown={onClose} style={overlay}>
+      <div onMouseDown={(e) => e.stopPropagation()} style={modalCard}>
+        <div style={headerRow}>
+          <div style={title}>Explain</div>
+          <button onClick={onClose} style={closeBtn} className="btn-interactive">
             Close
           </button>
         </div>
 
-        <div style={{ marginTop: 12 }}>
+        <div style={body}>
           {loading && <div>Loading…</div>}
-          {!loading && error && <div style={{ color: "crimson" }}>{error}</div>}
+          {!loading && error && <div style={errorText}>{error}</div>}
 
           {!loading && !error && data && (
-            <div style={{ display: "grid", gap: 10 }}>
+            <div style={contentGrid}>
               <div>
                 <b>Type:</b> {data.type}
               </div>
@@ -92,9 +55,7 @@ export function ExplainModal({ open, loading, error, data, onClose }: Props) {
               </div>
               <div>
                 <b>Example:</b>
-                <div style={{ marginTop: 4, padding: 10, border: "1px solid #eee", borderRadius: 10 }}>
-                  {data.example}
-                </div>
+                <div style={exampleBox}>{data.example}</div>
               </div>
               {data.notes ? (
                 <div>
@@ -108,3 +69,77 @@ export function ExplainModal({ open, loading, error, data, onClose }: Props) {
     </div>
   );
 }
+
+/** styles */
+
+const overlay: React.CSSProperties = {
+  position: "fixed",
+  inset: 0,
+  zIndex: 9998,
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  padding: 16,
+
+  // 遮罩层放一点透明度
+  background: "rgba(0, 0, 0, 0.15)",
+};
+
+const modalCard: React.CSSProperties = {
+  width: "min(720px, 100%)",
+  borderRadius: 14,
+
+  // 卡片本体用深色半透明 + 毛玻璃
+  background: "rgba(var(--panel-rgb), 0.5)",
+  backdropFilter: "blur(8px)",
+  WebkitBackdropFilter: "blur(8px)",
+
+  border: "1px solid var(--border)",
+  boxShadow: "var(--shadow)",
+  padding: 16,
+
+  color: "var(--text)",
+};
+
+const headerRow: React.CSSProperties = {
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  gap: 12,
+};
+
+const title: React.CSSProperties = {
+  fontWeight: 800,
+};
+
+const closeBtn: React.CSSProperties = {
+  borderRadius: 12,
+  padding: "6px 10px",
+  background: "rgba(var(--accent-rgb), 0.2)", 
+  border: "1px solid var(--border)",
+  color: "var(--text)",
+  cursor: "pointer",
+  boxShadow: "0 6px 18px rgba(0,0,0,0.12)",
+  outline: "none",
+};
+
+const body: React.CSSProperties = {
+  marginTop: 12,
+};
+
+const errorText: React.CSSProperties = {
+  color: "crimson",
+};
+
+const contentGrid: React.CSSProperties = {
+  display: "grid",
+  gap: 10,
+};
+
+const exampleBox: React.CSSProperties = {
+  marginTop: 4,
+  padding: 10,
+  border: "1px solid var(--border)",
+  borderRadius: 10,
+  background: "transparent",
+};
