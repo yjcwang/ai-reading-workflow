@@ -5,6 +5,9 @@ import { InputPanel } from "@/components/InputPanel";
 import { ResultPanel } from "@/components/ResultPanel";
 import { analyze } from "@/lib/api";
 import type { AnalyzeResponse, Level } from "@/lib/types";
+import { explain } from "@/lib/api";
+import type { ExplainResponse } from "@/lib/types";
+import { ExplainModal } from "@/components/ExplainModal";
 
 export default function Page() {
   // create data and keep state
@@ -16,6 +19,11 @@ export default function Page() {
   const [data, setData] = useState<AnalyzeResponse>({ vocab: [], grammar: [] });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const [explainOpen, setExplainOpen] = useState(false);
+  const [explainLoading, setExplainLoading] = useState(false);
+  const [explainError, setExplainError] = useState<string | null>(null);
+  const [explainData, setExplainData] = useState<ExplainResponse | null>(null);
 
   async function onConfirm() {
     const text = draftText.trim();
@@ -36,12 +44,37 @@ export default function Page() {
     }
   }
 
+  async function handleExplainRequest(payload: { selectedText: string; context: string }) {
+    // 打开 modal，先展示 loading
+    setExplainOpen(true);
+    setExplainLoading(true);
+    setExplainError(null);
+    setExplainData(null);
+
+    try {
+      const res = await explain(payload.selectedText, payload.context);
+      setExplainData(res);
+
+      // ✅ 如果你未来要把结果也写进 ResultPanel：
+      // setData(prev => ({...prev, ...})) 或者维护 explainHistory
+    } catch (e: any) {
+      setExplainError(e?.message ?? "Unknown error");
+    } finally {
+      setExplainLoading(false);
+    }
+  }
+
   function onClear() {
     // set all state back to initial
     setDraftText("");
     setLockedText(null);
     setData({ vocab: [], grammar: [] });
     setError(null);
+
+    setExplainOpen(false);
+    setExplainLoading(false);
+    setExplainError(null);
+    setExplainData(null);
   }
 
   return (
@@ -56,8 +89,16 @@ export default function Page() {
           loading={loading}
           onConfirm={onConfirm}
           onClear={onClear}
+          onExplainRequest={handleExplainRequest}
         />
         <ResultPanel data={data} error={error} loading={loading} />
+        <ExplainModal
+          open={explainOpen}
+          loading={explainLoading}
+          error={explainError}
+          data={explainData}
+          onClose={() => setExplainOpen(false)}
+        />
       </div>
     </main>
   );

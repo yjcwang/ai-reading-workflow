@@ -21,3 +21,15 @@ export type AnalyzeResponse = {
   vocab: VocabItem[];
   grammar: GrammarItem[];
 };
+
+// lib/types.ts
+export type ExplainType = "vocab" | "grammar" | "phrase";
+
+export type ExplainResponse = {
+  type: ExplainType;
+  surface: string;
+  reading?: string | null;
+  meaning_en: string;
+  example: string;
+  notes?: string | null;
+};

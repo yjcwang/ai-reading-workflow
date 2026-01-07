@@ -2,6 +2,7 @@
 
 import React from "react";
 import type { Level } from "@/lib/types";
+import { LockedTextViewer } from "@/components/LockedTextViewer";
 
 const LEVELS: Level[] = ["N5", "N4", "N3", "N2", "N1"];
 
@@ -17,6 +18,8 @@ type Props = {
   loading: boolean;
   onConfirm: () => void;
   onClear: () => void;
+
+  onExplainRequest?: (payload: { selectedText: string; context: string }) => void;
 };
 
 export function InputPanel({
@@ -28,6 +31,7 @@ export function InputPanel({
   loading,
   onConfirm,
   onClear,
+  onExplainRequest
 }: Props) {
   const canConfirm = !loading && draftText.trim().length > 0; // control if can use confirm buttom
 
@@ -69,7 +73,12 @@ export function InputPanel({
         </>
       ) : (
         <>
-          <div style={lockedBox}>{lockedText}</div>
+          <LockedTextViewer
+            text={lockedText}
+            style={lockedBox}
+            disabled={loading}
+            onExplainRequest={(payload) => onExplainRequest?.(payload)}
+          />
 
           <div style={{ marginTop: 10 }}>
             {loading ? (
