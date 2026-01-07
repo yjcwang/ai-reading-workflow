@@ -1,6 +1,7 @@
 from app.schemas import AnalyzeRequest, AnalyzeResponse
 from app.services.utils import extract_json
 from app.services.llm import call_llm_json
+from app.config import settings
 
 
 def analyze_text(req: AnalyzeRequest) -> AnalyzeResponse:
@@ -8,6 +9,8 @@ def analyze_text(req: AnalyzeRequest) -> AnalyzeResponse:
     print("=== Level ===")
     print(req.level)
     print("=== Level ===")
+    
+    provider = settings.LLM_PROVIDER_ANALYZER # donot use os.getenv
     prompt = f"""
     You are an AI Japanese reading tutor.
     The learner's level is: JLPT {req.level}.
@@ -27,7 +30,7 @@ def analyze_text(req: AnalyzeRequest) -> AnalyzeResponse:
     Text: 
     {req.text}
     """
-    raw = call_llm_json(prompt)
+    raw = call_llm_json(prompt, provider)
     print("=== RAW FROM LLM START ===")
     print(raw)
     print("=== RAW FROM LLM END ===")

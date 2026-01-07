@@ -5,6 +5,9 @@ from app.config import settings
 import httpx
 
 def _mock_json_output(prompt: str) -> str:
+    print("=== llm ===")
+    print("MOCK")
+    print("=== llm ===")
     return json.dumps({
         "vocab": [
             {"surface": "(Mock) 練習", "reading": "れんしゅう", "meaning_en": "practice", "why": "Appears in study contexts; high frequency."},
@@ -16,6 +19,10 @@ def _mock_json_output(prompt: str) -> str:
     }, ensure_ascii=False)
 
 def _call_ollama(prompt: str) -> str:
+    print("=== llm ===")
+    print("OLLAMA")
+    print(settings.OLLAMA_MODEL)
+    print("=== llm ===")
     model = settings.OLLAMA_MODEL
     url = "http://127.0.0.1:11434/api/generate"
     
@@ -37,6 +44,10 @@ def _call_ollama(prompt: str) -> str:
     return data["response"]
 
 def _call_openai(prompt: str) -> str:
+    print("=== llm ===")
+    print("OPENAI")
+    print(settings.OPENAI_MODEL)
+    print("=== llm ===")
     client = OpenAI(api_key=settings.OPENAI_API_KEY)
 
     resp = client.chat.completions.create(
@@ -51,6 +62,10 @@ def _call_openai(prompt: str) -> str:
     return resp.choices[0].message.content
 
 def _call_gemini(prompt: str) -> str:
+    print("=== llm ===")
+    print("GEMINI")
+    print(settings.GEMINI_MODEL)
+    print("=== llm ===")
     genai.configure(api_key=settings.GEMINI_API_KEY)
 
     model = genai.GenerativeModel(
@@ -68,13 +83,8 @@ def _call_gemini(prompt: str) -> str:
     return response.text
 
 
-def call_llm_json(prompt: str) -> str:
-    provider = settings.LLM_PROVIDER # donot use os.getenv
-
-    print("=== llm ===")
-    print(provider)
-    print("=== llm ===")
-
+def call_llm_json(prompt: str, provider: str) -> str:
+    
     if provider == "mock":
         return _mock_json_output(prompt)
     

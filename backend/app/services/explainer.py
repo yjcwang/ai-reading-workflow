@@ -1,10 +1,12 @@
 from app.schemas import ExplainRequest, ExplainResponse
 from app.services.utils import extract_json
 from app.services.llm import call_llm_json
-
+from app.config import settings
 
 def explain_selection(req: ExplainRequest) -> ExplainResponse:
     print("Explainer working")
+
+    provider = settings.LLM_PROVIDER_EXPLAINER # donot use os.getenv
     prompt = f"""
     You are a Japanese language assistant.
 
@@ -28,7 +30,7 @@ def explain_selection(req: ExplainRequest) -> ExplainResponse:
     "notes": string | null
     }}
     """
-    raw = call_llm_json(prompt)
+    raw = call_llm_json(prompt, provider)
     print("=== RAW FROM LLM START ===")
     print(raw)
     print("=== RAW FROM LLM END ===")

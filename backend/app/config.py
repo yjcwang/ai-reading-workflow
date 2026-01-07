@@ -4,7 +4,8 @@ from typing import Literal
 # entrance to get env setting (e.g OpenAI key, temperature)
 
 class Settings(BaseSettings):
-    LLM_PROVIDER: Literal["openai", "gemini", "mock", "ollama"] = "mock"
+    LLM_PROVIDER_ANALYZER: Literal["openai", "gemini", "mock", "ollama"] = "gemini"
+    LLM_PROVIDER_EXPLAINER: Literal["openai", "gemini", "mock", "ollama"] = "ollama"
 
     OPENAI_API_KEY: str | None = None
     OPENAI_MODEL: str = "gpt-4o-mini"
