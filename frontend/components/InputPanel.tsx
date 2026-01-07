@@ -79,10 +79,10 @@ export function InputPanel({
             disabled={loading}
           />
           <div style={{ display: "flex", gap: 10, marginTop: 10 }}>
-            <button style={primaryBtn} onClick={onConfirm} disabled={!canConfirm}>
+            <button style={primaryBtn} onClick={onConfirm} disabled={!canConfirm} className="btn-interactive">
               Confirm
             </button>
-            <button style={ghostBtn} onClick={onClear} disabled={loading && draftText.length === 0}>
+            <button style={ghostBtn} onClick={onClear} disabled={loading && draftText.length === 0} className="btn-interactive">
               Clear
             </button>
           </div>
@@ -98,7 +98,7 @@ export function InputPanel({
 
           <div style={{ marginTop: 10 }}>
             {loading ? (
-              <button style={ghostBtn} disabled >
+              <button style={ghostBtn} disabled className="btn-interactive" >
                 Loading…
               </button>
             ) : (

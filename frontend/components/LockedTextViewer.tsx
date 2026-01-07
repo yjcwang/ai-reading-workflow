@@ -135,6 +135,7 @@ export function LockedTextViewer({ text, style, onExplainRequest, disabled }: Pr
             top: btnPos.top,
             left: btnPos.left,
             zIndex: 9999,
+            fontWeight: 600,
 
             padding: "6px 10px",
             borderRadius: 12,
