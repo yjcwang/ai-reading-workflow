@@ -56,13 +56,28 @@ export function LockedTextViewer({ text, style, onExplainRequest, disabled }: Pr
       return;
     }
 
-    // 2) 获取选中区域的位置，用来定位按钮（用 fixed 更稳，不会被 overflow 裁掉）
-    const rect = sel.getRangeAt(0).getBoundingClientRect();
+    // 滚动边界检测 
+    
+    // 1. 获取容器（lockedBox）相对于视口的矩形
+    const containerRect = el.getBoundingClientRect();
+    // 2. 获取选区相对于视口的矩形
+    const selRect = sel.getRangeAt(0).getBoundingClientRect();
+
+    const isVisible = 
+      selRect.bottom > containerRect.top && 
+      selRect.top < containerRect.bottom;
+
+    if (!isVisible) { // 如果文字不可见，直接隐藏按钮和文字高亮
+      setBtnPos(null); 
+      setSelectedText("");
+      window.getSelection()?.removeAllRanges();
+      return;
+    }
 
     // 计算按钮位置：在选区右下角稍微偏移一点
     const margin = 8;
-    let top = rect.bottom + margin;
-    let left = rect.right + margin;
+    let top = selRect.bottom + margin;
+    let left = selRect.right + margin;
 
     // 防止按钮跑出屏幕右侧
     const BTN_W = 90;
@@ -71,7 +86,7 @@ export function LockedTextViewer({ text, style, onExplainRequest, disabled }: Pr
     // 防止按钮跑出屏幕底部（简单处理：如果太靠下，就放到上面）
     const BTN_H = 32;
     if (top > window.innerHeight - BTN_H - 8) {
-      top = rect.top - BTN_H - margin;
+      top = selRect.top - BTN_H - margin;
     }
 
     setSelectedText(t);

@@ -152,7 +152,7 @@ const textarea: React.CSSProperties = {
 
 const lockedBox: React.CSSProperties = {
   width: "100%",
-  height: 320,
+  height: "70vh",
   overflow: "auto",
   borderRadius: 14,
   padding: 12,
