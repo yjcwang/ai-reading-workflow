@@ -6,16 +6,16 @@ export type VocabItem = {
   surface: string;
   reading?: string;
   meaning_en: string;
-  why: string;
+  example: string;
+  notes?: string;
 };
 
 export type GrammarItem = {
   pattern: string;
   explanation_en: string;
-  example_from_text: string;
+  example: string;
   notes?: string;
 };
-// todo:Change optional
 
 export type AnalyzeResponse = {
   vocab: VocabItem[];
@@ -23,7 +23,7 @@ export type AnalyzeResponse = {
 };
 
 // lib/types.ts
-export type ExplainType = "vocab" | "grammar" | "phrase";
+export type ExplainType = "vocab" | "grammar";
 
 export type ExplainResponse = {
   type: ExplainType;

@@ -19,12 +19,12 @@ def analyze_text(req: AnalyzeRequest) -> AnalyzeResponse:
     - If the text contains items that are TOO EASY or TOO DIFFICULT for JLPT {req.level}, DO NOT include them.
     - Focus on items that are worth learning at this level.
     Quality over Quantity.
-    R          eading must be hiragana only (no romaji, no katakana, no English).
+    Reading must be hiragana only (no romaji, no katakana, no English).
     Do NOT output generic patterns like "V1 + (te) + V2" or "N1 + N2". Only list named grammar patterns used in the text.
     Return ONLY valid JSON with this shape:
     {{
-    "vocab": [{{"surface": "...", "reading": "...", "meaning_en": "...", "why": "..."}}],
-    "grammar": [{{"pattern": "...", "explanation_en": "...", "example_from_text": "...", "notes": "..."}}]
+    "vocab": [{{"surface": "...", "reading": "...", "meaning_en": "...", "example": "...", "notes": "..."}}],
+    "grammar": [{{"pattern": "...", "explanation_en": "...", "example": "...", "notes": "..."}}]
     }}
 
     Text: 
@@ -34,6 +34,8 @@ def analyze_text(req: AnalyzeRequest) -> AnalyzeResponse:
     print("=== RAW FROM LLM START ===")
     print(raw)
     print("=== RAW FROM LLM END ===")
+
+    # dspy
 
     data = extract_json(raw) 
     return AnalyzeResponse(**data)

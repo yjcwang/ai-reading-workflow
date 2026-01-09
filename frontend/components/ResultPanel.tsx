@@ -38,7 +38,8 @@ export function ResultPanel({ data, error, loading}: Props) {
                 <li key={i} style={item}>
                   <div style={{ fontWeight: 700 }}>{v.surface} {v.reading ? <span style={muted}>({v.reading})</span> : null}</div>
                   {v.meaning_en ? <div style={muted}>{v.meaning_en}</div> : null}
-                  {v.why ? <div style={mutedSmall}>{v.why}</div> : null}
+                  {v.example ? <div style={example}>{v.example}</div> : null}
+                  {v.notes ? <div style={mutedSmall}>{v.notes}</div> : null}
                 </li>
               ))
             )}
@@ -58,7 +59,7 @@ export function ResultPanel({ data, error, loading}: Props) {
                 <li key={i} style={item}>
                   <div style={{ fontWeight: 700 }}>{g.pattern}</div>
                   {g.explanation_en ? <div style={muted}>{g.explanation_en}</div> : null}
-                  {g.example_from_text ? <div style={example}>{g.example_from_text}</div> : null}
+                  {g.example ? <div style={example}>{g.example}</div> : null}
                   {g.notes ? <div style={mutedSmall}>{g.notes}</div> : null}
                 </li>
               ))

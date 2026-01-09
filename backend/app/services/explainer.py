@@ -13,7 +13,7 @@ def explain_selection(req: ExplainRequest) -> ExplainResponse:
     Decide whether the selected text is a vocabulary item or a grammar pattern,
     then explain it for a learner.
     For vocab, output exactly ONE reading in hiragana. If unsure, set reading to null.
-
+    Output an example in Japanese.
     Output ONLY valid JSON. No markdown. No extra text.
 
     Input:
@@ -22,7 +22,7 @@ def explain_selection(req: ExplainRequest) -> ExplainResponse:
 
     Output format:
     {{
-    "type": "vocab" | "grammar" | "phrase",
+    "type": "vocab" | "grammar",
     "surface": string,
     "reading": string | null,
     "meaning_en": string,

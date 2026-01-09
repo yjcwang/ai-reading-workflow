@@ -11,12 +11,13 @@ class VocabItem(BaseModel):
     surface: str
     reading: Optional[str] = None
     meaning_en: str
-    why: str = Field(..., description="Why this word is worth learning (context-based)")
+    example: str
+    notes: Optional[str] = None
 
 class GrammarItem(BaseModel):
     pattern: str
     explanation_en: str
-    example_from_text: str
+    example: str
     notes: Optional[str] = None
 
 class AnalyzeResponse(BaseModel):
@@ -24,7 +25,7 @@ class AnalyzeResponse(BaseModel):
     grammar: List[GrammarItem]
 
 
-ExplainType = Literal["vocab", "grammar", "phrase"]    
+ExplainType = Literal["vocab", "grammar"]    
 
 class ExplainRequest(BaseModel):
     selected_text: str = Field(..., min_length=1)
