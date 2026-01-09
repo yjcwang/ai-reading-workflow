@@ -4,19 +4,42 @@ import google.generativeai as genai
 from app.config import settings
 import httpx
 
+import json
+
 def _mock_json_output(prompt: str) -> str:
     print("=== llm ===")
-    print("MOCK")
+    print("MOCK (AnalyzeResponse)")
     print("=== llm ===")
-    return json.dumps({
+    
+    # 按照 AnalyzeResponse 的结构组织数据
+    mock_data = {
         "vocab": [
-            {"surface": "(Mock) 練習", "reading": "れんしゅう", "meaning_en": "practice", "why": "Appears in study contexts; high frequency."},
-            {"surface": "(Mock) 助言", "reading": "じょげん", "meaning_en": "advice", "why": "Common in academic/work settings."}
+            {
+                "surface": "(Mock) 練習",
+                "reading": "れんしゅう",
+                "meaning_en": "practice",
+                "example": "毎日ピアノを練習します。",  # 新 Schema 中的必填项
+                "notes": "Appears in study contexts; high frequency." # 原 why 改为 notes
+            },
+            {
+                "surface": "(Mock) 助言",
+                "reading": "じょげん",
+                "meaning_en": "advice",
+                "example": "先生から助言をもらいました。",
+                "notes": "Common in academic/work settings."
+            }
         ],
         "grammar": [
-            {"pattern": "(Mock) 〜てみる", "explanation_en": "Try doing something.", "example_from_text": "（例）やってみる", "notes": "Often used for attempts."}
+            {
+                "pattern": "(Mock) 〜てみる",
+                "explanation_en": "Try doing something.",
+                "example": "やってみる", # 原 example_from_text 改为 example
+                "notes": "Often used for attempts."
+            }
         ]
-    }, ensure_ascii=False)
+    }
+
+    return json.dumps(mock_data, ensure_ascii=False)
 
 def _call_ollama(prompt: str) -> str:
     print("=== llm ===")
