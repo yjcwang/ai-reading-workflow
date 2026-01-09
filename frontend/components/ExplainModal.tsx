@@ -100,6 +100,7 @@ const modalCard: React.CSSProperties = {
   boxShadow: "var(--shadow)",
   padding: 20,
   color: "var(--text)",
+  transform: "translateY(-40px)",
 };
 
 const headerRow: React.CSSProperties = {

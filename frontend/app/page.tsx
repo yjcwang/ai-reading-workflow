@@ -135,6 +135,23 @@ export default function Page() {
   });
 }
 
+
+/* ---------- Delete from list on ResultPanel ---------- */
+function handleDeleteVocab(surface: string) {
+  setData((prev) => ({
+    ...prev,
+    vocab: prev.vocab.filter((v) => v.surface !== surface),
+  }));
+}
+
+function handleDeleteGrammar(pattern: string) {
+  setData((prev) => ({
+    ...prev,
+    grammar: prev.grammar.filter((g) => g.pattern !== pattern),
+  }));
+}
+
+
   /* ---------- Render ---------- */
   return (
     <main style={page}>
@@ -156,6 +173,8 @@ export default function Page() {
           data={data} 
           error={error} 
           loading={loading} 
+          onDeleteVocab={handleDeleteVocab}
+          onDeleteGrammar={handleDeleteGrammar}
         />
         <ExplainModal
           open={explainOpen}

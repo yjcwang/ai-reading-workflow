@@ -10,10 +10,10 @@ def explain_selection(req: ExplainRequest) -> ExplainResponse:
     prompt = f"""
     You are a Japanese language assistant.
 
-    Decide whether the selected text is a vocabulary item or a grammar pattern,
+    Decide first in "type" whether the selected text is a vocabulary or a grammar,
     then explain it for a learner.
     For vocab, output exactly ONE reading in hiragana. If unsure, set reading to null.
-    Output an example in Japanese.
+    Output an example in Japanese and additionally notes if necessary.
     Output ONLY valid JSON. No markdown. No extra text.
 
     Input:

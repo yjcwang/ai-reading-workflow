@@ -7,11 +7,13 @@ type Props = {
   data: AnalyzeResponse;
   error: string | null;
   loading: boolean;
+  onDeleteVocab: (surface: string) => void;   
+  onDeleteGrammar: (pattern: string) => void;
 };
 
-export function ResultPanel({ data, error, loading}: Props) {
+export function ResultPanel({ data, error, loading, onDeleteVocab, onDeleteGrammar}: Props) {
   return ( 
-    // informatiion display top margin
+    // information display top margin
     <div style={card}> 
       <div style={rowBetween}>
         <div style={{ fontWeight: 700 }}>Result</div>
@@ -25,7 +27,7 @@ export function ResultPanel({ data, error, loading}: Props) {
 
       {/*Content*/}
       <div style={twoCols}>
-        <div>
+        <div> {/*Vocab item*/}
           <div style={sectionTitle}>Vocabulary</div>
           <ul style={list}> 
             {loading ? (
@@ -35,8 +37,17 @@ export function ResultPanel({ data, error, loading}: Props) {
               <li style={empty}>None</li>
             ) : (
               data.vocab.map((v, i) => (
-                <li key={i} style={item}>
+                <li key={v.surface} style={item}> 
                   <div style={{ fontWeight: 700 }}>{v.surface} {v.reading ? <span style={muted}>({v.reading})</span> : null}</div>
+                  {/*delete button*/}
+                  <button
+                    className="btn-interactive"
+                    style={deleteBtn}
+                    onClick={() => onDeleteVocab(v.surface)}
+                    title="Delete"
+                  >
+                    Delete
+                  </button>
                   {v.meaning_en ? <div style={muted}>{v.meaning_en}</div> : null}
                   {v.example ? <div style={example}>{v.example}</div> : null}
                   {v.notes ? <div style={mutedSmall}>{v.notes}</div> : null}
@@ -46,7 +57,7 @@ export function ResultPanel({ data, error, loading}: Props) {
           </ul>
         </div>
 
-        <div>
+        <div> {/*Grammar item*/}
           <div style={sectionTitle}>Grammar</div>
           <ul style={list}>
             {loading ? (
@@ -56,8 +67,17 @@ export function ResultPanel({ data, error, loading}: Props) {
               <li style={empty}>None</li>
             ) : (
               data.grammar.map((g, i) => (
-                <li key={i} style={item}>
+                <li key={g.pattern} style={item}>
                   <div style={{ fontWeight: 700 }}>{g.pattern}</div>
+                  {/*delete button*/}
+                  <button
+                    className="btn-interactive"
+                    style={deleteBtn}
+                    onClick={() => onDeleteGrammar(g.pattern)}
+                    title="Delete"
+                  >
+                    Delete
+                  </button>
                   {g.explanation_en ? <div style={muted}>{g.explanation_en}</div> : null}
                   {g.example ? <div style={example}>{g.example}</div> : null}
                   {g.notes ? <div style={mutedSmall}>{g.notes}</div> : null}
@@ -110,6 +130,19 @@ const item: React.CSSProperties = {
   background: "var(--surface)",
   borderRadius: 14,
   padding: 10,
+  position: "relative", 
+  paddingRight: 56,
+};
+
+const deleteBtn: React.CSSProperties = {
+  borderRadius: 12,
+  padding: "6px 10px",
+  background: "rgba(var(--accent-rgb), 0.2)",
+  border: "1px solid var(--border)",
+  position: "absolute", 
+  top: 10,
+  right: 10,
+  color: "var(--text)",
 };
 
 const empty: React.CSSProperties = { opacity: 0.6, padding: 10 };
