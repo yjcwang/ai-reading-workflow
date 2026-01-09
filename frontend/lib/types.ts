@@ -1,4 +1,3 @@
-// define structure of response 
 
 export type Level = "N5" | "N4" | "N3" | "N2" | "N1";
 
@@ -22,7 +21,6 @@ export type AnalyzeResponse = {
   grammar: GrammarItem[];
 };
 
-// lib/types.ts
 export type ExplainType = "vocab" | "grammar";
 
 export type ExplainResponse = {

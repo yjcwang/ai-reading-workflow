@@ -7,6 +7,7 @@ import httpx
 import json
 
 def _mock_json_output(prompt: str) -> str:
+    # TODO: Mock currently only works for Analyzer
     print("=== llm ===")
     print("MOCK (AnalyzeResponse)")
     print("=== llm ===")
@@ -18,8 +19,8 @@ def _mock_json_output(prompt: str) -> str:
                 "surface": "(Mock) 練習",
                 "reading": "れんしゅう",
                 "meaning_en": "practice",
-                "example": "毎日ピアノを練習します。",  # 新 Schema 中的必填项
-                "notes": "Appears in study contexts; high frequency." # 原 why 改为 notes
+                "example": "毎日ピアノを練習します。", 
+                "notes": "Appears in study contexts; high frequency."
             },
             {
                 "surface": "(Mock) 助言",
@@ -33,7 +34,7 @@ def _mock_json_output(prompt: str) -> str:
             {
                 "pattern": "(Mock) 〜てみる",
                 "explanation_en": "Try doing something.",
-                "example": "やってみる", # 原 example_from_text 改为 example
+                "example": "やってみる", 
                 "notes": "Often used for attempts."
             }
         ]

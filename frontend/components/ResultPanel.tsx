@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import type { AnalyzeResponse } from "@/lib/types";
+import type { AnalyzeResponse} from "@/lib/types";
 
 type Props = {
   data: AnalyzeResponse;

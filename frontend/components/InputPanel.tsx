@@ -16,7 +16,7 @@ type Props = {
   lockedText: string | null;
 
   loading: boolean;
-  onConfirm: () => void;
+  onAnalyzeRequest: () => void;
   onClear: () => void;
 
   onExplainRequest?: (payload: { selectedText: string; context: string }) => void;
@@ -32,7 +32,7 @@ export function InputPanel({
   setDraftText,
   lockedText,
   loading,
-  onConfirm,
+  onAnalyzeRequest: onConfirm,
   onClear,
   onExplainRequest,
   theme,
@@ -53,7 +53,7 @@ export function InputPanel({
           >
             {theme === "light" ? "Light" : "Dark"}
           </button>
-          <select // level selcetion
+          <select // level selection
             value={level}
             onChange={(e) => setLevel(e.target.value as Level)}
             disabled={loading}
@@ -69,7 +69,7 @@ export function InputPanel({
         </div>
       </div>
 
-      {!lockedText ? ( // two branch
+      {!lockedText ? ( 
         <>
           <textarea
             value={draftText}
@@ -89,7 +89,7 @@ export function InputPanel({
         </>
       ) : (
         <>
-          <LockedTextViewer
+          <LockedTextViewer  // if text locked, then throw it to LockedTextViewer 
             text={lockedText}
             style={lockedBox}
             disabled={loading}

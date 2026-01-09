@@ -6,17 +6,14 @@ type ExplainRequestPayload = {
   selectedText: string;
   // 先最省事：把整段 lockedText 当 context
   // 以后你要升级成“选中附近一句”，也只改这里或上层
+  // TODO: change context selection
   context: string;
 };
 
 type Props = {
   text: string;
   style?: React.CSSProperties;
-
-  // 点击 Explain 时，把 selectedText/context 抛给上层
   onExplainRequest: (payload: ExplainRequestPayload) => void;
-
-  // 上层 loading 时可以禁用
   disabled?: boolean;
 };
 
@@ -57,10 +54,7 @@ export function LockedTextViewer({ text, style, onExplainRequest, disabled }: Pr
     }
 
     // 滚动边界检测 
-    
-    // 1. 获取容器（lockedBox）相对于视口的矩形
     const containerRect = el.getBoundingClientRect();
-    // 2. 获取选区相对于视口的矩形
     const selRect = sel.getRangeAt(0).getBoundingClientRect();
 
     const isVisible = 
@@ -125,7 +119,7 @@ export function LockedTextViewer({ text, style, onExplainRequest, disabled }: Pr
 
     onExplainRequest({
       selectedText,
-      context: text, // MVP：先整段上下文
+      context: text, 
     });
 
     // 点击后可以隐藏按钮（避免重复触发）

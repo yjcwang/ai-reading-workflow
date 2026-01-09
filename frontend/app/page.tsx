@@ -13,7 +13,7 @@ type Theme = "light" | "dark";
 const THEME_KEY = "theme";
 
 export default function Page() {
-  // create data and keep state
+  // create data, setter, and keep state
   const [level, setLevel] = useState<Level>("N3");
 
   const [draftText, setDraftText] = useState("");
@@ -36,7 +36,7 @@ export default function Page() {
 
     const initial: Theme = saved === "dark" || saved === "light"
       ? saved
-      : "light"; // 默认白色
+      : "light"; 
 
     setTheme(initial);
     document.documentElement.dataset.theme = initial;
@@ -52,9 +52,9 @@ export default function Page() {
   }
 
   /* ---------- Analyzer actions ---------- */
-  async function onConfirm() {
+  async function handleAnalyzeRequest() {
     const text = draftText.trim();
-    if (!text) return; // check no empty text
+    if (!text) return; 
 
     setLockedText(text);
     setLoading(true); // loading until data extraction finished
@@ -73,7 +73,7 @@ export default function Page() {
 
   /* ---------- Explainer actions ---------- */
   async function handleExplainRequest(payload: { selectedText: string; context: string }) {
-    // 打开 modal，先展示 loading
+    // first loading
     setExplainOpen(true);
     setExplainLoading(true);
     setExplainError(null);
@@ -82,9 +82,6 @@ export default function Page() {
     try {
       const res = await explain(payload.selectedText, payload.context);
       setExplainData(res);
-
-      // 如果你未来要把结果也写进 ResultPanel：
-      // setData(prev => ({...prev, ...})) 或者维护 explainHistory
     } catch (e: any) {
       setExplainError(e?.message ?? "Unknown error");
     } finally {
@@ -105,6 +102,38 @@ export default function Page() {
     setExplainError(null);
     setExplainData(null);
   }
+  
+  /* ---------- Add from Modal ---------- */
+  function handleAddFromModal(item: ExplainResponse) {
+  setData((prev) => {
+    if (item.type === "vocab") {
+      const newItem = {
+        surface: item.surface,
+        reading: item.reading ?? undefined,
+        meaning_en: item.meaning_en,
+        example: item.example,
+        notes: item.notes ?? undefined,  // TODO: add in notes that this is added by user or other way to distinguish AI/manual
+      };
+      if (prev.vocab.some((v) => v.surface === newItem.surface)) return prev;
+      return {
+        ...prev,
+        vocab: [newItem, ...prev.vocab],
+      };
+    } else {
+      const newItem = {
+        pattern: item.surface,                 
+        explanation_en: item.meaning_en,       
+        example: item.example,
+        notes: item.notes ?? undefined,
+      };
+      if (prev.grammar.some((g) => g.pattern === newItem.pattern)) return prev; 
+      return {
+        ...prev,
+        grammar: [newItem, ...prev.grammar],
+      };
+    }
+  });
+}
 
   /* ---------- Render ---------- */
   return (
@@ -117,19 +146,24 @@ export default function Page() {
           setDraftText={setDraftText}
           lockedText={lockedText}
           loading={loading}
-          onConfirm={onConfirm}
+          onAnalyzeRequest={handleAnalyzeRequest}
           onClear={onClear}
           onExplainRequest={handleExplainRequest}
           theme={theme}
           onToggleTheme={toggleTheme}
         />
-        <ResultPanel data={data} error={error} loading={loading} />
+        <ResultPanel 
+          data={data} 
+          error={error} 
+          loading={loading} 
+        />
         <ExplainModal
           open={explainOpen}
           loading={explainLoading}
           error={explainError}
           data={explainData}
           onClose={() => setExplainOpen(false)}
+          onAdd={handleAddFromModal}
         />
       </div>
 

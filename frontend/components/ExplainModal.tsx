@@ -9,10 +9,16 @@ type Props = {
   error: string | null;
   data: ExplainResponse | null;
   onClose: () => void;
+  onAdd: (item: ExplainResponse) => void;
 };
 
-export function ExplainModal({ open, loading, error, data, onClose }: Props) {
-  // ESC 关闭
+export function ExplainModal({ 
+  open, 
+  loading, 
+  error, 
+  data, 
+  onClose, 
+  onAdd}: Props) {
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
       if (e.key === "Escape") onClose();
@@ -28,9 +34,24 @@ export function ExplainModal({ open, loading, error, data, onClose }: Props) {
       <div onMouseDown={(e) => e.stopPropagation()} style={modalCard}>
         <div style={headerRow}>
           <div style={title}>Explain</div>
-          <button onClick={onClose} style={closeBtn} className="btn-interactive">
-            Close
-          </button>
+          <div style={buttonGroup}>
+            <button 
+              disabled={!data || loading || !!error} 
+              onClick={() => {
+                if (!data) return;
+                onAdd(data);     
+                onClose();      
+              }} 
+              style={closeBtn}
+              className="btn-interactive"
+            > 
+              Add to list
+            </button>
+            
+            <button onClick={onClose} style={closeBtn} className="btn-interactive">
+              Close
+            </button>
+          </div>
         </div>
 
         <div style={body}>
@@ -38,20 +59,15 @@ export function ExplainModal({ open, loading, error, data, onClose }: Props) {
           {!loading && error && <div style={errorText}>{error}</div>}
 
           {!loading && !error && data && (
-            // 直接使用类似 ResultPanel item 内部的布局
             <div>
-              {/* Surface + Reading (在括号内) */}
               <div style={{ fontWeight: 700, fontSize: 18 }}>
                 {data.surface} {data.reading ? <span style={mutedNormal}>({data.reading})</span> : null}
               </div>
-
-              {/* Meaning */}
+             
               <div style={muted}>{data.meaning_en}</div>
-
-              {/* Example */}
+            
               {data.example ? <div style={example}>{data.example}</div> : null}
 
-              {/* Notes */}
               {data.notes ? <div style={mutedSmall}>{data.notes}</div> : null}
             </div>
           )}
@@ -61,7 +77,7 @@ export function ExplainModal({ open, loading, error, data, onClose }: Props) {
   );
 }
 
-/** Styles - 尽可能复用 ResultPanel 的样式定义 */
+
 
 const overlay: React.CSSProperties = {
   position: "fixed",
@@ -75,15 +91,14 @@ const overlay: React.CSSProperties = {
 };
 
 const modalCard: React.CSSProperties = {
-  width: "min(500px, 100%)", // 稍微调窄一点，更像卡片
-  borderRadius: 16, // 对应 ResultPanel 的 borderRadius
-  background: "rgba(var(--panel-rgb), 0.5)", // 保持与 ResultPanel 一致的底色逻辑，或者用之前的半透明
-  // 如果想保留毛玻璃效果可以保留下面几行，如果想完全一致则去掉
+  width: "min(500px, 100%)", 
+  borderRadius: 16, 
+  background: "rgba(var(--panel-rgb), 0.5)", 
   backdropFilter: "blur(8px)",
   WebkitBackdropFilter: "blur(8px)",
   border: "1px solid var(--border)",
   boxShadow: "var(--shadow)",
-  padding: 20, // 稍微加大内边距
+  padding: 20,
   color: "var(--text)",
 };
 
@@ -91,7 +106,7 @@ const headerRow: React.CSSProperties = {
   display: "flex",
   justifyContent: "space-between",
   alignItems: "center",
-  marginBottom: 16, // 拉开标题和内容的距离
+  marginBottom: 16, 
 };
 
 const title: React.CSSProperties = {
@@ -109,8 +124,13 @@ const closeBtn: React.CSSProperties = {
   boxShadow: "0 6px 18px rgba(0,0,0,0.12)",
 };
 
+const buttonGroup: React.CSSProperties = {
+  display: "flex",
+  gap: "8px",
+};
+
 const body: React.CSSProperties = {
-  // 移除之前的 grid，让内容自然堆叠
+
 };
 
 const errorText: React.CSSProperties = {
@@ -120,7 +140,6 @@ const errorText: React.CSSProperties = {
 
 const empty: React.CSSProperties = { opacity: 0.6, padding: 10 };
 
-// --- 以下样式直接复刻自 ResultPanel ---
 
 // 为了复用，稍作调整 (比如字号)，mutedNormal 用于括号内的读音
 const mutedNormal: React.CSSProperties = { opacity: 0.8, fontWeight: 400, fontSize: "0.9em" };
@@ -128,7 +147,7 @@ const mutedNormal: React.CSSProperties = { opacity: 0.8, fontWeight: 400, fontSi
 const muted: React.CSSProperties = { 
   opacity: 0.8, 
   marginTop: 8, 
-  fontSize: 15, // 弹窗里字稍微大一点点更易读
+  fontSize: 15, 
   lineHeight: 1.5 
 };
 
