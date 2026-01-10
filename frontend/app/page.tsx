@@ -3,17 +3,19 @@
 import React, { useState, useEffect } from "react";
 import { InputPanel } from "@/components/InputPanel";
 import { ResultPanel } from "@/components/ResultPanel";
-import { analyze } from "@/lib/api";
+import { analyze, explain, exportPdf} from "@/lib/api";
 import type { AnalyzeResponse, Level } from "@/lib/types";
-import { explain } from "@/lib/api";
 import type { ExplainResponse } from "@/lib/types";
 import { ExplainModal } from "@/components/ExplainModal";
+import { downloadBlob } from "@/lib/utils";
 
 type Theme = "light" | "dark";
 const THEME_KEY = "theme";
 
 export default function Page() {
   // create data, setter, and keep state
+  const [theme, setTheme] = useState<Theme>("light");
+
   const [level, setLevel] = useState<Level>("N3");
 
   const [draftText, setDraftText] = useState("");
@@ -28,7 +30,8 @@ export default function Page() {
   const [explainError, setExplainError] = useState<string | null>(null);
   const [explainData, setExplainData] = useState<ExplainResponse | null>(null);
 
-  const [theme, setTheme] = useState<Theme>("light");
+  const [exporting, setExporting] = useState(false);
+  const [exportError, setExportError] = useState<string | null>(null);
 
   /* ---------- Switch theme ---------- */
   useEffect(() => {
@@ -101,6 +104,9 @@ export default function Page() {
     setExplainLoading(false);
     setExplainError(null);
     setExplainData(null);
+
+    setExporting(false);
+    setExportError(null);
   }
   
   /* ---------- Add from Modal ---------- */
@@ -151,6 +157,21 @@ function handleDeleteGrammar(pattern: string) {
   }));
 }
 
+/* ---------- Export and Download PDF ---------- */
+
+async function handleExportPdf() {
+  try {
+    setExporting(true);
+    setExportError(null);
+
+    const blob = await exportPdf(data); // get pdf blob via api from backend
+    downloadBlob(blob, "my-list.pdf"); // then download at frontend
+  } catch (e: any) {
+    setExportError(e?.message ?? "Export failed");
+  } finally {
+    setExporting(false);
+  }
+}
 
   /* ---------- Render ---------- */
   return (
@@ -175,6 +196,9 @@ function handleDeleteGrammar(pattern: string) {
           loading={loading} 
           onDeleteVocab={handleDeleteVocab}
           onDeleteGrammar={handleDeleteGrammar}
+          onExportPdf={handleExportPdf}
+          exporting={exporting}
+          exportError={explainError}
         />
         <ExplainModal
           open={explainOpen}

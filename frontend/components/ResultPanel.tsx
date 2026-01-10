@@ -9,9 +9,13 @@ type Props = {
   loading: boolean;
   onDeleteVocab: (surface: string) => void;   
   onDeleteGrammar: (pattern: string) => void;
+
+  onExportPdf: () => void;          
+  exporting: boolean;               
+  exportError: string | null;
 };
 
-export function ResultPanel({ data, error, loading, onDeleteVocab, onDeleteGrammar}: Props) {
+export function ResultPanel({ data, error, loading, onDeleteVocab, onDeleteGrammar, onExportPdf, exporting, exportError}: Props) {
   return ( 
     // information display top margin
     <div style={card}> 
@@ -20,10 +24,20 @@ export function ResultPanel({ data, error, loading, onDeleteVocab, onDeleteGramm
         <div style={{ opacity: 0.7, fontSize: 13 }}> 
           {data.vocab.length} vocab · {data.grammar.length} grammar  
         </div>
+        <button
+          className="btn-interactive"
+          style={exportBtn}
+          onClick={onExportPdf}
+          disabled={loading || exporting || (data.vocab.length === 0 && data.grammar.length === 0)}
+          title="Export PDF"
+        >
+          {exporting ? "Exporting..." : "Export PDF"}
+        </button>
       </div>
       
       {/*Error message*/}
       {error ? <div style={errorBox}>Error: {error}</div> : null} 
+      {exportError ? <div style={errorBox}>Export: {exportError}</div> : null}
 
       {/*Content*/}
       <div style={twoCols}>
@@ -134,15 +148,25 @@ const item: React.CSSProperties = {
   paddingRight: 56,
 };
 
-const deleteBtn: React.CSSProperties = {
-  borderRadius: 12,
-  padding: "6px 10px",
+const exportBtn: React.CSSProperties = {
+  border: "1px solid var(--border-strong)",
   background: "rgba(var(--accent-rgb), 0.2)",
+  color: "var(--text)",
+  borderRadius: 14,
+  padding: "10px 12px",
+  cursor: "pointer",
+  fontWeight: 700,
+};
+
+const deleteBtn: React.CSSProperties = {
+  borderRadius: 14,
+  padding: "6px 10px",
+  background: "var(--text)",
+  color: "var(--text-invert)",
   border: "1px solid var(--border)",
   position: "absolute", 
   top: 10,
   right: 10,
-  color: "var(--text)",
 };
 
 const empty: React.CSSProperties = { opacity: 0.6, padding: 10 };
