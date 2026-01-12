@@ -161,12 +161,13 @@ const exportBtn: React.CSSProperties = {
 const deleteBtn: React.CSSProperties = {
   borderRadius: 14,
   padding: "6px 10px",
-  background: "var(--text)",
-  color: "var(--text-invert)",
+  background: "transparent",
+  color: "var(--text)",
   border: "1px solid var(--border)",
   position: "absolute", 
   top: 10,
   right: 10,
+  boxShadow: "0 6px 18px rgba(0,0,0,0.12)",
 };
 
 const empty: React.CSSProperties = { opacity: 0.6, padding: 10 };
@@ -179,7 +180,7 @@ const errorBox: React.CSSProperties = {
   border: "1px solid #5a2a2a",
   background: "#1a0f12",
   color: "#ffb5b5",
-  borderRadius: 12,
+  borderRadius: 14,
   padding: 10,
   marginBottom: 10,
 };

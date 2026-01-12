@@ -116,7 +116,7 @@ const title: React.CSSProperties = {
 };
 
 const closeBtn: React.CSSProperties = {
-  borderRadius: 12,
+  borderRadius: 14,
   padding: "6px 10px",
   background: "rgba(var(--accent-rgb), 0.2)",
   border: "1px solid var(--border)",
