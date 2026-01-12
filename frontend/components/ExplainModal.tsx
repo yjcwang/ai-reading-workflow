@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect } from "react";
-import type { ExplainResponse } from "@/lib/types";
+import type { ExplainResponse, ExplainWordResponse } from "@/lib/types";
 
 type Props = {
   open: boolean;
@@ -9,7 +9,7 @@ type Props = {
   error: string | null;
   data: ExplainResponse | null;
   onClose: () => void;
-  onAdd: (item: ExplainResponse) => void;
+  onAdd: (item: ExplainWordResponse) => void;
 };
 
 export function ExplainModal({ 
@@ -29,46 +29,152 @@ export function ExplainModal({
 
   if (!open) return null;
 
-  return (
+  const isWord = data && "kind" in data && data.kind === "word";
+  const isSentence = data && "kind" in data && data.kind === "sentence";
+
+   return (
     <div onMouseDown={onClose} style={overlay}>
       <div onMouseDown={(e) => e.stopPropagation()} style={modalCard}>
         <div style={headerRow}>
-          <div style={title}>Explain</div>
-          <div style={buttonGroup}>
-            <button 
-              disabled={!data || loading || !!error} 
-              onClick={() => {
-                if (!data) return;
-                onAdd(data);     
-                onClose();      
-              }} 
-              style={closeBtn}
-              className="btn-interactive"
-            > 
-              Add to list
-            </button>
-            
+          <div style={title}>Explain</div>     
             <button onClick={onClose} style={closeBtn} className="btn-interactive">
               Close
-            </button>
-          </div>
+            </button> 
         </div>
+
+          {data?.kind === "sentence" && (
+            <div style={jpBlock} title={data.sentence_jp}>
+              {data.sentence_jp}
+            </div>
+          )}
 
         <div style={body}>
           {loading && <div style={empty}>Loading...</div>}
           {!loading && error && <div style={errorText}>{error}</div>}
 
-          {!loading && !error && data && (
-            <div>
-              <div style={{ fontWeight: 700, fontSize: 18 }}>
-                {data.surface} {data.reading ? <span style={mutedNormal}>({data.reading})</span> : null}
+          {!loading && !error && data && isWord && (
+            <div style={{ display: "grid", gap: 14 }}>
+              <div style={title}>
+                {data.type === 'vocab' ? 'Vocabulary' : 'Grammar'}
               </div>
-             
-              <div style={muted}>{data.meaning_en}</div>
-            
-              {data.example ? <div style={example}>{data.example}</div> : null}
+              <div>
+                <div style={item}>
+                  <button
+                    className="btn-interactive"
+                    style={addBtn}
+                    onClick={() => onAdd(data)}
+                    title="Add to list"
+                  >
+                    Add
+                  </button>
+    
+                  <div style={itemSurface}>
+                    {data.surface}{" "}
+                    {data.reading ? <span style={mutedNormal}>({data.reading})</span> : null}
+                  </div>              
+                  <div style={muted}>{data.meaning_en}</div>
 
-              {data.notes ? <div style={mutedSmall}>{data.notes}</div> : null}
+                  {data.example ? <div style={example}>{data.example}</div> : null}
+
+                  {data.notes ? <div style={mutedSmall}>{data.notes}</div> : null}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {!loading && !error && data && isSentence && (
+            <div style={{ display: "grid", gap: 14 }}>
+              <div>
+                <div style={title}>Translation</div>
+                <div style={item}>{data.translation_en}</div>
+              </div>
+
+              <div>
+                <div style={title}>
+                  Vocabulary <span style={mutedSmall}>({data.vocab.length})</span>
+                </div>
+
+                {data.vocab.length === 0 ? (
+                  <div style={muted}>No vocab extracted.</div>
+                ) : (
+                  <ul style={list}>
+                    {data.vocab.map((v, idx) => (
+                      <li key={`${v.surface}-${idx}`} style={item}>
+                        <button
+                          className="btn-interactive"
+                          style={addBtn}
+                          onClick={() =>
+                            onAdd({
+                              kind: "word",
+                              type: "vocab",
+                              surface: v.surface,
+                              reading: v.reading,
+                              meaning_en: v.meaning_en,
+                              example: v.example,
+                              notes: v.notes ?? null,
+                            })
+                          }
+                          title="Add vocab"
+                        >
+                          Add
+                        </button>
+                        <div style={itemSurface}>
+                          {v.surface} {v.reading ? <span style={mutedNormal}>({v.reading})</span> : null}
+                        </div>
+                        {v.meaning_en ? <div style={muted}>{v.meaning_en}</div> : null}
+                        {v.example ? <div style={example}>{v.example}</div> : null}
+                        {v.notes ? <div style={mutedSmall}>{v.notes}</div> : null}
+                      </li>
+                    ))}
+                  </ul>
+
+                )}
+              </div>
+
+              <div>
+                <div style={title}>
+                  Grammar <span style={mutedSmall}>({data.grammar.length})</span>
+                </div>
+
+                {data.grammar.length === 0 ? (
+                  <div style={muted}>No grammar extracted.</div>
+                ) : (
+                  <ul style={list}>
+                    {data.grammar.map((g, idx) => (
+                      <li key={`${g.pattern}-${idx}`} style={item}>
+                        <button
+                          className="btn-interactive"
+                          style={addBtn}
+                          onClick={() =>
+                            onAdd({
+                              kind: "word",
+                              type: "grammar",
+                              surface: g.pattern,
+                              reading: null,
+                              meaning_en: g.explanation_en,
+                              example: g.example,
+                              notes: g.notes ?? null,
+                            })
+                          }
+                          title="Add grammar"
+                        >
+                          Add
+                        </button>
+                        <div style={itemSurface}>{g.pattern}</div>
+                        {g.explanation_en ? <div style={muted}>{g.explanation_en}</div> : null}
+                        {g.example ? <div style={example}>{g.example}</div> : null}
+                        {g.notes ? <div style={mutedSmall}>{g.notes}</div> : null}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </div>
+          )}
+
+          {!loading && !error && data && !isWord && !isSentence && (
+            <div style={errorText}>
+              Unknown response shape. Please check ExplainResponse types.
             </div>
           )}
         </div>
@@ -100,7 +206,10 @@ const modalCard: React.CSSProperties = {
   boxShadow: "var(--shadow)",
   padding: 20,
   color: "var(--text)",
-  transform: "translateY(-40px)",
+  transform: "translateY(-20px)",
+  maxHeight: "85vh",
+  display: "flex",
+  flexDirection: "column",
 };
 
 const headerRow: React.CSSProperties = {
@@ -115,7 +224,14 @@ const title: React.CSSProperties = {
   fontSize: 16,
 };
 
+const itemSurface: React.CSSProperties = {
+  fontWeight: 700, 
+  fontSize: 16,
+}
+
 const closeBtn: React.CSSProperties = {
+  display: "flex",
+  gap: "8px",
   borderRadius: 14,
   padding: "6px 10px",
   background: "rgba(var(--accent-rgb), 0.2)",
@@ -125,13 +241,24 @@ const closeBtn: React.CSSProperties = {
   boxShadow: "0 6px 18px rgba(0,0,0,0.12)",
 };
 
-const buttonGroup: React.CSSProperties = {
-  display: "flex",
-  gap: "8px",
+const addBtn: React.CSSProperties = {
+  borderRadius: 14,
+  padding: "6px 10px",
+  background: "transparent",
+  color: "var(--text)",
+  border: "1px solid var(--border)",
+  position: "absolute", 
+  top: 10,
+  right: 10,
+  boxShadow: "0 6px 18px rgba(0,0,0,0.12)",
 };
 
-const body: React.CSSProperties = {
 
+
+const body: React.CSSProperties = {
+  overflowY: "auto",
+  overscrollBehavior: "contain",
+  paddingRight: 6, 
 };
 
 const errorText: React.CSSProperties = {
@@ -165,3 +292,30 @@ const example: React.CSSProperties = {
   fontSize: 14,
   lineHeight: 1.5
 };
+
+const item: React.CSSProperties = {
+  border: "1px solid var(--border)",
+  background: "rgba(0,0,0,0.03)",
+  borderRadius: 14,
+  padding: 10,
+  position: "relative",
+};
+
+const list: React.CSSProperties = {
+  listStyle: "none",
+  padding: 0,
+  margin: 0,
+  display: "flex",
+  flexDirection: "column",
+  gap: 10,
+};
+
+const jpBlock: React.CSSProperties = {
+  ...item,
+  padding: 12,
+  whiteSpace: "normal",
+  wordBreak: "break-word",
+  lineHeight: 1.6,
+  opacity: 0.9,
+};
+

@@ -23,7 +23,8 @@ export type AnalyzeResponse = {
 
 export type ExplainType = "vocab" | "grammar";
 
-export type ExplainResponse = {
+export type ExplainWordResponse = {
+  kind: "word";
   type: ExplainType;
   surface: string;
   reading?: string | null;
@@ -31,3 +32,14 @@ export type ExplainResponse = {
   example: string;
   notes?: string | null;
 };
+
+export type ExplainSentenceResponse = {
+  kind: "sentence";
+  sentence_jp: string;
+  translation_en: string;
+  vocab: VocabItem[];
+  grammar: GrammarItem[];
+};
+
+export type ExplainResponse = ExplainWordResponse | ExplainSentenceResponse;
+

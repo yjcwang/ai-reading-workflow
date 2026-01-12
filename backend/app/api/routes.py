@@ -2,7 +2,7 @@ from fastapi import APIRouter
 from fastapi.responses import Response
 from app.schemas import AnalyzeRequest, AnalyzeResponse, ExplainRequest, ExplainResponse
 from app.services.analyzer import analyze_text
-from app.services.explainer import explain_selection
+from app.services.explainer import explain_word, explain_sentence
 from app.services.pdf_exporter import build_pdf_bytes
 
 # controller layer, engage service
@@ -16,7 +16,10 @@ def analyze_endpoint(req: AnalyzeRequest):
 
 @router.post("/explain", response_model=ExplainResponse)
 def explain_endpoint(req: ExplainRequest):
-    return explain_selection(req)
+    print("api explain_endpoint mode:")
+    print(req.mode)
+    if req.mode == "word": return explain_word(req)
+    else: return explain_sentence(req)
 
 @router.post("/export_pdf")
 def export_pdf_endpoint(req: AnalyzeResponse):

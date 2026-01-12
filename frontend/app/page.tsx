@@ -5,7 +5,7 @@ import { InputPanel } from "@/components/InputPanel";
 import { ResultPanel } from "@/components/ResultPanel";
 import { analyze, explain, exportPdf} from "@/lib/api";
 import type { AnalyzeResponse, Level } from "@/lib/types";
-import type { ExplainResponse } from "@/lib/types";
+import type { ExplainResponse, ExplainWordResponse, ExplainSentenceResponse } from "@/lib/types";
 import { ExplainModal } from "@/components/ExplainModal";
 import { downloadBlob } from "@/lib/utils";
 
@@ -75,6 +75,11 @@ export default function Page() {
   }
 
   /* ---------- Explainer actions ---------- */
+  function inferExplainMode(selectedText: string): "word" | "sentence" {
+    if (selectedText.length >= 12) return "sentence";
+    return "word";
+  }
+
   async function handleExplainRequest(payload: { selectedText: string; context: string }) {
     // first loading
     setExplainOpen(true);
@@ -82,9 +87,18 @@ export default function Page() {
     setExplainError(null);
     setExplainData(null);
 
+    // based on the textLength to explain to infer sentence/ word mode
+    const mode = inferExplainMode(payload.selectedText) 
     try {
-      const res = await explain(payload.selectedText, payload.context);
-      setExplainData(res);
+      const res = await explain(payload.selectedText, payload.context, mode);
+      if (res.kind === "sentence") {
+        setExplainData({
+          ...res,
+          sentence_jp: payload.selectedText,
+        });
+      } else {
+        setExplainData(res);
+      }
     } catch (e: any) {
       setExplainError(e?.message ?? "Unknown error");
     } finally {
@@ -110,7 +124,7 @@ export default function Page() {
   }
   
   /* ---------- Add from Modal ---------- */
-  function handleAddFromModal(item: ExplainResponse) {
+  function handleAddFromModal(item: ExplainWordResponse) {
   setData((prev) => {
     if (item.type === "vocab") {
       const newItem = {

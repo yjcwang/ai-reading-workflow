@@ -1,11 +1,11 @@
 from pydantic import BaseModel, Field
-from typing import List, Optional, Literal
+from typing import List, Optional, Literal, Union
 
 # define Request and Response structure with pydantic model
 
 class AnalyzeRequest(BaseModel):
     text: str = Field(..., min_length=1, description="Japanese text to analyze")
-    level: Optional[str] = Field(default=None, description="e.g., N5-N1 or beginner/intermediate") # equal with: str | None
+    level: Optional[str] = Field(default="N2", description="e.g., N5-N1 or beginner/intermediate") # equal with: str | None
 
 class VocabItem(BaseModel):
     surface: str
@@ -25,17 +25,29 @@ class AnalyzeResponse(BaseModel):
     grammar: List[GrammarItem]
 
 
-ExplainType = Literal["vocab", "grammar"]    
-
 class ExplainRequest(BaseModel):
+    mode: Literal["sentence", "word"] = "word"
     selected_text: str = Field(..., min_length=1)
     context: Optional[str] = None  
-    mode: Literal["auto", "vocab", "grammar"] = "auto"
+    level: Optional[str] = Field(default="N2", description="e.g., N5-N1 or beginner/intermediate")
 
-class ExplainResponse(BaseModel):
+ExplainType = Literal["vocab", "grammar"]    
+class ExplainWordResponse(BaseModel):
+    kind: Literal["word"] = "word"
     type: ExplainType
     surface: str
     reading: Optional[str] = None
     meaning_en: str                         
     example: str             
     notes: Optional[str] = None           
+
+class ExplainSentenceResponse(BaseModel):
+    kind: Literal["sentence"] = "sentence"
+    translation_en: str
+    vocab: List[VocabItem]
+    grammar: List[GrammarItem]
+
+ExplainResponse = Union[ExplainWordResponse, ExplainSentenceResponse]
+
+class TranslateSentenceResponse(BaseModel):
+    translation_en: str

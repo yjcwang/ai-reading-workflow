@@ -4,9 +4,6 @@ import React, { useEffect, useRef, useState } from "react";
 
 type ExplainRequestPayload = {
   selectedText: string;
-  // 先最省事：把整段 lockedText 当 context
-  // 以后你要升级成“选中附近一句”，也只改这里或上层
-  // TODO: change context selection
   context: string;
 };
 

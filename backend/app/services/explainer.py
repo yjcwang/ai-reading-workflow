@@ -1,14 +1,21 @@
-from app.schemas import ExplainRequest, ExplainResponse
+from app.schemas import ExplainRequest, ExplainWordResponse, ExplainSentenceResponse, AnalyzeRequest
 from app.services.utils import extract_json
 from app.services.llm import call_llm_json
 from app.config import settings
+from app.services.analyzer import analyze_text
+from app.services.translator import translate_sentence
 
-def explain_selection(req: ExplainRequest) -> ExplainResponse:
+def explain_word(req: ExplainRequest) -> ExplainWordResponse:
     print("Explainer working")
+    print("word mode")
+    print("=== Level ===")
+    print(req.level)
+    print("=== Level ===")
 
     provider = settings.LLM_PROVIDER_EXPLAINER # donot use os.getenv
     prompt = f"""
     You are a Japanese language assistant.
+    The learner's level is: JLPT {req.level}.
 
     Decide first in "type" whether the selected text is a vocabulary or a grammar,
     then explain it for a learner.
@@ -36,5 +43,21 @@ def explain_selection(req: ExplainRequest) -> ExplainResponse:
     print("=== RAW FROM LLM END ===")
 
     data = extract_json(raw)  
-    return ExplainResponse(**data)
+    return ExplainWordResponse(**data)
 
+def explain_sentence(req: ExplainRequest) -> ExplainSentenceResponse:
+    print("Explainer working")
+    print("sentence mode")
+    print("=== Level ===")
+    print(req.level)
+    print("=== Level ===")
+    print("Engage Translator and Analyzer...")
+
+    translation_en = translate_sentence(req.selected_text)
+    analysis = analyze_text(AnalyzeRequest(text=req.selected_text, level=req.level))
+
+    return ExplainSentenceResponse(
+        translation_en=translation_en,
+        vocab=analysis.vocab,
+        grammar=analysis.grammar,
+    )

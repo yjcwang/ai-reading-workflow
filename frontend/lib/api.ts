@@ -19,18 +19,17 @@ export async function analyze(text: string, level: Level): Promise<AnalyzeRespon
    return (await resp.json()) as AnalyzeResponse;
 }
 
-export async function explain(selected_text: string, context: string): Promise<ExplainResponse> {
+export async function explain(selected_text: string, context: string, mode: "word" | "sentence"): Promise<ExplainResponse> {
 
   const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
   if (!BASE_URL) {
    throw new Error("NEXT_PUBLIC_BACKEND_URL is not defined");
   }
-
   const resp = await fetch(BASE_URL + "/api/explain", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ selected_text, context, mode: "auto" }),
+    body: JSON.stringify({ mode, selected_text, context}), 
   });
 
   if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
