@@ -5,6 +5,8 @@ from app.config import settings
 from app.services.analyzer import analyze_text
 from app.services.translator import translate_sentence
 
+# two logic of explainer, for short word-> word mode, long sentence-> sentence mode
+# mode distinguish is decided at frontend
 def explain_word(req: ExplainRequest) -> ExplainWordResponse:
     print("Explainer working")
     print("word mode")

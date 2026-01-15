@@ -23,6 +23,7 @@ type Props = {
 
   theme: "light" | "dark";
   onToggleTheme: () => void;
+  getMode?: (selectedText: string) => "word" | "sentence";
 };
 
 export function InputPanel({
@@ -36,7 +37,8 @@ export function InputPanel({
   onClear,
   onExplainRequest,
   theme,
-  onToggleTheme
+  onToggleTheme,
+  getMode
 }: Props) {
   const canConfirm = !loading && draftText.trim().length > 0; // control if can use confirm buttom
 
@@ -94,6 +96,7 @@ export function InputPanel({
             style={lockedBox}
             disabled={loading}
             onExplainRequest={(payload) => onExplainRequest?.(payload)}
+            getMode={getMode}
           />
 
           <div style={{ marginTop: 10 }}>

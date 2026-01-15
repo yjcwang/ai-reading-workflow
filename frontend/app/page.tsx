@@ -203,6 +203,7 @@ async function handleExportPdf() {
           onExplainRequest={handleExplainRequest}
           theme={theme}
           onToggleTheme={toggleTheme}
+          getMode={inferExplainMode}
         />
         <ResultPanel 
           data={data} 

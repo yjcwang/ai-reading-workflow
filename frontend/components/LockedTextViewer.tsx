@@ -12,13 +12,18 @@ type Props = {
   style?: React.CSSProperties;
   onExplainRequest: (payload: ExplainRequestPayload) => void;
   disabled?: boolean;
+  // mode decision is made by page.tsx, render explainBtn depending on given mode
+  getMode?: (selectedText: string) => "word" | "sentence";
 };
 
-export function LockedTextViewer({ text, style, onExplainRequest, disabled }: Props) {
+export function LockedTextViewer({ text, style, onExplainRequest, disabled, getMode}: Props) {
   const boxRef = useRef<HTMLDivElement | null>(null);
 
   const [selectedText, setSelectedText] = useState<string>("");
   const [btnPos, setBtnPos] = useState<{ top: number; left: number } | null>(null);
+
+  const mode = getMode ? getMode(selectedText) : "word";
+  const explainBtnLabel = mode === "sentence" ? "Explain Sentence" : "Explain Word";
 
   // 1) 根据 selection 更新按钮位置和选中文字
   function updateSelection() {
@@ -137,27 +142,35 @@ export function LockedTextViewer({ text, style, onExplainRequest, disabled }: Pr
           disabled={disabled}
           className="btn-interactive"
           style={{
-            position: "fixed",
+            ...explainBtn,
             top: btnPos.top,
             left: btnPos.left,
-            zIndex: 9999,
-            fontWeight: 600,
-
-            padding: "6px 10px",
-            borderRadius: 12,
-            border: "1px solid var(--border)",
-            background: "rgba(var(--accent-rgb), 0.1)",
-            backdropFilter: "blur(3px)",
-            WebkitBackdropFilter: "blur(3px)",
-
-            color: "var(--text)",
-            cursor: "pointer",
-            boxShadow: "0 6px 18px rgba(0,0,0,0.12)",
           }}
         >
-          Explain
+          {explainBtnLabel}
         </button>
       )}
     </>
   );
 }
+
+
+
+const explainBtn: React.CSSProperties = {
+  position: "fixed",
+  
+  zIndex: 9999,
+  fontWeight: 600,
+
+  padding: "6px 10px",
+  borderRadius: 12,
+  border: "1px solid var(--border)",
+  background: "rgba(var(--accent-rgb), 0.1)",
+  backdropFilter: "blur(3px)",
+  WebkitBackdropFilter: "blur(3px)",
+
+  color: "var(--text)",
+  cursor: "pointer",
+  boxShadow: "0 6px 18px rgba(0,0,0,0.12)",
+
+};
