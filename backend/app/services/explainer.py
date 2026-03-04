@@ -6,7 +6,7 @@ from app.services.analyzer import analyze_text
 from app.services.translator import translate_sentence
 
 # two logic of explainer, for short word-> word mode, long sentence-> sentence mode
-# mode distinguish is decided at frontend
+# mode distinguish is decided at frontend\app\page.tsx
 def explain_word(req: ExplainRequest) -> ExplainWordResponse:
     print("Explainer working")
     print("word mode")
@@ -15,7 +15,7 @@ def explain_word(req: ExplainRequest) -> ExplainWordResponse:
     print("=== Level ===")
 
     provider = settings.LLM_PROVIDER_EXPLAINER # donot use os.getenv
-    prompt = f"""
+    prompt = f"""###FEATURE:EXPLAINER###
     You are a Japanese language assistant.
     The learner's level is: JLPT {req.level}.
 
@@ -47,6 +47,7 @@ def explain_word(req: ExplainRequest) -> ExplainWordResponse:
     data = extract_json(raw)  
     return ExplainWordResponse(**data)
 
+# explain with scentence mode is not strictly explainer, it is composition of translator and analyzer
 def explain_sentence(req: ExplainRequest) -> ExplainSentenceResponse:
     print("Explainer working")
     print("sentence mode")

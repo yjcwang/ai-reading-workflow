@@ -10,8 +10,8 @@ def analyze_text(req: AnalyzeRequest) -> AnalyzeResponse:
     print(req.level)
     print("=== Level ===")
     
-    provider = settings.LLM_PROVIDER_ANALYZER # donot use os.getenv
-    prompt = f"""
+    provider = settings.LLM_PROVIDER_ANALYZER 
+    prompt = f"""###FEATURE:ANALYZER###
     You are an AI Japanese reading tutor.
     The learner's level is: JLPT {req.level}.
     STRICT REQUIREMENTS:

@@ -6,8 +6,8 @@ from app.config import settings
 def translate_sentence(sentence: str) -> str:
     print("Translator working")
 
-    provider = settings.LLM_PROVIDER_EXPLAINER # donot use os.getenv
-    prompt = f"""
+    provider = settings.LLM_PROVIDER_EXPLAINER 
+    prompt = f"""###FEATURE:TRANSLATOR###
     You are a professional Japanese-to-English translator.
     Translate the given Japanese sentence into natural English.
 

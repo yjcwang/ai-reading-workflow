@@ -16,8 +16,6 @@ def analyze_endpoint(req: AnalyzeRequest):
 
 @router.post("/explain", response_model=ExplainResponse)
 def explain_endpoint(req: ExplainRequest):
-    print("api explain_endpoint mode:")
-    print(req.mode)
     if req.mode == "word": return explain_word(req)
     else: return explain_sentence(req)
 

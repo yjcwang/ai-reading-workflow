@@ -7,40 +7,56 @@ import httpx
 import json
 
 def _mock_json_output(prompt: str) -> str:
-    # TODO: Mock currently only works for Analyzer
-    print("=== llm ===")
-    print("MOCK (AnalyzeResponse)")
-    print("=== llm ===")
-    
-    # 按照 AnalyzeResponse 的结构组织数据
-    mock_data = {
-        "vocab": [
-            {
-                "surface": "(Mock) 練習",
-                "reading": "れんしゅう",
-                "meaning_en": "practice",
-                "example": "毎日ピアノを練習します。", 
-                "notes": "Appears in study contexts; high frequency."
-            },
-            {
-                "surface": "(Mock) 助言",
-                "reading": "じょげん",
-                "meaning_en": "advice",
-                "example": "先生から助言をもらいました。",
-                "notes": "Common in academic/work settings."
-            }
-        ],
-        "grammar": [
-            {
-                "pattern": "(Mock) 〜てみる",
-                "explanation_en": "Try doing something.",
-                "example": "やってみる", 
-                "notes": "Often used for attempts."
-            }
-        ]
-    }
 
-    return json.dumps(mock_data, ensure_ascii=False)
+    print("=== llm ===")
+    print("MOCK")
+    print("=== llm ===")
+
+    cleaned_prompt = prompt.strip()
+    # use ###FEATURE:### to distinguish between different service to generate correct response
+    if cleaned_prompt.startswith("###FEATURE:ANALYZER###"):
+        data = {
+            "vocab": [
+                {
+                    "surface": "(Mock)練習",
+                    "reading": "れんしゅう",
+                    "meaning_en": "practice",
+                    "example": "毎日ピアノを练习します。", 
+                    "notes": "Appears in study contexts."
+                }
+            ],
+            "grammar": [
+                {
+                    "pattern": "(Mock)〜てみる",
+                    "explanation_en": "Try doing something.",
+                    "example": "やってみる", 
+                    "notes": "Often used for attempts."
+                }
+            ]
+        }
+    elif cleaned_prompt.startswith("###FEATURE:EXPLAINER###"):
+        data = {
+            "type": "vocab",
+            "surface": "(Mock)把握",
+            "reading": "はあく",
+            "meaning_en": "grasp",
+            "example": "情報の背景を把握する",
+            "notes": "Formal context."
+        }
+    elif cleaned_prompt.startswith("###FEATURE:TRANSLATOR###"):
+        data = {
+            "translation_en": "(Mock) This is a translated text."
+        }
+    else:
+        preview = prompt[:50].replace("\n", " ")
+        raise ValueError(
+            f"MockProvider Error: No matching feature found in prompt. "
+            f"Prompt prefix: [{preview}...]"
+        )
+
+    return json.dumps(data, ensure_ascii=False)
+    
+  
 
 def _call_ollama(prompt: str) -> str:
     print("=== llm ===")
