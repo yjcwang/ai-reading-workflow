@@ -33,6 +33,8 @@ export default function Page() {
   const [exporting, setExporting] = useState(false);
   const [exportError, setExportError] = useState<string | null>(null);
 
+  const [targetLang, setTargetLang] = useState<"en" | "zh">("zh");
+
   /* ---------- Switch theme ---------- */
   useEffect(() => {
     const saved = localStorage.getItem(THEME_KEY) as Theme | null;
@@ -64,7 +66,7 @@ export default function Page() {
     setError(null);
 
     try {
-      const res = await analyze(text, level); // api engaged extract text
+      const res = await analyze(text, level, targetLang); // api engaged extract text
       setData(res);
     } catch (e: any) {
       setError(e?.message ?? "Unknown error");
@@ -90,7 +92,7 @@ export default function Page() {
     // based on the textLength to explain to infer sentence/ word mode
     const mode = inferExplainMode(payload.selectedText) 
     try {
-      const res = await explain(payload.selectedText, payload.context, mode);
+      const res = await explain(payload.selectedText, payload.context, mode, targetLang);
       if (res.kind === "sentence") {
         setExplainData({
           ...res,
@@ -130,7 +132,7 @@ export default function Page() {
       const newItem = {
         surface: item.surface,
         reading: item.reading ?? undefined,
-        meaning_en: item.meaning_en,
+        meaning: item.meaning,
         example: item.example,
         notes: item.notes ?? undefined,  // TODO: add in notes that this is added by user or other way to distinguish AI/manual
       };
@@ -142,7 +144,7 @@ export default function Page() {
     } else {
       const newItem = {
         pattern: item.surface,                 
-        explanation_en: item.meaning_en,       
+        explanation: item.meaning,       
         example: item.example,
         notes: item.notes ?? undefined,
       };

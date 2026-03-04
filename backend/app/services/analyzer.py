@@ -2,6 +2,7 @@ from app.schemas import AnalyzeRequest, AnalyzeResponse
 from app.services.utils import extract_json
 from app.services.llm import call_llm_json
 from app.config import settings
+from app.services.utils import get_full_language_name
 
 
 def analyze_text(req: AnalyzeRequest) -> AnalyzeResponse:
@@ -9,26 +10,33 @@ def analyze_text(req: AnalyzeRequest) -> AnalyzeResponse:
     print("=== Level ===")
     print(req.level)
     print("=== Level ===")
+
+    target_lang_full = get_full_language_name(req.target_lang)
+    print("language is: ", target_lang_full)
     
     provider = settings.LLM_PROVIDER_ANALYZER 
     prompt = f"""###FEATURE:ANALYZER###
-    You are an AI Japanese reading tutor.
-    The learner's level is: JLPT {req.level}.
-    STRICT REQUIREMENTS:
-    - Only extract vocabulary and grammar that are appropriate for JLPT {req.level}.
-    - If the text contains items that are TOO EASY or TOO DIFFICULT for JLPT {req.level}, DO NOT include them.
+    You are a Japanese language expert and translator.
+    Your task is to analyze Japanese text and provide explanations EXCLUSIVELY in {target_lang_full}.
+    [STRICT LANGUAGE RULES]
+    - ALL "meaning", "explanation", and "notes" fields MUST be written in {target_lang_full}.
+    - DO NOT use Japanese to explain Japanese.
+    [JLPT {req.level} CONTEXT]
+    - Extract vocabulary and grammar relevant to JLPT {req.level}.
     - Focus on items that are worth learning at this level.
-    Quality over Quantity.
-    Reading must be hiragana only (no romaji, no katakana, no English).
-    Do NOT output generic patterns like "V1 + (te) + V2" or "N1 + N2". Only list named grammar patterns used in the text.
+    [MORE rules]
+    - Reading: Hiragana only.
+    - Do NOT output generic patterns like "V1 + (te) + V2" or "N1 + N2". Only list named grammar patterns used in the text.
+    [OUTPUT FORMAT]
     Return ONLY valid JSON with this shape:
     {{
-    "vocab": [{{"surface": "...", "reading": "...", "meaning_en": "...", "example": "...", "notes": "..."}}],
-    "grammar": [{{"pattern": "...", "explanation_en": "...", "example": "...", "notes": "..."}}]
+    "vocab": [{{"surface": "...", "reading": "...", "meaning": "({target_lang_full} meaning here)", "example": "...", "notes": "({target_lang_full} additional tips or null)"}}],
+    "grammar": [{{"pattern": "...", "explanation": "({target_lang_full} explanation here)", "example": "Japanese example sentence", "notes": "({target_lang_full} additional tips or null)"}}]
     }}
-
-    Text: 
+ 
+    [INPUT text]
     {req.text}
+    Ensure all JSON keys are properly quoted with a single pair of double quotes. No triple quotes or leading double quotes.
     """
     raw = call_llm_json(prompt, provider)
     print("=== RAW FROM LLM START ===")

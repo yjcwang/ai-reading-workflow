@@ -6,17 +6,18 @@ from typing import List, Optional, Literal, Union
 class AnalyzeRequest(BaseModel):
     text: str = Field(..., min_length=1, description="Japanese text to analyze")
     level: Optional[str] = Field(default="N2", description="e.g., N5-N1 or beginner/intermediate") # equal with: str | None
+    target_lang: str = "en"
 
 class VocabItem(BaseModel):
     surface: str
     reading: Optional[str] = None
-    meaning_en: str
+    meaning: str
     example: str
     notes: Optional[str] = None
 
 class GrammarItem(BaseModel):
     pattern: str
-    explanation_en: str
+    explanation: str
     example: str
     notes: Optional[str] = None
 
@@ -30,6 +31,7 @@ class ExplainRequest(BaseModel):
     selected_text: str = Field(..., min_length=1)
     context: Optional[str] = None  
     level: Optional[str] = Field(default="N2", description="e.g., N5-N1 or beginner/intermediate")
+    target_lang: str = "en"
 
 ExplainType = Literal["vocab", "grammar"]    
 class ExplainWordResponse(BaseModel):
@@ -37,7 +39,7 @@ class ExplainWordResponse(BaseModel):
     type: ExplainType
     surface: str
     reading: Optional[str] = None
-    meaning_en: str                         
+    meaning: str                         
     example: str             
     notes: Optional[str] = None           
 
@@ -50,4 +52,4 @@ class ExplainSentenceResponse(BaseModel):
 ExplainResponse = Union[ExplainWordResponse, ExplainSentenceResponse]
 
 class TranslateSentenceResponse(BaseModel):
-    translation_en: str
+    translation: str

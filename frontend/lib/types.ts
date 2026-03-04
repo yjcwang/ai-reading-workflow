@@ -4,14 +4,14 @@ export type Level = "N5" | "N4" | "N3" | "N2" | "N1";
 export type VocabItem = {
   surface: string;
   reading?: string;
-  meaning_en: string;
+  meaning: string;
   example: string;
   notes?: string;
 };
 
 export type GrammarItem = {
   pattern: string;
-  explanation_en: string;
+  explanation: string;
   example: string;
   notes?: string;
 };
@@ -28,7 +28,7 @@ export type ExplainWordResponse = {
   type: ExplainType;
   surface: string;
   reading?: string | null;
-  meaning_en: string;
+  meaning: string;
   example: string;
   notes?: string | null;
 };
@@ -36,7 +36,7 @@ export type ExplainWordResponse = {
 export type ExplainSentenceResponse = {
   kind: "sentence";
   sentence_jp: string;
-  translation_en: string;
+  translation: string;
   vocab: VocabItem[];
   grammar: GrammarItem[];
 };

@@ -2,7 +2,7 @@ import type { AnalyzeResponse, Level, ExplainResponse } from "./types";
 
 // service layer, handle operations
 
-export async function analyze(text: string, level: Level): Promise<AnalyzeResponse> {
+export async function analyze(text: string, level: Level, target_lang: string): Promise<AnalyzeResponse> {
 
   const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
@@ -13,13 +13,13 @@ export async function analyze(text: string, level: Level): Promise<AnalyzeRespon
   const resp = await fetch(BASE_URL + "/api/analyze", {
      method: "POST",
      headers: { "Content-Type": "application/json" },
-     body: JSON.stringify({ text, level }),
+     body: JSON.stringify({ text, level, target_lang }),
    });
    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
    return (await resp.json()) as AnalyzeResponse;
 }
 
-export async function explain(selected_text: string, context: string, mode: "word" | "sentence"): Promise<ExplainResponse> {
+export async function explain(selected_text: string, context: string, mode: "word" | "sentence", target_lang: string): Promise<ExplainResponse> {
 
   const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
@@ -29,7 +29,7 @@ export async function explain(selected_text: string, context: string, mode: "wor
   const resp = await fetch(BASE_URL + "/api/explain", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ mode, selected_text, context}), 
+    body: JSON.stringify({ mode, selected_text, context, target_lang}), 
   });
 
   if (!resp.ok) throw new Error(`HTTP ${resp.status}`);

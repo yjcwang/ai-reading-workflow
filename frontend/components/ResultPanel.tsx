@@ -62,7 +62,7 @@ export function ResultPanel({ data, error, loading, onDeleteVocab, onDeleteGramm
                   >
                     Delete
                   </button>
-                  {v.meaning_en ? <div style={muted}>{v.meaning_en}</div> : null}
+                  {v.meaning ? <div style={muted}>{v.meaning}</div> : null}
                   {v.example ? <div style={example}>{v.example}</div> : null}
                   {v.notes ? <div style={mutedSmall}>{v.notes}</div> : null}
                 </li>
@@ -92,7 +92,7 @@ export function ResultPanel({ data, error, loading, onDeleteVocab, onDeleteGramm
                   >
                     Delete
                   </button>
-                  {g.explanation_en ? <div style={muted}>{g.explanation_en}</div> : null}
+                  {g.explanation ? <div style={muted}>{g.explanation}</div> : null}
                   {g.example ? <div style={example}>{g.example}</div> : null}
                   {g.notes ? <div style={mutedSmall}>{g.notes}</div> : null}
                 </li>

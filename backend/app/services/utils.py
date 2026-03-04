@@ -18,3 +18,11 @@ def extract_json(raw: str) -> dict:
         raise ValueError(f"No JSON object found in LLM output:\n{s}")
 
     return json.loads(s[start:end+1])
+
+LANGUAGE_NAMES = {
+    "en": "English",
+    "zh": "Chinese",
+}
+
+def get_full_language_name(lang_code: str) -> str:
+    return LANGUAGE_NAMES.get(lang_code.lower(), "English")

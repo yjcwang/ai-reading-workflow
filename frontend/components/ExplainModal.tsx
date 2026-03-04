@@ -72,7 +72,7 @@ export function ExplainModal({
                     {data.surface}{" "}
                     {data.reading ? <span style={mutedNormal}>({data.reading})</span> : null}
                   </div>              
-                  <div style={muted}>{data.meaning_en}</div>
+                  <div style={muted}>{data.meaning}</div>
 
                   {data.example ? <div style={example}>{data.example}</div> : null}
 
@@ -86,7 +86,7 @@ export function ExplainModal({
             <div style={{ display: "grid", gap: 14 }}>
               <div>
                 <div style={title}>Translation</div>
-                <div style={item}>{data.translation_en}</div>
+                <div style={item}>{data.translation}</div>
               </div>
 
               <div>
@@ -109,7 +109,7 @@ export function ExplainModal({
                               type: "vocab",
                               surface: v.surface,
                               reading: v.reading,
-                              meaning_en: v.meaning_en,
+                              meaning: v.meaning,
                               example: v.example,
                               notes: v.notes ?? null,
                             })
@@ -121,7 +121,7 @@ export function ExplainModal({
                         <div style={itemSurface}>
                           {v.surface} {v.reading ? <span style={mutedNormal}>({v.reading})</span> : null}
                         </div>
-                        {v.meaning_en ? <div style={muted}>{v.meaning_en}</div> : null}
+                        {v.meaning ? <div style={muted}>{v.meaning}</div> : null}
                         {v.example ? <div style={example}>{v.example}</div> : null}
                         {v.notes ? <div style={mutedSmall}>{v.notes}</div> : null}
                       </li>
@@ -151,7 +151,7 @@ export function ExplainModal({
                               type: "grammar",
                               surface: g.pattern,
                               reading: null,
-                              meaning_en: g.explanation_en,
+                              meaning: g.explanation,
                               example: g.example,
                               notes: g.notes ?? null,
                             })
@@ -161,7 +161,7 @@ export function ExplainModal({
                           Add
                         </button>
                         <div style={itemSurface}>{g.pattern}</div>
-                        {g.explanation_en ? <div style={muted}>{g.explanation_en}</div> : null}
+                        {g.explanation ? <div style={muted}>{g.explanation}</div> : null}
                         {g.example ? <div style={example}>{g.example}</div> : null}
                         {g.notes ? <div style={mutedSmall}>{g.notes}</div> : null}
                       </li>
