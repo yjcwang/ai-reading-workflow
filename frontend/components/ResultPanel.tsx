@@ -2,6 +2,8 @@
 
 import React from "react";
 import type { AnalyzeResponse} from "@/lib/types";
+import { UI_STRINGS } from "@/lib/i18n";
+import { TargetLang } from "@/lib/types";
 
 type Props = {
   data: AnalyzeResponse;
@@ -9,20 +11,21 @@ type Props = {
   loading: boolean;
   onDeleteVocab: (surface: string) => void;   
   onDeleteGrammar: (pattern: string) => void;
-
   onExportPdf: () => void;          
   exporting: boolean;               
   exportError: string | null;
+  targetLang: TargetLang;
 };
 
-export function ResultPanel({ data, error, loading, onDeleteVocab, onDeleteGrammar, onExportPdf, exporting, exportError}: Props) {
+export function ResultPanel({ data, error, loading, onDeleteVocab, onDeleteGrammar, onExportPdf, exporting, exportError, targetLang}: Props) {
+  const tUI = UI_STRINGS[targetLang];
   return ( 
     // information display top margin
     <div style={card}> 
       <div style={rowBetween}>
-        <div style={{ fontWeight: 700 }}>Result</div>
+        <div style={{ fontWeight: 700 }}>{tUI.resultPanel.resultTitle}</div>
         <div style={{ opacity: 0.7, fontSize: 13 }}> 
-          {data.vocab.length} vocab · {data.grammar.length} grammar  
+          {data.vocab.length} {tUI.common.word} · {data.grammar.length} {tUI.common.grammar}  
         </div>
         <button
           className="btn-interactive"
@@ -31,24 +34,24 @@ export function ResultPanel({ data, error, loading, onDeleteVocab, onDeleteGramm
           disabled={loading || exporting || (data.vocab.length === 0 && data.grammar.length === 0)}
           title="Export PDF"
         >
-          {exporting ? "Exporting..." : "Export PDF"}
+          {exporting ? tUI.resultPanel.exporting : tUI.resultPanel.exportPdf}
         </button>
       </div>
       
       {/*Error message*/}
-      {error ? <div style={errorBox}>Error: {error}</div> : null} 
-      {exportError ? <div style={errorBox}>Export: {exportError}</div> : null}
+      {error ? <div style={errorBox}>{tUI.common.error}: {error}</div> : null} 
+      {exportError ? <div style={errorBox}>{tUI.resultPanel.exportPdf}{tUI.common.error}: {exportError}</div> : null}
 
       {/*Content*/}
       <div style={twoCols}>
         <div> {/*Vocab item*/}
-          <div style={sectionTitle}>Vocabulary</div>
+          <div style={sectionTitle}>{tUI.resultPanel.vocabTitle}</div>
           <ul style={list}> 
             {loading ? (
-              <li style={empty}>Loading...</li>
+              <li style={empty}>{tUI.common.loading}</li>
             ) :
             data.vocab.length === 0 ? ( 
-              <li style={empty}>None</li>
+              <li style={empty}>{tUI.resultPanel.noData}</li>
             ) : (
               data.vocab.map((v, i) => (
                 <li key={v.surface} style={item}> 
@@ -60,7 +63,7 @@ export function ResultPanel({ data, error, loading, onDeleteVocab, onDeleteGramm
                     onClick={() => onDeleteVocab(v.surface)}
                     title="Delete"
                   >
-                    Delete
+                    {tUI.resultPanel.deleteItem}
                   </button>
                   {v.meaning ? <div style={muted}>{v.meaning}</div> : null}
                   {v.example ? <div style={example}>{v.example}</div> : null}
@@ -72,13 +75,13 @@ export function ResultPanel({ data, error, loading, onDeleteVocab, onDeleteGramm
         </div>
 
         <div> {/*Grammar item*/}
-          <div style={sectionTitle}>Grammar</div>
+          <div style={sectionTitle}>{tUI.resultPanel.grammarTitle}</div>
           <ul style={list}>
             {loading ? (
-              <li style={empty}>Loading...</li>
+              <li style={empty}>{tUI.common.loading}</li>
             ) :
             data.grammar.length === 0 ? (
-              <li style={empty}>None</li>
+              <li style={empty}>{tUI.resultPanel.noData}</li>
             ) : (
               data.grammar.map((g, i) => (
                 <li key={g.pattern} style={item}>
@@ -90,7 +93,7 @@ export function ResultPanel({ data, error, loading, onDeleteVocab, onDeleteGramm
                     onClick={() => onDeleteGrammar(g.pattern)}
                     title="Delete"
                   >
-                    Delete
+                    {tUI.resultPanel.deleteItem}
                   </button>
                   {g.explanation ? <div style={muted}>{g.explanation}</div> : null}
                   {g.example ? <div style={example}>{g.example}</div> : null}

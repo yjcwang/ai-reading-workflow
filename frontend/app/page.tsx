@@ -8,6 +8,7 @@ import type { AnalyzeResponse, Level } from "@/lib/types";
 import type { ExplainResponse, ExplainWordResponse, ExplainSentenceResponse } from "@/lib/types";
 import { ExplainModal } from "@/components/ExplainModal";
 import { downloadBlob } from "@/lib/utils";
+import { TargetLang } from "@/lib/types";
 
 type Theme = "light" | "dark";
 const THEME_KEY = "theme";
@@ -33,7 +34,7 @@ export default function Page() {
   const [exporting, setExporting] = useState(false);
   const [exportError, setExportError] = useState<string | null>(null);
 
-  const [targetLang, setTargetLang] = useState<"en" | "zh">("zh");
+  const [targetLang, setTargetLang] = useState<TargetLang>("zh");
 
   /* ---------- Switch theme ---------- */
   useEffect(() => {
@@ -55,6 +56,26 @@ export default function Page() {
       return next;
     });
   }
+
+  /* ---------- [NEW] Language Persistence & Reset Logic ---------- */
+  useEffect(() => {
+    const savedLang = localStorage.getItem("target_lang") as TargetLang;
+    if (savedLang === "zh" || savedLang === "en") {
+      setTargetLang(savedLang);
+    }
+  }, []);
+
+  // 关键：当手动切换语言时，执行清理逻辑
+  const handleLanguageChange = (newLang: TargetLang) => {
+    if (newLang === targetLang) return;
+    
+    // 1. 持久化
+    setTargetLang(newLang);
+    localStorage.setItem("target_lang", newLang);
+    
+    // 2. [ARCHITECT DECISION] 清空当前所有结果，强制用户重新分析，确保内容纯正
+    onClear(); 
+  };
 
   /* ---------- Analyzer actions ---------- */
   async function handleAnalyzeRequest() {
@@ -206,6 +227,8 @@ async function handleExportPdf() {
           theme={theme}
           onToggleTheme={toggleTheme}
           getMode={inferExplainMode}
+          targetLang={targetLang}
+          onLanguageChange={handleLanguageChange}
         />
         <ResultPanel 
           data={data} 
@@ -216,6 +239,7 @@ async function handleExportPdf() {
           onExportPdf={handleExportPdf}
           exporting={exporting}
           exportError={explainError}
+          targetLang={targetLang}
         />
         <ExplainModal
           open={explainOpen}
@@ -224,6 +248,7 @@ async function handleExportPdf() {
           data={explainData}
           onClose={() => setExplainOpen(false)}
           onAdd={handleAddFromModal}
+          targetLang={targetLang}
         />
       </div>
 

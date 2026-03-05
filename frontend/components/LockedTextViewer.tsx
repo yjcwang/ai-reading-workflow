@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
+import { UI_STRINGS } from "@/lib/i18n";
+import { TargetLang } from "@/lib/types";
 
 type ExplainRequestPayload = {
   selectedText: string;
@@ -14,16 +16,19 @@ type Props = {
   disabled?: boolean;
   // mode decision is made by page.tsx, render explainBtn depending on given mode
   getMode?: (selectedText: string) => "word" | "sentence";
+  targetLang: TargetLang;
 };
 
-export function LockedTextViewer({ text, style, onExplainRequest, disabled, getMode}: Props) {
+export function LockedTextViewer({ text, style, onExplainRequest, disabled, getMode, targetLang}: Props) {
+  const tUI = UI_STRINGS[targetLang];
+
   const boxRef = useRef<HTMLDivElement | null>(null);
 
   const [selectedText, setSelectedText] = useState<string>("");
   const [btnPos, setBtnPos] = useState<{ top: number; left: number } | null>(null);
 
   const mode = getMode ? getMode(selectedText) : "word";
-  const explainBtnLabel = mode === "sentence" ? "Explain Sentence" : "Explain Word";
+  const explainBtnLabel = mode === "sentence" ? tUI.lockedTextViewer.explainBtnScentence : tUI.lockedTextViewer.explainBtnWord;
 
   // 1) 根据 selection 更新按钮位置和选中文字
   function updateSelection() {

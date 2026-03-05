@@ -3,8 +3,14 @@
 import React from "react";
 import type { Level } from "@/lib/types";
 import { LockedTextViewer } from "@/components/LockedTextViewer";
+import { UI_STRINGS } from "@/lib/i18n";
+import { TargetLang } from "@/lib/types";
 
 const LEVELS: Level[] = ["N5", "N4", "N3", "N2", "N1"];
+const LANGUAGES = [
+  { code: "zh", label: "中文" },
+  { code: "en", label: "English" },
+] as const;
 
 type Props = {
   level: Level;
@@ -24,6 +30,9 @@ type Props = {
   theme: "light" | "dark";
   onToggleTheme: () => void;
   getMode?: (selectedText: string) => "word" | "sentence";
+
+  targetLang: TargetLang;
+  onLanguageChange: (lang: TargetLang) => void;
 };
 
 export function InputPanel({
@@ -38,24 +47,44 @@ export function InputPanel({
   onExplainRequest,
   theme,
   onToggleTheme,
-  getMode
+  getMode,
+  targetLang, 
+  onLanguageChange
 }: Props) {
   const canConfirm = !loading && draftText.trim().length > 0; // control if can use confirm buttom
+
+  const tUI = UI_STRINGS[targetLang];
 
   return (
     <div style={card}>
       <div style={rowBetween}>
-        <div style={{ fontWeight: 700 }}>Input</div>
+        <div style={{ fontWeight: 700 }}>{tUI.inputPanel.inputTitle}</div>
         <div style={rightTools}>
-          <button // toggle theme
+          {/* Toggle Theme Light/Dark*/}
+          <button
             style={ghostBtnSmall}
             onClick={onToggleTheme}
             disabled={loading}
             className="btn-interactive"
           >
-            {theme === "light" ? "Light" : "Dark"}
+            {theme === "light" ? tUI.inputPanel.lightMode : tUI.inputPanel.darkMode}
           </button>
-          <select // level selection
+          {/* Language Selection EN/ZH */}
+          <select
+            value={targetLang}
+            onChange={(e) => onLanguageChange(e.target.value as "zh" | "en")}
+            disabled={loading}
+            style={select} 
+            className="btn-interactive"
+          >
+            {LANGUAGES.map((lang) => (
+              <option key={lang.code} value={lang.code}>
+                {lang.label}
+              </option>
+            ))}
+          </select>  
+          {/* Level Selection N1-N5*/}
+          <select
             value={level}
             onChange={(e) => setLevel(e.target.value as Level)}
             disabled={loading}
@@ -76,16 +105,16 @@ export function InputPanel({
           <textarea
             value={draftText}
             onChange={(e) => setDraftText(e.target.value)}
-            placeholder="Input text…"
+            placeholder={tUI.inputPanel.placeholder}
             style={textarea}
             disabled={loading}
           />
           <div style={{ display: "flex", gap: 10, marginTop: 10 }}>
             <button style={primaryBtn} onClick={onConfirm} disabled={!canConfirm} className="btn-interactive">
-              Confirm
+              {tUI.inputPanel.analyzeBtn}
             </button>
             <button style={ghostBtn} onClick={onClear} disabled={loading && draftText.length === 0} className="btn-interactive">
-              Clear
+              {tUI.common.clear}
             </button>
           </div>
         </>
@@ -97,16 +126,17 @@ export function InputPanel({
             disabled={loading}
             onExplainRequest={(payload) => onExplainRequest?.(payload)}
             getMode={getMode}
+            targetLang={targetLang}
           />
 
           <div style={{ marginTop: 10 }}>
             {loading ? (
               <button style={ghostBtn} disabled className="btn-interactive" >
-                Loading…
+                {tUI.common.loading}
               </button>
             ) : (
               <button style={ghostBtn} onClick={onClear} className="btn-interactive">
-                Clear All
+                {tUI.common.clear}
               </button>
             )}
           </div>

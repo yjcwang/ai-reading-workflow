@@ -20,7 +20,7 @@ def _mock_json_output(prompt: str) -> str:
                 {
                     "surface": "(Mock)練習",
                     "reading": "れんしゅう",
-                    "meaning_en": "practice",
+                    "meaning": "practice",
                     "example": "毎日ピアノを练习します。", 
                     "notes": "Appears in study contexts."
                 }
@@ -28,7 +28,7 @@ def _mock_json_output(prompt: str) -> str:
             "grammar": [
                 {
                     "pattern": "(Mock)〜てみる",
-                    "explanation_en": "Try doing something.",
+                    "explanation": "Try doing something.",
                     "example": "やってみる", 
                     "notes": "Often used for attempts."
                 }
@@ -39,13 +39,13 @@ def _mock_json_output(prompt: str) -> str:
             "type": "vocab",
             "surface": "(Mock)把握",
             "reading": "はあく",
-            "meaning_en": "grasp",
+            "meaning": "grasp",
             "example": "情報の背景を把握する",
             "notes": "Formal context."
         }
     elif cleaned_prompt.startswith("###FEATURE:TRANSLATOR###"):
         data = {
-            "translation_en": "(Mock) This is a translated text."
+            "translation": "(Mock) This is a translated text."
         }
     else:
         preview = prompt[:50].replace("\n", " ")

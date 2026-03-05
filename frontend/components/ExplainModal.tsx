@@ -2,6 +2,8 @@
 
 import React, { useEffect } from "react";
 import type { ExplainResponse, ExplainWordResponse } from "@/lib/types";
+import { UI_STRINGS } from "@/lib/i18n";
+import { TargetLang } from "@/lib/types";
 
 type Props = {
   open: boolean;
@@ -10,6 +12,7 @@ type Props = {
   data: ExplainResponse | null;
   onClose: () => void;
   onAdd: (item: ExplainWordResponse) => void;
+  targetLang: TargetLang;
 };
 
 export function ExplainModal({ 
@@ -18,7 +21,10 @@ export function ExplainModal({
   error, 
   data, 
   onClose, 
-  onAdd}: Props) {
+  onAdd,
+  targetLang}: Props) {
+  const tUI = UI_STRINGS[targetLang];
+  
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
       if (e.key === "Escape") onClose();
@@ -36,9 +42,9 @@ export function ExplainModal({
     <div onMouseDown={onClose} style={overlay}>
       <div onMouseDown={(e) => e.stopPropagation()} style={modalCard}>
         <div style={headerRow}>
-          <div style={title}>Explain</div>     
+          <div style={title}>{tUI.explainModal.explainTitle}</div>     
             <button onClick={onClose} style={closeBtn} className="btn-interactive">
-              Close
+              {tUI.explainModal.close}
             </button> 
         </div>
 
@@ -55,7 +61,7 @@ export function ExplainModal({
           {!loading && !error && data && isWord && (
             <div style={{ display: "grid", gap: 14 }}>
               <div style={title}>
-                {data.type === 'vocab' ? 'Vocabulary' : 'Grammar'}
+                {data.type === 'vocab' ? tUI.common.word : tUI.common.grammar}
               </div>
               <div>
                 <div style={item}>
@@ -65,7 +71,7 @@ export function ExplainModal({
                     onClick={() => onAdd(data)}
                     title="Add to list"
                   >
-                    Add
+                    {tUI.explainModal.addToList}
                   </button>
     
                   <div style={itemSurface}>
@@ -91,7 +97,7 @@ export function ExplainModal({
 
               <div>
                 <div style={title}>
-                  Vocabulary <span style={mutedSmall}>({data.vocab.length})</span>
+                  {tUI.common.word} <span style={mutedSmall}>({data.vocab.length})</span>
                 </div>
 
                 {data.vocab.length === 0 ? (
@@ -116,7 +122,7 @@ export function ExplainModal({
                           }
                           title="Add vocab"
                         >
-                          Add
+                          {tUI.explainModal.addToList}
                         </button>
                         <div style={itemSurface}>
                           {v.surface} {v.reading ? <span style={mutedNormal}>({v.reading})</span> : null}
@@ -133,7 +139,7 @@ export function ExplainModal({
 
               <div>
                 <div style={title}>
-                  Grammar <span style={mutedSmall}>({data.grammar.length})</span>
+                  {tUI.common.grammar} <span style={mutedSmall}>({data.grammar.length})</span>
                 </div>
 
                 {data.grammar.length === 0 ? (
@@ -158,7 +164,7 @@ export function ExplainModal({
                           }
                           title="Add grammar"
                         >
-                          Add
+                          {tUI.explainModal.addToList}
                         </button>
                         <div style={itemSurface}>{g.pattern}</div>
                         {g.explanation ? <div style={muted}>{g.explanation}</div> : null}

@@ -1,8 +1,9 @@
 import type { AnalyzeResponse, Level, ExplainResponse } from "./types";
+import { TargetLang } from "@/lib/types";
 
 // service layer, handle operations
 
-export async function analyze(text: string, level: Level, target_lang: string): Promise<AnalyzeResponse> {
+export async function analyze(text: string, level: Level, target_lang: TargetLang): Promise<AnalyzeResponse> {
 
   const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
@@ -19,7 +20,7 @@ export async function analyze(text: string, level: Level, target_lang: string): 
    return (await resp.json()) as AnalyzeResponse;
 }
 
-export async function explain(selected_text: string, context: string, mode: "word" | "sentence", target_lang: string): Promise<ExplainResponse> {
+export async function explain(selected_text: string, context: string, mode: "word" | "sentence", target_lang: TargetLang): Promise<ExplainResponse> {
 
   const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
