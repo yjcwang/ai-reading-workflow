@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React , { useState } from "react";
 import type { Level } from "@/lib/types";
 import { LockedTextViewer } from "@/components/LockedTextViewer";
 import { UI_STRINGS } from "@/lib/i18n";
@@ -51,9 +51,32 @@ export function InputPanel({
   targetLang, 
   onLanguageChange
 }: Props) {
-  const canConfirm = !loading && draftText.trim().length > 0; // control if can use confirm buttom
+  // control if can use confirm buttom
+  const canConfirm = !loading && draftText.trim().length > 0; 
+  // record the language to switch, but not switched yet
+  const [pendingLang, setPendingLang] = useState<TargetLang | null>(null);
 
   const tUI = UI_STRINGS[targetLang];
+
+  // select language will open a confirmation window
+  const handleSelectChange = (newLang: TargetLang) => {
+    if (newLang === targetLang) return;
+
+    // 架构逻辑：如果没有锁定文本，说明没结果，直接切；如果有，则弹窗确认
+    if (!lockedText) {
+      onLanguageChange(newLang);
+    } else {
+      setPendingLang(newLang);
+    }
+  };
+
+  // 弹窗确认按钮
+  const confirmLangChange = () => {
+    if (pendingLang) {
+      onLanguageChange(pendingLang);
+      setPendingLang(null);
+    }
+  };
 
   return (
     <div style={card}>
@@ -69,10 +92,10 @@ export function InputPanel({
           >
             {theme === "light" ? tUI.inputPanel.lightMode : tUI.inputPanel.darkMode}
           </button>
-          {/* Language Selection EN/ZH */}
+          {/* Language Switch EN/ZH */}
           <select
             value={targetLang}
-            onChange={(e) => onLanguageChange(e.target.value as "zh" | "en")}
+            onChange={(e) => handleSelectChange(e.target.value as TargetLang)}
             disabled={loading}
             style={select} 
             className="btn-interactive"
@@ -97,6 +120,44 @@ export function InputPanel({
               </option>
             ))}
           </select>
+          {/* confirm modal for language switch */}
+          {pendingLang && (
+            <div style={modalOverlay} onMouseDown={() => setPendingLang(null)}>
+              <div 
+                style={modalContainer} 
+                onMouseDown={(e) => e.stopPropagation()}
+              >
+                {/* Header */}
+                <div style={modalTitle}>
+                  {tUI.inputPanel.langConfirmTitle}
+                </div>
+
+                {/* Body */}
+                <div style={modalMessage}>
+                  {tUI.inputPanel.langConfirmMessage}
+                </div>
+
+                {/* Footer and Button */}
+                <div style={modalFooter}>
+                  <button 
+                    style={closeBtn} 
+                    className="btn-interactive"
+                    onClick={() => setPendingLang(null)}
+                  >
+                    {tUI.inputPanel.cancel}
+                  </button>
+                  <button 
+                    style={confirmBtn} 
+                    className="btn-interactive"
+                    onClick={confirmLangChange}
+                  >
+                    {tUI.inputPanel.confirm}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
         </div>
       </div>
 
@@ -225,3 +286,72 @@ const ghostBtnSmall: React.CSSProperties = {
   padding: "8px 10px",
   borderRadius: 14,
 };
+
+const modalOverlay: React.CSSProperties = {
+  position: "fixed",
+  inset: 0,
+  zIndex: 9999, // 确保在所有内容之上
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  padding: 16,
+  background: "rgba(0, 0, 0, 0.15)", // 统一遮罩透明度
+};
+
+const modalContainer: React.CSSProperties = {
+  width: "min(400px, 100%)", // 确认框可以比详情框稍窄
+  borderRadius: 16,
+  background: "rgba(var(--panel-rgb), 0.5)", // 统一玻璃拟态背景
+  backdropFilter: "blur(8px)",
+  WebkitBackdropFilter: "blur(8px)",
+  border: "1px solid var(--border)",
+  boxShadow: "var(--shadow)",
+  padding: 20,
+  color: "var(--text)",
+  transform: "translateY(-20px)",
+  display: "flex",
+  flexDirection: "column",
+  gap: 16,
+};
+
+const modalTitle: React.CSSProperties = {
+  fontWeight: 700,
+  fontSize: 16,
+};
+
+const modalMessage: React.CSSProperties = {
+  opacity: 0.8,
+  fontSize: 15,
+  lineHeight: 1.5,
+};
+
+const modalFooter: React.CSSProperties = {
+  display: "flex",
+  justifyContent: "flex-end",
+  gap: 10,
+  marginTop: 4,
+};
+
+const closeBtn: React.CSSProperties = {
+  display: "flex",
+  gap: "8px",
+  borderRadius: 14,
+  padding: "6px 10px",
+  background: "transparent",
+  border: "1px solid var(--border)",
+  color: "var(--text)",
+  cursor: "pointer",
+  boxShadow: "0 6px 18px rgba(0,0,0,0.12)",
+};
+const confirmBtn: React.CSSProperties = {
+  display: "flex",
+  gap: "8px",
+  borderRadius: 14,
+  padding: "6px 10px",
+  background: "rgba(var(--accent-rgb), 0.2)",
+  border: "1px solid var(--border)",
+  color: "var(--text)",
+  cursor: "pointer",
+  boxShadow: "0 6px 18px rgba(0,0,0,0.12)",
+};
+

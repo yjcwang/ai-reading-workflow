@@ -14,6 +14,10 @@ export const UI_STRINGS = {
       darkMode: "暗色",
       placeholder: "请输入日语文本...",
       analyzeBtn: "分析文本",
+      langConfirmTitle: "切换语言确认",
+      langConfirmMessage: "切换解释语言将清空当前所有分析结果，是否继续？",
+      confirm: "确认切换",
+      cancel: "取消",
     },
     lockedTextViewer: {
       explainBtnWord: "解释单词",
@@ -48,6 +52,10 @@ export const UI_STRINGS = {
       darkMode: "Dark",
       placeholder: "Enter Japanese text...",
       analyzeBtn: "Analyze Text",
+      langConfirmTitle: "Switch Language?",
+      langConfirmMessage: "Changing the language will clear all current results. Do you want to proceed?",
+      confirm: "Confirm",
+      cancel: "Cancel",
     },
     lockedTextViewer: {
       explainBtnWord: "Explain Word",
