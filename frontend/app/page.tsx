@@ -200,8 +200,7 @@ async function handleExportPdf() {
   try {
     setExporting(true);
     setExportError(null);
-
-    const blob = await exportPdf(data); // get pdf blob via api from backend
+    const blob = await exportPdf(data, targetLang); // get pdf blob via api from backend
     downloadBlob(blob, "my-list.pdf"); // then download at frontend
   } catch (e: any) {
     setExportError(e?.message ?? "Export failed");

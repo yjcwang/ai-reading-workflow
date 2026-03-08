@@ -1,124 +1,178 @@
+import os
 from io import BytesIO
-from reportlab.pdfgen import canvas
+from pathlib import Path
+from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
+from reportlab.lib.units import cm
 
-from pathlib import Path
 from app.schemas import AnalyzeResponse
 
-FONT_NAME = "NotoSansJP"
+# 字体常量定义
+FONT_JP = "NotoSansJP"
+FONT_SC = "NotoSansSC"
 
-def _register_font_once():
-    # 用相对当前文件的路径，避免你从不同目录启动导致找不到字体
-    font_path = Path(__file__).resolve().parents[1] / "assets" / "fonts" / "NotoSansJP-Regular.ttf"
-    if not font_path.exists():
-        raise FileNotFoundError(f"Font not found: {font_path}")
-
-    try:
-        pdfmetrics.getFont(FONT_NAME)
-    except KeyError:
-        pdfmetrics.registerFont(TTFont(FONT_NAME, str(font_path)))
-
-def _draw_wrapped(c: canvas.Canvas, text: str, x: int, y0: int, max_width: int, font_size: int = 10, line_h: int = 14):
+class PDFExporter:
     """
-    简单按字符换行（对日文/中文/英文都够用）
-    返回写完后的 y
+    高级 PDF 导出架构：支持多语言字形切换与自动布局
     """
-    c.setFont(FONT_NAME, font_size)
-    y = y0
-    cur = ""
-    for ch in text:
-        test = cur + ch
-        if pdfmetrics.stringWidth(test, FONT_NAME, font_size) <= max_width:
-            cur = test
-        else:
-            c.drawString(x, y, cur)
-            y -= line_h
-            cur = ch
-    if cur:
-        c.drawString(x, y, cur)
-        y -= line_h
-    return y
+    def __init__(self):
+        self._register_fonts()
+        self.styles = self._get_custom_styles()
 
-def build_pdf_bytes(data: AnalyzeResponse) -> bytes:
-    _register_font_once()
+    def _register_fonts(self):
+        """注册中日双语字体"""
+        base_path = Path(__file__).resolve().parents[1] / "assets" / "fonts"
+        fonts = {
+            FONT_JP: "NotoSansJP-Regular.ttf",
+            FONT_SC: "NotoSansSC-Regular.ttf"
+        }
+        
+        for name, filename in fonts.items():
+            path = base_path / filename
+            if not path.exists():
+                raise FileNotFoundError(f"Missing font file: {path}")
+            
+            try:
+                pdfmetrics.getFont(name)
+            except KeyError:
+                pdfmetrics.registerFont(TTFont(name, str(path)))
 
-    buf = BytesIO()
-    c = canvas.Canvas(buf, pagesize=A4)
-    width, height = A4
+    def _get_custom_styles(self):
+        """定义样式表：分离样式与逻辑"""
+        styles = getSampleStyleSheet()
+        
+        # 日语主样式
+        styles.add(ParagraphStyle(
+            name='JP_Content',
+            fontName=FONT_JP,
+            fontSize=10,
+            leading=16,
+            wordWrap='CJK'
+        ))
 
-    margin_x = 40
-    y = height - 50
+        # 中文/通用说明样式
+        styles.add(ParagraphStyle(
+            name='CN_Body',
+            fontName=FONT_SC,
+            fontSize=10,
+            leading=14,
+            textColor=colors.toColor("#333333"),
+            wordWrap='CJK'
+        ))
 
-    def new_page():
-        nonlocal y
-        c.showPage()
-        c.setFont(FONT_NAME, 10)
-        y = height - 50
+        # 备注样式：字体稍小，颜色稍淡
+        styles.add(ParagraphStyle(
+            name='Note_Body',
+            parent=styles['CN_Body'],
+            fontSize=9,
+            textColor=colors.toColor("#666666"),
+            leftIndent=10
+        ))
 
-    # 标题
-    c.setFont(FONT_NAME, 16)
-    c.drawString(margin_x, y, "My List Export")
-    y -= 24
+        styles.add(ParagraphStyle(
+            name='Heading',
+            parent=styles['Heading1'],
+            fontName=FONT_SC,
+            fontSize=18,
+            spaceAfter=12
+        ))
 
-    c.setFont(FONT_NAME, 10)
-    c.drawString(margin_x, y, f"Vocab: {len(data.vocab)} · Grammar: {len(data.grammar)}")
-    y -= 24
+        return styles
 
-    # Vocabulary
-    c.setFont(FONT_NAME, 12)
-    c.drawString(margin_x, y, "Vocabulary")
-    y -= 18
+    def _fmt_mix(self, text: str, mode: str = "SC") -> str:
+        """辅助方法：利用 HTML 标签在段落内强制指定字体"""
+        font = FONT_SC if mode == "SC" else FONT_JP
+        return f'<font name="{font}">{text}</font>'
 
-    for i, v in enumerate(data.vocab, start=1):
-        if y < 90:
-            new_page()
+    def build_pdf_bytes(self, data: AnalyzeResponse, target_lang: str = "en") -> bytes:
+        i18n = {
+            "en": {
+                "main_title": "Summary List",
+                "vocab_title": "Vocabulary",
+                "grammar_title": "Grammar",
+                "meaning": "Meaning",
+                "example": "Example",
+                "explanation": "Explanation",
+                "notes": "Notes"
+            },
+            "zh": {
+                "main_title": "总结列表",
+                "vocab_title": "词汇",
+                "grammar_title": "语法",
+                "meaning": "释义",
+                "example": "例",
+                "explanation": "讲解",
+                "notes": "备注"
+            }
+        }
+        t = i18n.get(target_lang, i18n["en"])
+        buffer = BytesIO()
+        doc = SimpleDocTemplate(
+            buffer,
+            pagesize=A4,
+            leftMargin=2*cm, rightMargin=2*cm, topMargin=2*cm, bottomMargin=2*cm
+        )
 
-        title = f"{i}. {v.surface}"
-        if v.reading:
-            title += f" ({v.reading})"
+        elements = []
 
-        c.setFont(FONT_NAME, 11)
-        c.drawString(margin_x, y, title)
-        y -= 16
+        # 1. 标题
+        elements.append(Paragraph(t["main_title"], self.styles['Heading']))
+        elements.append(Spacer(1, 0.5*cm))
 
-        y = _draw_wrapped(c, f"Meaning: {v.meaning_en}", margin_x + 10, y, max_width=520)
+        # 2. Vocabulary Section
+        elements.append(Paragraph(self._fmt_mix(t["vocab_title"], "SC"), self.styles['Heading']))
+        elements.append(Spacer(1, 0.3*cm))
 
-        if v.example:
-            y = _draw_wrapped(c, f"Example: {v.example}", margin_x + 10, y, max_width=520)
+        for i, v in enumerate(data.vocab, 1):
+            # 单词与读音 (JP)
+            jp_title = f"<b>{i}. {v.surface}</b>"
+            if v.reading:
+                jp_title += f" ({v.reading})"
+            elements.append(Paragraph(self._fmt_mix(jp_title, "JP"), self.styles['JP_Content']))
 
-        if v.notes:
-            y = _draw_wrapped(c, f"Notes: {v.notes}", margin_x + 10, y, max_width=520)
+            # 含义 (SC)
+            if v.meaning:
+                elements.append(Paragraph(self._fmt_mix(f"<i>{t['meaning']}:</i> {v.meaning}", "SC"), self.styles['CN_Body']))
+            
+            # 例句 (JP)
+            if v.example:
+                elements.append(Paragraph(self._fmt_mix(f"{t['example']}: {v.example}", "JP"), self.styles['JP_Content']))
+            
+            # --- 新增：词汇备注 (SC) ---
+            if hasattr(v, 'notes') and v.notes:
+                elements.append(Paragraph(self._fmt_mix(f"{t['notes']}: {v.notes}", "SC"), self.styles['Note_Body']))
+            
+            elements.append(Spacer(1, 0.3*cm))
 
-        y -= 8
+        # 3. Grammar Section
+        if data.grammar:
+            elements.append(Spacer(1, 0.5*cm))
+            elements.append(Paragraph(self._fmt_mix(t["grammar_title"], "SC"), self.styles['Heading']))
+            
+            for i, g in enumerate(data.grammar, 1):
+                # 语法模式 (JP)
+                elements.append(Paragraph(self._fmt_mix(f"{i}. {g.pattern}", "JP"), self.styles['JP_Content']))
+                
+                # 解释 (SC)
+                elements.append(Paragraph(self._fmt_mix(f"{t['explanation']}: {g.explanation}", "SC"), self.styles['CN_Body']))
+                
+                # --- 新增：语法例句 (JP) ---
+                if hasattr(g, 'example') and g.example:
+                    elements.append(Paragraph(self._fmt_mix(f"{t['example']}: {g.example}", "JP"), self.styles['JP_Content']))
+                
+                # --- 新增：语法备注 (SC) ---
+                if hasattr(g, 'notes') and g.notes:
+                    elements.append(Paragraph(self._fmt_mix(f"{t['notes']}: {g.notes}", "SC"), self.styles['Note_Body']))
+                
+                elements.append(Spacer(1, 0.3*cm))
 
-    y -= 10
-    if y < 120:
-        new_page()
+        # 生成文档
+        doc.build(elements)
+        return buffer.getvalue()
 
-    # Grammar
-    c.setFont(FONT_NAME, 12)
-    c.drawString(margin_x, y, "Grammar")
-    y -= 18
-
-    for i, g in enumerate(data.grammar, start=1):
-        if y < 90:
-            new_page()
-
-        c.setFont(FONT_NAME, 11)
-        c.drawString(margin_x, y, f"{i}. {g.pattern}")
-        y -= 16
-
-        y = _draw_wrapped(c, f"Explanation: {g.explanation_en}", margin_x + 10, y, max_width=520)
-
-        if g.example:
-            y = _draw_wrapped(c, f"Example: {g.example}", margin_x + 10, y, max_width=520)
-
-        if g.notes:
-            y = _draw_wrapped(c, f"Notes: {g.notes}", margin_x + 10, y, max_width=520)
-
-        y -= 8
-
-    c.save()
-    return buf.getvalue()
+def build_pdf_bytes(data: AnalyzeResponse, target_lang: str = "en") -> bytes:
+    return PDFExporter().build_pdf_bytes(data, target_lang)

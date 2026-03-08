@@ -53,3 +53,7 @@ ExplainResponse = Union[ExplainWordResponse, ExplainSentenceResponse]
 
 class TranslateSentenceResponse(BaseModel):
     translation: str
+
+class ExportPDFRequest(BaseModel):
+    data: AnalyzeResponse
+    target_lang: str = "en" 

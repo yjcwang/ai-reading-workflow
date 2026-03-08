@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from fastapi.responses import Response
-from app.schemas import AnalyzeRequest, AnalyzeResponse, ExplainRequest, ExplainResponse
+from app.schemas import AnalyzeRequest, AnalyzeResponse, ExplainRequest, ExplainResponse, ExportPDFRequest
 from app.services.analyzer import analyze_text
 from app.services.explainer import explain_word, explain_sentence
 from app.services.pdf_exporter import build_pdf_bytes
@@ -20,12 +20,12 @@ def explain_endpoint(req: ExplainRequest):
     else: return explain_sentence(req)
 
 @router.post("/export_pdf")
-def export_pdf_endpoint(req: AnalyzeResponse):
-    pdf_bytes = build_pdf_bytes(req)
+def export_pdf_endpoint(req: ExportPDFRequest):
+    pdf_bytes = build_pdf_bytes(req.data, req.target_lang)
     return Response(
         content=pdf_bytes,
         media_type="application/pdf",
-        headers={"Content-Disposition": 'attachment; filename="my-list.pdf"'},
+        headers={"Content-Disposition": 'attachment; filename={"my-list.pdf"}'},
     )
 
 

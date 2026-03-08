@@ -37,17 +37,17 @@ export async function explain(selected_text: string, context: string, mode: "wor
   return (await resp.json()) as ExplainResponse;
 }
 
-export async function exportPdf(data: AnalyzeResponse): Promise<Blob> {
+export async function exportPdf(data: AnalyzeResponse, targetLang: TargetLang): Promise<Blob> {
   const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
   if (!BASE_URL) {
     throw new Error("NEXT_PUBLIC_BACKEND_URL is not defined");
   }
-
+ 
   const resp = await fetch(BASE_URL + "/api/export_pdf", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
+    body: JSON.stringify({data, target_lang: targetLang}),
   });
 
   if (!resp.ok) throw new Error(`HTTP ${resp.status}`);

@@ -21,7 +21,7 @@ def _mock_json_output(prompt: str) -> str:
                     "surface": "(Mock)練習",
                     "reading": "れんしゅう",
                     "meaning": "practice",
-                    "example": "毎日ピアノを练习します。", 
+                    "example": "毎日ピアノを練習します。", 
                     "notes": "Appears in study contexts."
                 }
             ],

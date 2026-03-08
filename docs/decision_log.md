@@ -17,6 +17,15 @@ We need to add a Session-Level Language Lock, to switch language for both UI and
 - Add new file frontend/lib/i18n.ts as a dictionary for UI text, allow future extension of more languages
 - Add switch language button in inputPanel.tsx, which open a confirmation modal to let user know session will be refreshed after switching, this is a session-level lock 
 
+## 2026-03-08 PDF Exporter Enhancement and i18n Support (Issue #10)
+
+### Context
+After adding Chinese, PDF exporter doesnot support specific Chinese character, so enhancement with i18n support in PDFExporter necessary
+
+### Decision
+- Add new NotoSansSC
+- Parse New targetLang parameter for PDF exporter 
+- Adapative title in PDF with i18n dictionary
 
 
 
