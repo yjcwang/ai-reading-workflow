@@ -41,18 +41,18 @@ class ExplainWordResponse(BaseModel):
     reading: Optional[str] = None
     meaning: str                         
     example: str             
-    notes: Optional[str] = None           
+    notes: Optional[str] = None   
+
+class TranslateSentenceResponse(BaseModel):
+    translation: str        
 
 class ExplainSentenceResponse(BaseModel):
     kind: Literal["sentence"] = "sentence"
-    translation_en: str
+    translation: TranslateSentenceResponse
     vocab: List[VocabItem]
     grammar: List[GrammarItem]
 
 ExplainResponse = Union[ExplainWordResponse, ExplainSentenceResponse]
-
-class TranslateSentenceResponse(BaseModel):
-    translation: str
 
 class ExportPDFRequest(BaseModel):
     data: AnalyzeResponse

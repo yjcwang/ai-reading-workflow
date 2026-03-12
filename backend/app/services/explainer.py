@@ -18,7 +18,8 @@ def explain_word(req: ExplainRequest) -> ExplainWordResponse:
     target_lang_full = get_full_language_name(req.target_lang)
 
     provider = settings.LLM_PROVIDER_EXPLAINER
-    prompt = f"""###FEATURE:EXPLAINER###
+
+    system_prompt = f"""###FEATURE:EXPLAINER###
     You are a Japanese language expert and translator. 
     Your task is to analyze the selected text and provide explanations EXCLUSIVELY in {target_lang_full}.
     [STRICT LANGUAGE RULES]
@@ -30,22 +31,22 @@ def explain_word(req: ExplainRequest) -> ExplainWordResponse:
     2. Provide exactly ONE reading in Hiragana for vocabulary. Set to null if not applicable.
     3. Provide a clear example sentence in Japanese.
     4. Use the "context" to ensure the explanation is accurate for this specific usage.
-    [OUTPUT FORMAT]
-    Return ONLY valid JSON with this shape:
-    {{
-      "type": "vocab" | "grammar",
-      "surface": "...",
-      "reading": "hiragana or null",
-      "meaning": "({target_lang_full} explanation here)",
-      "example": "Japanese example sentence",
-      "notes": "({target_lang_full} additional tips or null)"
-    }}
+    """.strip()
 
-    [INPUT]
-    selected_text: "{req.selected_text}"
-    context: "{req.context or ""}"
-    """
-    raw = call_llm_json(prompt, provider)
+    user_prompt = f"""
+    Explain the following Japanese section.
+    Text:
+    "{req.selected_text}"
+    Context:
+    "{req.context or ""}"
+    """.strip()
+
+    raw = call_llm_json(
+        provider=provider,
+        system_prompt=system_prompt,
+        user_prompt=user_prompt,
+        response_model=ExplainWordResponse,
+    )
     print("=== RAW FROM LLM START ===")
     print(raw)
     print("=== RAW FROM LLM END ===")

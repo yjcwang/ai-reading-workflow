@@ -34,10 +34,14 @@ export type ExplainWordResponse = {
   notes?: string | null;
 };
 
+export type TranslateSentenceResponse = {
+  translation: string;
+};
+
 export type ExplainSentenceResponse = {
   kind: "sentence";
   sentence_jp: string;
-  translation: string;
+  translation: TranslateSentenceResponse;
   vocab: VocabItem[];
   grammar: GrammarItem[];
 };

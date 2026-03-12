@@ -92,7 +92,7 @@ export function ExplainModal({
             <div style={{ display: "grid", gap: 14 }}>
               <div>
                 <div style={title}>Translation</div>
-                <div style={item}>{data.translation}</div>
+                <div style={item}>{data.translation.translation}</div>
               </div>
 
               <div>

@@ -27,5 +27,13 @@ After adding Chinese, PDF exporter doesnot support specific Chinese character, s
 - Parse New targetLang parameter for PDF exporter 
 - Adapative title in PDF with i18n dictionary
 
+## 2026-03-12 LLM Service Refactor and Structured Output Support (Issue #12)
 
+### Context
+While changing into the new qwen3.5 model, call_ollama() always lead to timeout. Additionally, it's observed that the previous LLM integration used a single prompt parameter and relied on prompt engineering to enforce JSON output.
+
+### Decision
+- Change api/generate into api/chat in call_ollama()
+- Refactor call_llm_json interface, Replace single prompt argument with structured parameters:
+system_prompt, user_prompt, response_model
 
