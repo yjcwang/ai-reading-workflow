@@ -58,35 +58,8 @@ def _mock_json_output(prompt: str) -> str:
 
     return json.dumps(data, ensure_ascii=False)
     
-  
-
-def _call_ollama(prompt: str) -> str:
-    print("=== llm ===")
-    print("OLLAMA")
-    print(settings.OLLAMA_MODEL)
-    print("=== llm ===")
-    model = settings.OLLAMA_MODEL
-    url = "http://127.0.0.1:11434/api/generate"
-    
-    payload = {
-        "model": model,
-        "prompt": prompt,
-        "stream": False,
-        "options": {
-            "temperature": 0.2,
-            "top_p": 0.9,
-            "repeat_penalty": 1.1,
-            "num_ctx": 4096
-        }
-    }
-
-    r = httpx.post(url, json=payload, timeout=120)
-    r.raise_for_status()
-    data = r.json()
-    return data["response"]
-
 # use api/chat
-def _call_ollama_chat(
+def _call_ollama(
     *,
     system_prompt: str,
     user_prompt: str,
@@ -232,7 +205,7 @@ def call_llm_json(
         return _mock_json_output(user_prompt)
 
     if provider == "ollama":
-        return _call_ollama_chat(
+        return _call_ollama(
             system_prompt=system_prompt,
             user_prompt=user_prompt,
             response_schema=schema,
