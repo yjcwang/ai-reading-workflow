@@ -40,19 +40,13 @@ def explain_word(req: ExplainRequest) -> ExplainWordResponse:
     Context:
     "{req.context or ""}"
     """.strip()
-
-    raw = call_llm_json(
+    
+    return call_llm_json(
         provider=provider,
         system_prompt=system_prompt,
         user_prompt=user_prompt,
         response_model=ExplainWordResponse,
     )
-    print("=== RAW FROM LLM START ===")
-    print(raw)
-    print("=== RAW FROM LLM END ===")
-
-    data = extract_json(raw)  
-    return ExplainWordResponse(**data)
 
 # explain with scentence mode is not strictly explainer, it is composition of translator and analyzer
 def explain_sentence(req: ExplainRequest) -> ExplainSentenceResponse:

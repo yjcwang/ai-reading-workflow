@@ -24,15 +24,10 @@ def translate_sentence(sentence: str, target_lang: str) -> TranslateSentenceResp
     Text:
     "{sentence}"
     """.strip()
-
-    raw = call_llm_json(
+    
+    return call_llm_json(
         provider=provider,
         system_prompt=system_prompt,
         user_prompt=user_prompt,
         response_model=TranslateSentenceResponse,
     )
-    print("=== RAW FROM LLM START ===")
-    print(raw)
-    print("=== RAW FROM LLM END ===")
-    data = extract_json(raw)
-    return TranslateSentenceResponse(**data)

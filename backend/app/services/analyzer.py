@@ -36,18 +36,9 @@ def analyze_text(req: AnalyzeRequest) -> AnalyzeResponse:
     {req.text}
     """.strip()
 
-    raw = call_llm_json(
+    return call_llm_json(
         provider=provider,
         system_prompt=system_prompt,
         user_prompt=user_prompt,
         response_model=AnalyzeResponse,
     )
-
-    print("=== RAW FROM LLM START ===")
-    print(raw)
-    print("=== RAW FROM LLM END ===")
-
-    # dspy
-
-    data = extract_json(raw) 
-    return AnalyzeResponse(**data)

@@ -5,8 +5,17 @@ import httpx
 from typing import Any
 from google import genai
 from google.genai import types
-from typing import Type
-from pydantic import BaseModel
+from typing import Type, TypeVar, Any, Callable, Dict
+from pydantic import BaseModel, ValidationError
+import logging
+from tenacity import (
+    retry,
+    stop_after_attempt,
+    wait_exponential,
+    retry_if_exception_type,
+    before_sleep_log
+)
+from app.services.utils import extract_json
 
 def _mock_json_output(prompt: str) -> str:
 
@@ -188,41 +197,91 @@ def _call_gemini(
     return response.text
 
 
-def call_llm_json(
+logger = logging.getLogger(__name__)
+
+T = TypeVar("T", bound=BaseModel)
+
+LLM_STRATEGY_MAP: Dict[str, Callable] = {
+    "mock": _mock_json_output,
+    "ollama": _call_ollama,
+    "openai": _call_openai,
+    "gemini": _call_gemini,
+}
+
+@retry(
+    # Case1: Network error
+    # Case2: Pydantic Validation error
+    # Case3: Invalid json
+    retry=retry_if_exception_type((httpx.HTTPError, ValidationError, ValueError)),
+    stop=stop_after_attempt(3), 
+    wait=wait_exponential(multiplier=1, min=2, max=10), # Expontential Backoff: 2s, 4s, 8s...
+    before_sleep=before_sleep_log(logger, logging.WARNING),
+    reraise=True
+)
+def call_llm_with_retry(
     *,
     provider: str,
     system_prompt: str,
     user_prompt: str,
-    response_model: Type[BaseModel] | None = None,
-) -> str:
+    response_model: Type[T],
+) -> T:
+    
     schema = None
     if response_model is not None:
         schema = response_model.model_json_schema()
 
     provider = provider.strip().lower()
 
+    handler = LLM_STRATEGY_MAP.get(provider)
+    
+    # Find provider in dictionary
+    if not handler:
+        valid_providers = ", ".join(LLM_STRATEGY_MAP.keys())
+        raise ValueError(
+            f"Unsupported LLM provider: '{provider}'. "
+            f"Supported providers are: [{valid_providers}]"
+        )
+
+    # Engage llm caller function
     if provider == "mock":
-        return _mock_json_output(user_prompt)
+        raw_content = handler(system_prompt)
+    
+    else: raw_content = handler(
+        system_prompt=system_prompt,
+        user_prompt=user_prompt,
+        response_schema=schema,
+    )
 
-    if provider == "ollama":
-        return _call_ollama(
-            system_prompt=system_prompt,
-            user_prompt=user_prompt,
-            response_schema=schema,
-        )
+    print("=== RAW FROM LLM START ===")
+    print(raw_content)
+    print("=== RAW FROM LLM END ===")
 
-    if provider == "openai":
-        return _call_openai(
-            system_prompt=system_prompt,
-            user_prompt=user_prompt,
-            response_schema=schema,
-        )
+    # Try extract JSON
+    try:
+        data = extract_json(raw_content)
+    except Exception as e:
+        logger.error(f"Failed to extract JSON from LLM response: {raw_content}")
+        raise ValueError("Invalid JSON format") from e
 
-    if provider == "gemini":
-        return _call_gemini(
-            system_prompt=system_prompt,
-            user_prompt=user_prompt,
-            response_schema=schema,
-        )
+    # Pydantic Validation
+    try:
+        validated_data = response_model(**data)
+        return validated_data
+    except ValidationError as e:
+        logger.error(f"LLM output schema mismatch. Provider: {provider}, Error: {e}")
+        raise e
 
-    raise ValueError(f"Unknown LLM_PROVIDER: {provider}")
+
+def call_llm_json(
+    *,
+    provider: str,
+    system_prompt: str,
+    user_prompt: str,
+    response_model: Type[T],
+) -> T:
+    return call_llm_with_retry(
+        provider=provider,
+        system_prompt=system_prompt,
+        user_prompt=user_prompt,
+        response_model=response_model
+    )

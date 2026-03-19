@@ -37,3 +37,15 @@ While changing into the new qwen3.5 model, call_ollama() always lead to timeout.
 - Refactor call_llm_json interface, Replace single prompt argument with structured parameters:
 system_prompt, user_prompt, response_model
 
+## 2026-03-19 Automated Retry and Robust LLM Integration  (Issue #9)
+
+### Context
+Previous LLM integartion lacks error handling and retry mechanism. Furthermore, there is a tight coupling between the service layer and raw LLM responses, requiring manual JSON extraction and validation in every business logic function
+### Decision
+- Integrate tenacity library in llm.py for automated retry 
+- Refactor call_llm_json, error handling moved to lowest layer, service layer don't handle extract_json and pythantic validation anymore, it get safe response model directly
+- Add dictionary for LLM providers, discard if-case distinctions
+
+
+
+
