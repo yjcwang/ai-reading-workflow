@@ -90,7 +90,7 @@ def _call_ollama(
         ],
         "stream": False,
         "options": {
-            "temperature": 0.2,
+            "temperature": 0.1,
             "top_p": 0.9,
             "repeat_penalty": 1.1,
             "num_ctx": 4096,
@@ -139,7 +139,7 @@ def _call_openai(
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_prompt},
         ],
-        "temperature": 0.2,
+        "temperature": 0.1,
     }
 
     if response_schema is not None:
@@ -174,7 +174,7 @@ def _call_gemini(
     client = genai.Client(api_key=settings.GEMINI_API_KEY)
 
     config_kwargs: dict[str, Any] = {
-        "temperature": 0.2,
+        "temperature": 0.1,
         "top_p": 0.9,
         "system_instruction": system_prompt,
     }
@@ -196,6 +196,42 @@ def _call_gemini(
 
     return response.text
 
+def _call_deepseek(
+    *,
+    system_prompt: str,
+    user_prompt: str,
+    response_schema: dict[str, Any] | None = None,
+) -> str:
+    print("=== llm ===")
+    print("DEEPSEEK")
+    print(settings.DEEPSEEK_MODEL)
+    print("=== llm ===")
+
+    client = OpenAI(
+        api_key=settings.DEEPSEEK_API_KEY,
+        base_url="https://api.deepseek.com"
+    )
+
+    # deepseek API doesn't support direct json schema, thus this need to be injected into system prompt
+    full_system_prompt = system_prompt
+    if response_schema:
+        schema_str = json.dumps(response_schema, ensure_ascii=False, indent=2)
+        full_system_prompt += f"\n\nReturn a JSON object that strictly follows this schema:\n{schema_str}"
+
+    request_kwargs: dict[str, Any] = {
+        "model": "deepseek-chat",
+        "messages": [
+            {"role": "system", "content": full_system_prompt},
+            {"role": "user", "content": user_prompt},
+        ],
+        "temperature": 0.1, 
+        "response_format": {"type": "json_object"} 
+    }
+
+    response = client.chat.completions.create(**request_kwargs)
+    return response.choices[0].message.content
+
+
 
 logger = logging.getLogger(__name__)
 
@@ -206,6 +242,7 @@ LLM_STRATEGY_MAP: Dict[str, Callable] = {
     "ollama": _call_ollama,
     "openai": _call_openai,
     "gemini": _call_gemini,
+    "deepseek": _call_deepseek,
 }
 
 @retry(

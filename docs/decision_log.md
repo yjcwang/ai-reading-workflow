@@ -46,6 +46,13 @@ Previous LLM integartion lacks error handling and retry mechanism. Furthermore, 
 - Refactor call_llm_json, error handling moved to lowest layer, service layer don't handle extract_json and pythantic validation anymore, it get safe response model directly
 - Add dictionary for LLM providers, discard if-case distinctions
 
+## 2026-03-21 Add Deepseek API  (Issue #14)
+
+### Context
+Previous local llm (ollama qwen) responses with slow speed and depends strictly on hardware, it can be a demo but not practical for common use
+### Decision
+- Add _call_deepseek in llm, and update accordingly dictionary, config.py and .env
+
 
 
 
