@@ -30,11 +30,11 @@ After adding Chinese, PDF exporter doesnot support specific Chinese character, s
 ## 2026-03-12 LLM Service Refactor and Structured Output Support (Issue #12)
 
 ### Context
-While changing into the new qwen3.5 model, call_ollama() always lead to timeout. Additionally, it's observed that the previous LLM integration used a single prompt parameter and relied on prompt engineering to enforce JSON output.
+While changing into the new qwen3.5 model, `call_ollama()` always lead to timeout. Additionally, it's observed that the previous LLM integration used a single prompt parameter and relied on prompt engineering to enforce JSON output.
 
 ### Decision
-- Change api/generate into api/chat in call_ollama()
-- Refactor call_llm_json interface, Replace single prompt argument with structured parameters:
+- Change api/generate into api/chat in `call_ollama()`
+- Refactor `call_llm_json` interface, Replace single prompt argument with structured parameters:
 system_prompt, user_prompt, response_model
 
 ## 2026-03-19 Automated Retry and Robust LLM Integration  (Issue #9)
@@ -43,7 +43,7 @@ system_prompt, user_prompt, response_model
 Previous LLM integartion lacks error handling and retry mechanism. Furthermore, there is a tight coupling between the service layer and raw LLM responses, requiring manual JSON extraction and validation in every business logic function
 ### Decision
 - Integrate tenacity library in llm.py for automated retry 
-- Refactor call_llm_json, error handling moved to lowest layer, service layer don't handle extract_json and pythantic validation anymore, it get safe response model directly
+- Refactor `call_llm_json`, error handling moved to lowest layer, service layer don't handle `extract_json` and pythantic validation anymore, it get safe response model directly
 - Add dictionary for LLM providers, discard if-case distinctions
 
 ## 2026-03-21 Add Deepseek API  (Issue #14)
@@ -51,7 +51,22 @@ Previous LLM integartion lacks error handling and retry mechanism. Furthermore, 
 ### Context
 Previous local llm (ollama qwen) responses with slow speed and depends strictly on hardware, it can be a demo but not practical for common use
 ### Decision
-- Add _call_deepseek in llm, and update accordingly dictionary, config.py and .env
+- Add `_call_deepseek` in llm, and update accordingly dictionary, config.py and .env
+
+## 2026-03-21 Refactor Page Logic into Feature Hooks and Pure Helpers (Issue #11)
+
+### Context
+The main page (page.tsx) component had grown too large and was mixing multiple responsibilities, including UI state, persistence, async actions, and result transformation logic. This made the file harder to read, test, and extend safely.
+
+### Decision
+- Extract theme state and persistence into `useTheme`
+- Extract target language persistence into `useTargetLang`
+- Extract analyze flow into `useAnalyzeFeature`
+- Extract explain flow into `useExplainFeature`
+- Extract PDF export flow into `useExportPdf`
+- Move pure result transformation logic into `result-helpers`
+- Keep `page.tsx` focused on feature orchestration and component composition
+
 
 
 
