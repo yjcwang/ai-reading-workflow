@@ -20,7 +20,7 @@ export async function analyze(text: string, level: Level, target_lang: TargetLan
    return (await resp.json()) as AnalyzeResponse;
 }
 
-export async function explain(selected_text: string, context: string, mode: "word" | "sentence", target_lang: TargetLang): Promise<ExplainResponse> {
+export async function explain(mode: "word" | "sentence", selected_text: string, context: string, level: Level, target_lang: TargetLang): Promise<ExplainResponse> {
 
   const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
@@ -30,7 +30,7 @@ export async function explain(selected_text: string, context: string, mode: "wor
   const resp = await fetch(BASE_URL + "/api/explain", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ mode, selected_text, context, target_lang}), 
+    body: JSON.stringify({ mode, selected_text, context, level, target_lang}), 
   });
 
   if (!resp.ok) throw new Error(`HTTP ${resp.status}`);

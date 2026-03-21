@@ -17,7 +17,7 @@ export default function Page() {
   // create data, setter, and keep state
   const [theme, setTheme] = useState<Theme>("light");
 
-  const [level, setLevel] = useState<Level>("N3");
+  const [level, setLevel] = useState<Level>("N2");
 
   const [draftText, setDraftText] = useState("");
   const [lockedText, setLockedText] = useState<string | null>(null);
@@ -113,7 +113,7 @@ export default function Page() {
     // based on the textLength to explain to infer sentence/ word mode
     const mode = inferExplainMode(payload.selectedText) 
     try {
-      const res = await explain(payload.selectedText, payload.context, mode, targetLang);
+      const res = await explain(mode, payload.selectedText, payload.context, level, targetLang);
       if (res.kind === "sentence") {
         setExplainData({
           ...res,
