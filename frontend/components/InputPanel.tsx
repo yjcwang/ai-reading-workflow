@@ -1,6 +1,7 @@
 "use client";
 
 import React , { useState } from "react";
+import styles from "./InputPanel.module.css";
 import type {
   Level,
   GenerateTextRequest,
@@ -96,28 +97,26 @@ export function InputPanel({
 
 
   return (
-    <div style={card}>
-      <div style={rowBetween}>
-        <div style={leftTools}>
+    <div className={styles.card}>
+      <div className={styles.rowBetween}>
+        <div className={styles.leftTools}>
           <div style={{ fontWeight: 700 }}>{tUI.inputPanel.inputTitle}</div>
           {!lockedText && (
             <button
-              style={ghostBtnSmall}
+              className={`${styles.ghostBtnSmall} btn-interactive`}
               onClick={() => setGenerateModalOpen(true)}
               disabled={analyzeLoading}
-              className="btn-interactive"
             >
               {tUI.generator.title}
             </button>
           )}
         </div>
-        <div style={rightTools}>
+        <div className={styles.rightTools}>
           {/* Toggle Theme Light/Dark*/}
           <button
-            style={ghostBtnSmall}
+            className={`${styles.ghostBtnSmall} btn-interactive`}
             onClick={onToggleTheme}
             disabled={analyzeLoading}
-            className="btn-interactive"
           >
             {theme === "light" ? tUI.inputPanel.lightMode : tUI.inputPanel.darkMode}
           </button>
@@ -126,8 +125,7 @@ export function InputPanel({
             value={targetLang}
             onChange={(e) => handleLanguageChange(e.target.value as TargetLang)}
             disabled={analyzeLoading}
-            style={select} 
-            className="btn-interactive"
+            className={`${styles.select} btn-interactive`}
           >
             {LANGUAGES.map((lang) => (
               <option key={lang.code} value={lang.code}>
@@ -140,8 +138,7 @@ export function InputPanel({
             value={level}
             onChange={(e) => setLevel(e.target.value as Level)}
             disabled={analyzeLoading}
-            style={select}
-            className="btn-interactive"
+            className={`${styles.select} btn-interactive`}
           >
             {LEVELS.map((lv) => (
               <option key={lv} value={lv}>
@@ -195,22 +192,22 @@ export function InputPanel({
               >
                 <div style={modalTitle}>{tUI.generator.title}</div>
 
-                <div style={generateForm}>
+                <div className={styles.generateForm}>
                 
-                  <label style={fieldBlock}>
-                    <span style={fieldLabel}>{tUI.generator.topic}</span>
+                  <label className={styles.fieldBlock}>
+                    <span className={styles.fieldLabel}>{tUI.generator.topic}</span>
                     <input
                       value={generateRequest.topic}
                       onChange={(e) =>
                         onGenerateRequestChange({ topic: e.target.value })
                       }
                       placeholder={tUI.generator.topicPlaceholder}
-                      style={input}
+                      className={styles.input}
                     />
                   </label>
 
-                  <label style={fieldBlock}>
-                    <span style={fieldLabel}>{tUI.generator.length}</span>
+                  <label className={styles.fieldBlock}>
+                    <span className={styles.fieldLabel}>{tUI.generator.length}</span>
                     <select
                       value={generateRequest.length}
                       onChange={(e) =>
@@ -218,8 +215,7 @@ export function InputPanel({
                           length: e.target.value as GenerateTextRequest["length"],
                         })
                       }
-                      style={select}
-                      className="btn-interactive"
+                      className={`${styles.select} btn-interactive`}
                     >
                       <option value="short">{tUI.generator.lengthShort}</option>
                       <option value="medium">{tUI.generator.lengthMedium}</option>
@@ -227,8 +223,8 @@ export function InputPanel({
                     </select>
                   </label>
 
-                  <label style={fieldBlock}>
-                    <span style={fieldLabel}>{tUI.generator.style}</span>
+                  <label className={styles.fieldBlock}>
+                    <span className={styles.fieldLabel}>{tUI.generator.style}</span>
                     <select
                       value={generateRequest.style}
                       onChange={(e) =>
@@ -236,8 +232,7 @@ export function InputPanel({
                           style: e.target.value as GenerateTextRequest["style"],
                         })
                       }
-                      style={select}
-                      className="btn-interactive"
+                      className={`${styles.select} btn-interactive`}
                     >
                       <option value="daily">{tUI.generator.styleDaily}</option>
                       <option value="news">{tUI.generator.styleNews}</option>
@@ -253,8 +248,9 @@ export function InputPanel({
                     style={closeBtn}
                     className="btn-interactive"
                     onClick={() => setGenerateModalOpen(false)}
+                    disabled={generateLoading}
                   >
-                    Cancel
+                    {tUI.generator.cancel}
                   </button>
                   {generateError && (
                     <div style={errorText}>
@@ -272,7 +268,7 @@ export function InputPanel({
                     }}
                     disabled={!generateRequest.topic.trim() || analyzeLoading || generateLoading}
                   >
-                    {generateLoading ? "Generating..." : "Generate"}
+                    {generateLoading ? tUI.generator.generating : tUI.generator.generateBtn}
                   </button>
                 </div>
               </div>
@@ -288,14 +284,14 @@ export function InputPanel({
             value={draftText}
             onChange={(e) => setDraftText(e.target.value)}
             placeholder={tUI.inputPanel.placeholder}
-            style={textarea}
+            className={styles.textarea}
             disabled={analyzeLoading}
           />
-          <div style={{ display: "flex", gap: 10, marginTop: 10 }}>
-            <button style={primaryBtn} onClick={onConfirm} disabled={!canConfirm} className="btn-interactive">
+          <div className={styles.actionRow}>
+            <button className={`${styles.primaryBtn} btn-interactive`} onClick={onConfirm} disabled={!canConfirm}>
               {tUI.inputPanel.analyzeBtn}
             </button>
-            <button style={ghostBtn} onClick={onClear} disabled={analyzeLoading && draftText.length === 0} className="btn-interactive">
+            <button className={`${styles.ghostBtn} btn-interactive`} onClick={onClear} disabled={analyzeLoading && draftText.length === 0}>
               {tUI.common.clear}
             </button>
           </div>
@@ -311,13 +307,13 @@ export function InputPanel({
             targetLang={targetLang}
           />
 
-          <div style={{ marginTop: 10 }}>
+          <div className={styles.lockedActions}>
             {analyzeLoading ? (
-              <button style={ghostBtn} disabled className="btn-interactive" >
+              <button className={`${styles.ghostBtn} btn-interactive`} disabled >
                 {tUI.common.loading}
               </button>
             ) : (
-              <button style={ghostBtn} onClick={onClear} className="btn-interactive">
+              <button className={`${styles.ghostBtn} btn-interactive`} onClick={onClear}>
                 {tUI.common.clear}
               </button>
             )}
@@ -329,42 +325,7 @@ export function InputPanel({
 }
 
 
-
-const card: React.CSSProperties = {
-  background: "var(--panel)",
-  border: "1px solid var(--border)",
-  borderRadius: 16,
-  padding: 14,
-};
-
-const rowBetween: React.CSSProperties = {
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
-  marginBottom: 10,
-};
-
-const select: React.CSSProperties = {
-  background: "var(--surface)",
-  color: "var(--text)",
-  border: "1px solid var(--border)",
-  borderRadius: 14,
-  padding: "8px 10px",
-};
-
-const textarea: React.CSSProperties = {
-  width: "100%",
-  height: 320,
-  resize: "vertical",
-  borderRadius: 14,
-  padding: 12,
-  border: "1px solid var(--border-strong)",
-  background: "var(--surface)",
-  color: "var(--text)",
-  outline: "none",
-  lineHeight: 1.5,
-};
-
+// modal css style are kept here because changing them may lead to no glass effect
 const lockedBox: React.CSSProperties = {
   width: "100%",
   height: "70vh",
@@ -375,37 +336,6 @@ const lockedBox: React.CSSProperties = {
   background: "var(--surface)",
   whiteSpace: "pre-wrap",
   lineHeight: 1.5,
-};
-
-const primaryBtn: React.CSSProperties = {
-  border: "1px solid var(--border-strong)",
-  background: "var(--text)",
-  color: "var(--text-invert)",
-  borderRadius: 14,
-  padding: "10px 12px",
-  cursor: "pointer",
-  fontWeight: 700,
-};
-
-const ghostBtn: React.CSSProperties = {
-  border: "1px solid var(--border-strong)",
-  background: "transparent",
-  color: "var(--text)",
-  borderRadius: 14,
-  padding: "10px 12px",
-  cursor: "pointer",
-};
-
-const rightTools: React.CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  gap: 10,
-};
-
-const ghostBtnSmall: React.CSSProperties = {
-  ...ghostBtn,
-  padding: "8px 10px",
-  borderRadius: 14,
 };
 
 const modalOverlay: React.CSSProperties = {
@@ -474,40 +404,6 @@ const confirmBtn: React.CSSProperties = {
   color: "var(--text)",
   cursor: "pointer",
   boxShadow: "0 6px 18px rgba(0,0,0,0.12)",
-};
-
-// text generator 
-const leftTools: React.CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  gap: 10,
-};
-
-const input: React.CSSProperties = {
-  width: "100%",
-  background: "var(--surface)",
-  color: "var(--text)",
-  border: "1px solid var(--border)",
-  borderRadius: 14,
-  padding: "8px 10px",
-  outline: "none",
-};
-
-const generateForm: React.CSSProperties = {
-  display: "flex",
-  flexDirection: "column",
-  gap: 12,
-};
-
-const fieldBlock: React.CSSProperties = {
-  display: "flex",
-  flexDirection: "column",
-  gap: 6,
-};
-
-const fieldLabel: React.CSSProperties = {
-  fontSize: 14,
-  fontWeight: 600,
 };
 
 const errorText: React.CSSProperties = {
