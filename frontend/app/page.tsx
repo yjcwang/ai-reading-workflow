@@ -9,6 +9,7 @@ import { useTargetLang } from "@/hooks/useTargetLang";
 import { useExplainFeature, inferExplainMode } from "@/hooks/useExplainFeature";
 import { useAnalyzeFeature } from "@/hooks/useAnalyzeFeature";
 import { useExportPdf } from "@/hooks/useExportPdf";
+import { useGenerateTextFeature } from "@/hooks/useGenerateTextFeature";
 import {
   addItemFromExplain,
   deleteGrammarByPattern,
@@ -17,11 +18,16 @@ import {
 import type {
   ExplainWordResponse,
   Level,
+  GenerateTextRequest,
 } from "@/lib/types";
+import { DEFAULT_GENERATE_REQUEST } from "@/lib/types";
 
 export default function Page() {
-  const [level, setLevel] = useState<Level>("N2");
-  const [draftText, setDraftText] = useState("");
+  const [level, setLevel] = useState<Level>("N5");
+  const [text, setText] = useState("");
+  const [generateRequest, setGenerateRequest] = useState<GenerateTextRequest>(
+    DEFAULT_GENERATE_REQUEST 
+  );
 
   /* ---------- Toggle theme ---------- */
   const { theme, toggleTheme } = useTheme();
@@ -36,7 +42,24 @@ export default function Page() {
   });
 
   async function handleAnalyzeRequest() {
-    await analyzeFeature.handleAnalyzeRequest(draftText);
+    await analyzeFeature.handleAnalyzeRequest(text);
+  }
+
+  /* ---------- Generate text ---------- */
+  const generateFeature = useGenerateTextFeature({ level });
+  function handleGenerateRequestChange(patch: Partial<GenerateTextRequest>) { // patch is update of only a part, e.g. { topic: "校园生活" }
+    setGenerateRequest((prev) => ({
+      ...prev,
+      ...patch,
+    }));
+  }
+
+  async function handleGenerateRequest(): Promise<boolean> {
+    const generatedText = await generateFeature.handleGenerateRequest(generateRequest);
+    if (!generatedText) return false;
+
+    setText(generatedText);
+    return true;
   }
 
   /* ---------- Explainer actions ---------- */
@@ -45,9 +68,17 @@ export default function Page() {
     targetLang,
   });
 
+  async function handleExplainRequest(payload: {
+    selectedText: string;
+    context: string;
+  }) {
+    await explainFeature.handleExplainRequest(payload);
+  }
+
   /* ---------- Clear all ---------- */
   function onClear() {
-    setDraftText("");
+    setText("");
+    setGenerateRequest(DEFAULT_GENERATE_REQUEST);
     analyzeFeature.resetAnalyze();
     explainFeature.resetExplain();
     exportFeature.resetExport();
@@ -90,23 +121,28 @@ export default function Page() {
         <InputPanel
           level={level}
           setLevel={setLevel}
-          draftText={draftText}
-          setDraftText={setDraftText}
+          text={text}
+          setText={setText}
           lockedText={analyzeFeature.lockedText}
-          loading={analyzeFeature.loading}
+          analyzeLoading={analyzeFeature.analyzeLoading}
           onAnalyzeRequest={handleAnalyzeRequest}
           onClear={onClear}
-          onExplainRequest={explainFeature.handleExplainRequest}
+          onExplainRequest={handleExplainRequest}
           theme={theme}
           onToggleTheme={toggleTheme}
           getMode={inferExplainMode}
           targetLang={targetLang}
           onLanguageChange={handleLanguageChangeWithReset}
+          generateRequest={generateRequest}
+          onGenerateRequestChange={handleGenerateRequestChange}
+          onGenerateRequest={handleGenerateRequest}
+          generateLoading={generateFeature.generateLoading}
+          generateError={generateFeature.generateError}
         />
         <ResultPanel 
           data={analyzeFeature.data} 
           error={analyzeFeature.error} 
-          loading={analyzeFeature.loading} 
+          analyzeLoading={analyzeFeature.analyzeLoading} 
           onDeleteVocab={handleDeleteVocab}
           onDeleteGrammar={handleDeleteGrammar}
           onExportPdf={handleExportPdf}
@@ -116,7 +152,7 @@ export default function Page() {
         />
         <ExplainModal
           open={explainFeature.explainOpen}
-          loading={explainFeature.explainLoading}
+          explainLoading={explainFeature.explainLoading}
           error={explainFeature.explainError}
           data={explainFeature.explainData}
           onClose={explainFeature.closeExplain}

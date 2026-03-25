@@ -7,7 +7,7 @@ import { TargetLang } from "@/lib/types";
 
 type Props = {
   open: boolean;
-  loading: boolean;
+  explainLoading: boolean;
   error: string | null;
   data: ExplainResponse | null;
   onClose: () => void;
@@ -17,7 +17,7 @@ type Props = {
 
 export function ExplainModal({ 
   open, 
-  loading, 
+  explainLoading: loading, 
   error, 
   data, 
   onClose, 

@@ -52,7 +52,7 @@ export function useAnalyzeFeature({
   return {
     data,
     setData,
-    loading,
+    analyzeLoading: loading,
     error,
     lockedText,
     handleAnalyzeRequest,

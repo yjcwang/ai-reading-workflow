@@ -48,3 +48,21 @@ export type ExplainSentenceResponse = {
 
 export type ExplainResponse = ExplainWordResponse | ExplainSentenceResponse;
 
+
+export type GenerateTextRequest = {
+  topic: string;
+  length: "short" | "medium" | "long";
+  style: "daily" | "campus" | "news" | "conversation" | "science";
+};
+
+export const DEFAULT_GENERATE_REQUEST: GenerateTextRequest = {
+  topic: "",
+  length: "medium",
+  style: "daily",
+};
+
+export type GenerateTextResponse = {
+  title: string;
+  text: string;
+};
+

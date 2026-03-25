@@ -8,7 +8,7 @@ import { TargetLang } from "@/lib/types";
 type Props = {
   data: AnalyzeResponse;
   error: string | null;
-  loading: boolean;
+  analyzeLoading: boolean;
   onDeleteVocab: (surface: string) => void;   
   onDeleteGrammar: (pattern: string) => void;
   onExportPdf: () => void;          
@@ -17,7 +17,7 @@ type Props = {
   targetLang: TargetLang;
 };
 
-export function ResultPanel({ data, error, loading, onDeleteVocab, onDeleteGrammar, onExportPdf, exporting, exportError, targetLang}: Props) {
+export function ResultPanel({ data, error, analyzeLoading: loading, onDeleteVocab, onDeleteGrammar, onExportPdf, exporting, exportError, targetLang}: Props) {
   const tUI = UI_STRINGS[targetLang];
   return ( 
     // information display top margin

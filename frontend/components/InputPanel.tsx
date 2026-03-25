@@ -1,10 +1,13 @@
 "use client";
 
 import React , { useState } from "react";
-import type { Level } from "@/lib/types";
+import type {
+  Level,
+  GenerateTextRequest,
+  TargetLang,
+} from "@/lib/types";
 import { LockedTextViewer } from "@/components/LockedTextViewer";
 import { UI_STRINGS } from "@/lib/i18n";
-import { TargetLang } from "@/lib/types";
 
 const LEVELS: Level[] = ["N5", "N4", "N3", "N2", "N1"];
 const LANGUAGES = [
@@ -16,12 +19,18 @@ type Props = {
   level: Level;
   setLevel: (lv: Level) => void;
 
-  draftText: string;
-  setDraftText: (t: string) => void;
+  text: string;
+  setText: (t: string) => void;
+
+  generateRequest: GenerateTextRequest;
+  onGenerateRequestChange: (patch: Partial<GenerateTextRequest>) => void;
+  onGenerateRequest: () => Promise<boolean> | boolean;
+  generateLoading?: boolean;
+  generateError?: string | null;
 
   lockedText: string | null;
 
-  loading: boolean;
+  analyzeLoading: boolean;
   onAnalyzeRequest: () => void;
   onClear: () => void;
 
@@ -38,10 +47,10 @@ type Props = {
 export function InputPanel({
   level,
   setLevel,
-  draftText,
-  setDraftText,
+  text: draftText,
+  setText: setDraftText,
   lockedText,
-  loading,
+  analyzeLoading: analyzeLoading,
   onAnalyzeRequest: onConfirm,
   onClear,
   onExplainRequest,
@@ -49,17 +58,24 @@ export function InputPanel({
   onToggleTheme,
   getMode,
   targetLang, 
-  onLanguageChange
+  onLanguageChange,
+  generateRequest: generateRequest,
+  onGenerateRequestChange: onGenerateRequestChange,
+  onGenerateRequest,
+  generateLoading,
+  generateError
 }: Props) {
   // control if can use confirm buttom
-  const canConfirm = !loading && draftText.trim().length > 0; 
+  const canConfirm = !analyzeLoading && draftText.trim().length > 0; 
   // record the language to switch, but not switched yet
   const [pendingLang, setPendingLang] = useState<TargetLang | null>(null);
+  // generate text modal switch
+  const [generateModalOpen, setGenerateModalOpen] = useState(false);
 
   const tUI = UI_STRINGS[targetLang];
 
   // select language will open a confirmation window
-  const handleSelectChange = (newLang: TargetLang) => {
+  const handleLanguageChange = (newLang: TargetLang) => {
     if (newLang === targetLang) return;
 
     // 架构逻辑：如果没有锁定文本，说明没结果，直接切；如果有，则弹窗确认
@@ -78,16 +94,29 @@ export function InputPanel({
     }
   };
 
+
   return (
     <div style={card}>
       <div style={rowBetween}>
-        <div style={{ fontWeight: 700 }}>{tUI.inputPanel.inputTitle}</div>
+        <div style={leftTools}>
+          <div style={{ fontWeight: 700 }}>{tUI.inputPanel.inputTitle}</div>
+          {!lockedText && (
+            <button
+              style={ghostBtnSmall}
+              onClick={() => setGenerateModalOpen(true)}
+              disabled={analyzeLoading}
+              className="btn-interactive"
+            >
+              {tUI.generator.title}
+            </button>
+          )}
+        </div>
         <div style={rightTools}>
           {/* Toggle Theme Light/Dark*/}
           <button
             style={ghostBtnSmall}
             onClick={onToggleTheme}
-            disabled={loading}
+            disabled={analyzeLoading}
             className="btn-interactive"
           >
             {theme === "light" ? tUI.inputPanel.lightMode : tUI.inputPanel.darkMode}
@@ -95,8 +124,8 @@ export function InputPanel({
           {/* Language Switch EN/ZH */}
           <select
             value={targetLang}
-            onChange={(e) => handleSelectChange(e.target.value as TargetLang)}
-            disabled={loading}
+            onChange={(e) => handleLanguageChange(e.target.value as TargetLang)}
+            disabled={analyzeLoading}
             style={select} 
             className="btn-interactive"
           >
@@ -110,7 +139,7 @@ export function InputPanel({
           <select
             value={level}
             onChange={(e) => setLevel(e.target.value as Level)}
-            disabled={loading}
+            disabled={analyzeLoading}
             style={select}
             className="btn-interactive"
           >
@@ -157,6 +186,98 @@ export function InputPanel({
               </div>
             </div>
           )}
+          {/* Text generator modal TODO: this is too big here in this file? */}
+          {generateModalOpen && (
+            <div style={modalOverlay} onMouseDown={() => setGenerateModalOpen(false)}>
+              <div
+                style={modalContainer}
+                onMouseDown={(e) => e.stopPropagation()}
+              >
+                <div style={modalTitle}>{tUI.generator.title}</div>
+
+                <div style={generateForm}>
+                
+                  <label style={fieldBlock}>
+                    <span style={fieldLabel}>{tUI.generator.topic}</span>
+                    <input
+                      value={generateRequest.topic}
+                      onChange={(e) =>
+                        onGenerateRequestChange({ topic: e.target.value })
+                      }
+                      placeholder={tUI.generator.topicPlaceholder}
+                      style={input}
+                    />
+                  </label>
+
+                  <label style={fieldBlock}>
+                    <span style={fieldLabel}>{tUI.generator.length}</span>
+                    <select
+                      value={generateRequest.length}
+                      onChange={(e) =>
+                        onGenerateRequestChange({
+                          length: e.target.value as GenerateTextRequest["length"],
+                        })
+                      }
+                      style={select}
+                      className="btn-interactive"
+                    >
+                      <option value="short">{tUI.generator.lengthShort}</option>
+                      <option value="medium">{tUI.generator.lengthMedium}</option>
+                      <option value="long">{tUI.generator.lengthLong}</option>
+                    </select>
+                  </label>
+
+                  <label style={fieldBlock}>
+                    <span style={fieldLabel}>{tUI.generator.style}</span>
+                    <select
+                      value={generateRequest.style}
+                      onChange={(e) =>
+                        onGenerateRequestChange({
+                          style: e.target.value as GenerateTextRequest["style"],
+                        })
+                      }
+                      style={select}
+                      className="btn-interactive"
+                    >
+                      <option value="daily">{tUI.generator.styleDaily}</option>
+                      <option value="news">{tUI.generator.styleNews}</option>
+                      <option value="blog">{tUI.generator.styleBlog}</option>
+                      <option value="conversation">{tUI.generator.styleConversation}</option>
+                      <option value="science">{tUI.generator.styleScience}</option>
+                    </select>
+                  </label>
+                </div>
+
+                <div style={modalFooter}>
+                  <button
+                    style={closeBtn}
+                    className="btn-interactive"
+                    onClick={() => setGenerateModalOpen(false)}
+                  >
+                    Cancel
+                  </button>
+                  {generateError && (
+                    <div style={errorText}>
+                      {generateError}
+                    </div>
+                  )}
+                  <button
+                    style={confirmBtn}
+                    className="btn-interactive"
+                    onClick={async () => {
+                      const success = await onGenerateRequest();
+                      if (success) {
+                        setGenerateModalOpen(false);
+                      }
+                    }}
+                    disabled={analyzeLoading || generateLoading}
+                  >
+                    {generateLoading ? "Generating..." : "Generate"}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
 
         </div>
       </div>
@@ -168,13 +289,13 @@ export function InputPanel({
             onChange={(e) => setDraftText(e.target.value)}
             placeholder={tUI.inputPanel.placeholder}
             style={textarea}
-            disabled={loading}
+            disabled={analyzeLoading}
           />
           <div style={{ display: "flex", gap: 10, marginTop: 10 }}>
             <button style={primaryBtn} onClick={onConfirm} disabled={!canConfirm} className="btn-interactive">
               {tUI.inputPanel.analyzeBtn}
             </button>
-            <button style={ghostBtn} onClick={onClear} disabled={loading && draftText.length === 0} className="btn-interactive">
+            <button style={ghostBtn} onClick={onClear} disabled={analyzeLoading && draftText.length === 0} className="btn-interactive">
               {tUI.common.clear}
             </button>
           </div>
@@ -184,14 +305,14 @@ export function InputPanel({
           <LockedTextViewer  // if text locked, then throw it to LockedTextViewer 
             text={lockedText}
             style={lockedBox}
-            disabled={loading}
+            disabled={analyzeLoading}
             onExplainRequest={(payload) => onExplainRequest?.(payload)}
             getMode={getMode}
             targetLang={targetLang}
           />
 
           <div style={{ marginTop: 10 }}>
-            {loading ? (
+            {analyzeLoading ? (
               <button style={ghostBtn} disabled className="btn-interactive" >
                 {tUI.common.loading}
               </button>
@@ -353,5 +474,45 @@ const confirmBtn: React.CSSProperties = {
   color: "var(--text)",
   cursor: "pointer",
   boxShadow: "0 6px 18px rgba(0,0,0,0.12)",
+};
+
+// text generator 
+const leftTools: React.CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  gap: 10,
+};
+
+const input: React.CSSProperties = {
+  width: "100%",
+  background: "var(--surface)",
+  color: "var(--text)",
+  border: "1px solid var(--border)",
+  borderRadius: 14,
+  padding: "8px 10px",
+  outline: "none",
+};
+
+const generateForm: React.CSSProperties = {
+  display: "flex",
+  flexDirection: "column",
+  gap: 12,
+};
+
+const fieldBlock: React.CSSProperties = {
+  display: "flex",
+  flexDirection: "column",
+  gap: 6,
+};
+
+const fieldLabel: React.CSSProperties = {
+  fontSize: 14,
+  fontWeight: 600,
+};
+
+const errorText: React.CSSProperties = {
+  color: "crimson",
+  fontSize: 14,
+  lineHeight: 1.4,
 };
 
