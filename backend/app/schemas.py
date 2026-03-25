@@ -57,3 +57,14 @@ ExplainResponse = Union[ExplainWordResponse, ExplainSentenceResponse]
 class ExportPDFRequest(BaseModel):
     data: AnalyzeResponse
     target_lang: str = "en" 
+    
+# notice that request schema in backend has a 'level' field more than in backend
+class GenerateTextRequest(BaseModel):
+    level: Literal["N5", "N4", "N3", "N2", "N1"]
+    topic: str = Field(..., min_length=1, max_length=200)
+    length: Literal["short", "medium", "long"] = "medium"
+    style: Literal["daily", "blog", "news", "conversation", "science"] = "daily"
+
+class GenerateTextResponse(BaseModel):
+    title: str
+    text: str

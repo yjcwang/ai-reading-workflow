@@ -19,7 +19,7 @@ export function useGenerateTextFeature({
   ): Promise<string | null> {
     setGenerateLoading(true);
     setGenerateError(null);
-
+ 
     try {
       const res = await generateText(request, level);
       return res.text;

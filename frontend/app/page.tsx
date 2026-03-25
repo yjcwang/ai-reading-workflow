@@ -23,7 +23,7 @@ import type {
 import { DEFAULT_GENERATE_REQUEST } from "@/lib/types";
 
 export default function Page() {
-  const [level, setLevel] = useState<Level>("N5");
+  const [level, setLevel] = useState<Level>("N2");
   const [text, setText] = useState("");
   const [generateRequest, setGenerateRequest] = useState<GenerateTextRequest>(
     DEFAULT_GENERATE_REQUEST 
@@ -55,7 +55,18 @@ export default function Page() {
   }
 
   async function handleGenerateRequest(): Promise<boolean> {
-    const generatedText = await generateFeature.handleGenerateRequest(generateRequest);
+    const topic = generateRequest.topic.trim();
+
+    if (!topic) {
+      return false;
+    }
+    const request = {
+      ...generateRequest,
+      topic,
+      level,
+    };
+
+    const generatedText = await generateFeature.handleGenerateRequest(request);
     if (!generatedText) return false;
 
     setText(generatedText);

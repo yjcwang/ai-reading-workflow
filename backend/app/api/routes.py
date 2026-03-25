@@ -1,9 +1,10 @@
 from fastapi import APIRouter
 from fastapi.responses import Response
-from app.schemas import AnalyzeRequest, AnalyzeResponse, ExplainRequest, ExplainResponse, ExportPDFRequest
+from app.schemas import AnalyzeRequest, AnalyzeResponse, ExplainRequest, ExplainResponse, ExportPDFRequest, GenerateTextRequest, GenerateTextResponse
 from app.services.analyzer import analyze_text
 from app.services.explainer import explain_word, explain_sentence
 from app.services.pdf_exporter import build_pdf_bytes
+from app.services.text_generator import generate_text
 
 # controller layer, engage service
 
@@ -27,5 +28,9 @@ def export_pdf_endpoint(req: ExportPDFRequest):
         media_type="application/pdf",
         headers={"Content-Disposition": 'attachment; filename={"my-list.pdf"}'},
     )
+
+@router.post("/generate-text", response_model=GenerateTextResponse)
+def generate_text_endpoint(req: GenerateTextRequest):
+    return generate_text(req)
 
 

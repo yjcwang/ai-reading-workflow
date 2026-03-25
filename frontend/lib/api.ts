@@ -42,6 +42,24 @@ export async function explain(mode: "word" | "sentence", selected_text: string, 
   return (await resp.json()) as ExplainResponse;
 }
 
+export async function exportPdf(data: AnalyzeResponse, targetLang: TargetLang): Promise<Blob> {
+  const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+
+  if (!BASE_URL) {
+    throw new Error("NEXT_PUBLIC_BACKEND_URL is not defined");
+  }
+ 
+  const resp = await fetch(BASE_URL + "/api/export_pdf", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({data, target_lang: targetLang}),
+  });
+
+  if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+
+  return await resp.blob();
+}
+
 export async function generateText(
   request: GenerateTextRequest,
   level: Level,
@@ -59,22 +77,4 @@ export async function generateText(
 
   if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
   return (await resp.json()) as GenerateTextResponse;
-}
-
-export async function exportPdf(data: AnalyzeResponse, targetLang: TargetLang): Promise<Blob> {
-  const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
-
-  if (!BASE_URL) {
-    throw new Error("NEXT_PUBLIC_BACKEND_URL is not defined");
-  }
- 
-  const resp = await fetch(BASE_URL + "/api/export_pdf", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({data, target_lang: targetLang}),
-  });
-
-  if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-
-  return await resp.blob();
 }

@@ -270,7 +270,7 @@ export function InputPanel({
                         setGenerateModalOpen(false);
                       }
                     }}
-                    disabled={analyzeLoading || generateLoading}
+                    disabled={!generateRequest.topic.trim() || analyzeLoading || generateLoading}
                   >
                     {generateLoading ? "Generating..." : "Generate"}
                   </button>
