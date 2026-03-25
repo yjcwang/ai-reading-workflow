@@ -67,6 +67,21 @@ The main page (page.tsx) component had grown too large and was mixing multiple r
 - Move pure result transformation logic into `result-helpers`
 - Keep `page.tsx` focused on feature orchestration and component composition
 
+## 2026-03-25 Add AI Text Generator Feature in Frontend (Issue #15)
+
+### Context
+The application required users to manually find and paste Japanese text before analysis. 
+
+### Decision
+- Introduce AI text generation as a new feature 
+- Add generator UI inside `InputPanel` via a modal-based interaction
+- Move generation logic into `useGenerateTextFeature` for consistency with existing feature hooks
+- Keep `InputPanel` focused on UI and user interactions only
+- Store generation parameters (`topic`, `length`, `style`) in page-level state
+- Use page-level orchestration (`handleGenerateRequest`) to connect UI and feature logic
+- Reuse existing `text` as the single source of truth for analysis input
+- Align generation level with global `level` instead of duplicating it in generator state
+- Introduce i18n support for generator UI (labels, options, states)
 
 
 
