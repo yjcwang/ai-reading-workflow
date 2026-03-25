@@ -9,7 +9,7 @@ def translate_sentence(sentence: str, target_lang: str) -> TranslateSentenceResp
 
     target_lang_full = get_full_language_name(target_lang)
 
-    provider = settings.LLM_PROVIDER_EXPLAINER 
+    provider = settings.LLM_PROVIDER_TRANSLATOR
 
     system_prompt = f"""###FEATURE:TRANSLATOR###
     You are a professional Japanese-to-{target_lang_full} translator.

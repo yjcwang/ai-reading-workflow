@@ -6,6 +6,8 @@ from typing import Literal
 class Settings(BaseSettings):
     LLM_PROVIDER_ANALYZER: Literal["openai", "gemini", "mock", "ollama", "deepseek"] = "gemini"
     LLM_PROVIDER_EXPLAINER: Literal["openai", "gemini", "mock", "ollama", "deepseek"] = "ollama"
+    LLM_PROVIDER_TRANSLATOR: Literal["openai", "gemini", "mock", "ollama", "deepseek"] = "ollama"
+    LLM_PROVIDER_TEXT_GENERATOR: Literal["openai", "gemini", "mock", "ollama", "deepseek"] = "ollama"
 
     OLLAMA_MODEL: str = "qwen2.5:7b"
 

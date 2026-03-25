@@ -74,14 +74,17 @@ The application required users to manually find and paste Japanese text before a
 
 ### Decision
 - Introduce AI text generation as a new feature 
+#### Frontend
 - Add generator UI inside `InputPanel` via a modal-based interaction
 - Move generation logic into `useGenerateTextFeature` for consistency with existing feature hooks
-- Keep `InputPanel` focused on UI and user interactions only
-- Store generation parameters (`topic`, `length`, `style`) in page-level state
+- Store generation parameters (`topic`, `length`, `style`) in page-level state, add input validation of topic field
 - Use page-level orchestration (`handleGenerateRequest`) to connect UI and feature logic
 - Reuse existing `text` as the single source of truth for analysis input
 - Align generation level with global `level` instead of duplicating it in generator state
-- Introduce i18n support for generator UI (labels, options, states)
+#### Backend
+- Add new endpoint: POST /api/generate-text
+- Introduce `GenerateTextRequest` (which include `level` inside, different as in frontend) and `GenerateTextResponse` schemas using Pydantic
+- Implement `text_generator` service following existing analyzer pattern
 
 
 
