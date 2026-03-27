@@ -8,6 +8,8 @@ import type {
   TargetLang,
 } from "@/lib/types";
 import { LockedTextViewer } from "@/components/LockedTextViewer";
+import { LanguageConfirmModal } from "@/components/LanguageConfirmModal";
+import { TextGeneratorModal } from "@/components/TextGeneratorModal";
 import { UI_STRINGS } from "@/lib/i18n";
 
 const LEVELS: Level[] = ["N5", "N4", "N3", "N2", "N1"];
@@ -79,7 +81,7 @@ export function InputPanel({
   const handleLanguageChange = (newLang: TargetLang) => {
     if (newLang === targetLang) return;
 
-    // 架构逻辑：如果没有锁定文本，说明没结果，直接切；如果有，则弹窗确认
+    // 鏋舵瀯閫昏緫锛氬鏋滄病鏈夐攣瀹氭枃鏈紝璇存槑娌＄粨鏋滐紝鐩存帴鍒囷紱濡傛灉鏈夛紝鍒欏脊绐楃‘璁?
     if (!lockedText) {
       onLanguageChange(newLang);
     } else {
@@ -87,7 +89,6 @@ export function InputPanel({
     }
   };
 
-  // 弹窗确认按钮
   const confirmLangChange = () => {
     if (pendingLang) {
       onLanguageChange(pendingLang);
@@ -147,133 +148,29 @@ export function InputPanel({
             ))}
           </select>
           {/* confirm modal for language switch */}
-          {pendingLang && (
-            <div style={modalOverlay} onMouseDown={() => setPendingLang(null)}>
-              <div 
-                style={modalContainer} 
-                onMouseDown={(e) => e.stopPropagation()}
-              >
-                {/* Header */}
-                <div style={modalTitle}>
-                  {tUI.inputPanel.langConfirmTitle}
-                </div>
-
-                {/* Body */}
-                <div style={modalMessage}>
-                  {tUI.inputPanel.langConfirmMessage}
-                </div>
-
-                {/* Footer and Button */}
-                <div style={modalFooter}>
-                  <button 
-                    style={closeBtn} 
-                    className="btn-interactive"
-                    onClick={() => setPendingLang(null)}
-                  >
-                    {tUI.inputPanel.cancel}
-                  </button>
-                  <button 
-                    style={confirmBtn} 
-                    className="btn-interactive"
-                    onClick={confirmLangChange}
-                  >
-                    {tUI.inputPanel.confirm}
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-          {/* Text generator modal TODO: this is too big here in this file? */}
-          {generateModalOpen && (
-            <div style={modalOverlay} onMouseDown={() => setGenerateModalOpen(false)}>
-              <div
-                style={modalContainer}
-                onMouseDown={(e) => e.stopPropagation()}
-              >
-                <div style={modalTitle}>{tUI.generator.title}</div>
-
-                <div className={styles.generateForm}>
-                
-                  <label className={styles.fieldBlock}>
-                    <span className={styles.fieldLabel}>{tUI.generator.topic}</span>
-                    <input
-                      value={generateRequest.topic}
-                      onChange={(e) =>
-                        onGenerateRequestChange({ topic: e.target.value })
-                      }
-                      placeholder={tUI.generator.topicPlaceholder}
-                      className={styles.input}
-                    />
-                  </label>
-
-                  <label className={styles.fieldBlock}>
-                    <span className={styles.fieldLabel}>{tUI.generator.length}</span>
-                    <select
-                      value={generateRequest.length}
-                      onChange={(e) =>
-                        onGenerateRequestChange({
-                          length: e.target.value as GenerateTextRequest["length"],
-                        })
-                      }
-                      className={`${styles.select} btn-interactive`}
-                    >
-                      <option value="short">{tUI.generator.lengthShort}</option>
-                      <option value="medium">{tUI.generator.lengthMedium}</option>
-                      <option value="long">{tUI.generator.lengthLong}</option>
-                    </select>
-                  </label>
-
-                  <label className={styles.fieldBlock}>
-                    <span className={styles.fieldLabel}>{tUI.generator.style}</span>
-                    <select
-                      value={generateRequest.style}
-                      onChange={(e) =>
-                        onGenerateRequestChange({
-                          style: e.target.value as GenerateTextRequest["style"],
-                        })
-                      }
-                      className={`${styles.select} btn-interactive`}
-                    >
-                      <option value="daily">{tUI.generator.styleDaily}</option>
-                      <option value="news">{tUI.generator.styleNews}</option>
-                      <option value="blog">{tUI.generator.styleBlog}</option>
-                      <option value="conversation">{tUI.generator.styleConversation}</option>
-                      <option value="science">{tUI.generator.styleScience}</option>
-                    </select>
-                  </label>
-                </div>
-
-                <div style={modalFooter}>
-                  <button
-                    style={closeBtn}
-                    className="btn-interactive"
-                    onClick={() => setGenerateModalOpen(false)}
-                    disabled={generateLoading}
-                  >
-                    {tUI.generator.cancel}
-                  </button>
-                  {generateError && (
-                    <div style={errorText}>
-                      {generateError}
-                    </div>
-                  )}
-                  <button
-                    style={confirmBtn}
-                    className="btn-interactive"
-                    onClick={async () => {
-                      const success = await onGenerateRequest();
-                      if (success) {
-                        setGenerateModalOpen(false);
-                      }
-                    }}
-                    disabled={!generateRequest.topic.trim() || analyzeLoading || generateLoading}
-                  >
-                    {generateLoading ? tUI.generator.generating : tUI.generator.generateBtn}
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
+          <LanguageConfirmModal
+            open={!!pendingLang}
+            targetLang={targetLang}
+            onClose={() => setPendingLang(null)}
+            onConfirm={confirmLangChange}
+          />
+          {/* Text generator modal */}
+          <TextGeneratorModal
+            open={generateModalOpen}
+            targetLang={targetLang}
+            generateRequest={generateRequest}
+            analyzeLoading={analyzeLoading}
+            generateLoading={generateLoading}
+            generateError={generateError}
+            onClose={() => setGenerateModalOpen(false)}
+            onGenerateRequestChange={onGenerateRequestChange}
+            onGenerate={async () => {
+              const success = await onGenerateRequest();
+              if (success) {
+                setGenerateModalOpen(false);
+              }
+            }}
+          />
 
         </div>
       </div>
@@ -325,7 +222,6 @@ export function InputPanel({
 }
 
 
-// modal css style are kept here because changing them may lead to no glass effect
 const lockedBox: React.CSSProperties = {
   width: "100%",
   height: "70vh",
@@ -337,78 +233,3 @@ const lockedBox: React.CSSProperties = {
   whiteSpace: "pre-wrap",
   lineHeight: 1.5,
 };
-
-const modalOverlay: React.CSSProperties = {
-  position: "fixed",
-  inset: 0,
-  zIndex: 9999, // 确保在所有内容之上
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  padding: 16,
-  background: "rgba(0, 0, 0, 0.15)", // 统一遮罩透明度
-};
-
-const modalContainer: React.CSSProperties = {
-  width: "min(400px, 100%)", // 确认框可以比详情框稍窄
-  borderRadius: 16,
-  background: "rgba(var(--panel-rgb), 0.5)", // 统一玻璃拟态背景
-  backdropFilter: "blur(8px)",
-  WebkitBackdropFilter: "blur(8px)",
-  border: "1px solid var(--border)",
-  boxShadow: "var(--shadow)",
-  padding: 20,
-  color: "var(--text)",
-  transform: "translateY(-20px)",
-  display: "flex",
-  flexDirection: "column",
-  gap: 16,
-};
-
-const modalTitle: React.CSSProperties = {
-  fontWeight: 700,
-  fontSize: 16,
-};
-
-const modalMessage: React.CSSProperties = {
-  opacity: 0.8,
-  fontSize: 15,
-  lineHeight: 1.5,
-};
-
-const modalFooter: React.CSSProperties = {
-  display: "flex",
-  justifyContent: "flex-end",
-  gap: 10,
-  marginTop: 4,
-};
-
-const closeBtn: React.CSSProperties = {
-  display: "flex",
-  gap: "8px",
-  borderRadius: 14,
-  padding: "6px 10px",
-  background: "transparent",
-  border: "1px solid var(--border)",
-  color: "var(--text)",
-  cursor: "pointer",
-  boxShadow: "0 6px 18px rgba(0,0,0,0.12)",
-};
-const confirmBtn: React.CSSProperties = {
-  display: "flex",
-  gap: "8px",
-  borderRadius: 14,
-  padding: "6px 10px",
-  background: "rgba(var(--accent-rgb), 0.2)",
-  border: "1px solid var(--border)",
-  color: "var(--text)",
-  cursor: "pointer",
-  boxShadow: "0 6px 18px rgba(0,0,0,0.12)",
-};
-
-const errorText: React.CSSProperties = {
-  color: "crimson",
-  fontSize: 14,
-  lineHeight: 1.4,
-};
-
