@@ -86,6 +86,17 @@ The application required users to manually find and paste Japanese text before a
 - Introduce `GenerateTextRequest` (which include `level` inside, different as in frontend) and `GenerateTextResponse` schemas using Pydantic
 - Implement `text_generator` service following existing analyzer pattern
 
+## 2026-03-27 Refactor InputPanel into smaller Components (Issue #17)
+
+### Context
+`InputPanel` had grown too large and was handling too much UI structure directly, including modal markup and styling css. This made the component harder to read and maintain safely on the frontend.
+
+### Decision
+- Keep `InputPanel` as the owner of state and business decisions and existing handlers
+- Extract `LanguageConfirmModal` and `TextGeneratorModal` from `InputPanel` as separate component
+- Move `InputPanel` styles into `InputPanel.module.css` 
+
+
 
 
 

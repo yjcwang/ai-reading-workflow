@@ -62,18 +62,18 @@ export function LanguageConfirmModal({
 const modalOverlay: React.CSSProperties = {
   position: "fixed",
   inset: 0,
-  zIndex: 9999, // 纭繚鍦ㄦ墍鏈夊唴瀹逛箣涓?
+  zIndex: 9999, 
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
   padding: 16,
-  background: "rgba(0, 0, 0, 0.15)", // 缁熶竴閬僵閫忔槑搴?
+  background: "rgba(0, 0, 0, 0.15)", 
 };
 
 const modalContainer: React.CSSProperties = {
-  width: "min(400px, 100%)", // 纭妗嗗彲浠ユ瘮璇︽儏妗嗙◢绐?
+  width: "min(400px, 100%)", 
   borderRadius: 16,
-  background: "rgba(var(--panel-rgb), 0.5)", // 缁熶竴鐜荤拑鎷熸€佽儗鏅?
+  background: "rgba(var(--panel-rgb), 0.5)", 
   backdropFilter: "blur(8px)",
   WebkitBackdropFilter: "blur(8px)",
   border: "1px solid var(--border)",
