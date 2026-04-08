@@ -9,15 +9,15 @@ class AnalyzeRequest(BaseModel):
     target_lang: str = "en"
 
 class VocabItem(BaseModel):
-    surface: str
+    expression: str
     reading: Optional[str] = None
-    meaning: str
+    definition: str
     example: str
     notes: Optional[str] = None
 
 class GrammarItem(BaseModel):
-    pattern: str
-    explanation: str
+    expression: str
+    definition: str
     example: str
     notes: Optional[str] = None
 
@@ -37,9 +37,9 @@ ExplainType = Literal["vocab", "grammar"]
 class ExplainWordResponse(BaseModel):
     kind: Literal["word"] = "word"
     type: ExplainType
-    surface: str
+    expression: str
     reading: Optional[str] = None
-    meaning: str                         
+    definition: str
     example: str             
     notes: Optional[str] = None   
 

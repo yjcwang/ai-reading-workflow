@@ -12,8 +12,8 @@ import { useExportPdf } from "@/hooks/useExportPdf";
 import { useGenerateTextFeature } from "@/hooks/useGenerateTextFeature";
 import {
   addItemFromExplain,
-  deleteGrammarByPattern,
-  deleteVocabBySurface,
+  deleteGrammarByExpression,
+  deleteVocabByExpression,
 } from "@/lib/item-helpers";
 import type {
   ExplainWordResponse,
@@ -108,12 +108,12 @@ export default function Page() {
   }
 
   /* ---------- Delete from list on ResultPanel ---------- */
-  function handleDeleteVocab(surface: string) {
-    analyzeFeature.setData((prev) => deleteVocabBySurface(prev, surface));
+  function handleDeleteVocab(expression: string) {
+    analyzeFeature.setData((prev) => deleteVocabByExpression(prev, expression));
   }
 
-  function handleDeleteGrammar(pattern: string) {
-    analyzeFeature.setData((prev) => deleteGrammarByPattern(prev, pattern));
+  function handleDeleteGrammar(expression: string) {
+    analyzeFeature.setData((prev) => deleteGrammarByExpression(prev, expression));
   }
 
   /* ---------- Export and Download PDF ---------- */
@@ -189,4 +189,3 @@ const grid: React.CSSProperties = {
   gap: 16,
   minHeight: 0,
 };
-

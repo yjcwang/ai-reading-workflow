@@ -20,7 +20,7 @@ def analyze_text(req: AnalyzeRequest) -> AnalyzeResponse:
     You are a Japanese language expert and translator.
     Your task is to analyze Japanese text and provide explanations EXCLUSIVELY in {target_lang_full}.
     [STRICT LANGUAGE RULES]
-    - ALL "meaning", "explanation", and "notes" fields MUST be written in {target_lang_full}.
+    - ALL "definition" and "notes" fields MUST be written in {target_lang_full}.
     - DO NOT use Japanese to explain Japanese.
     [JLPT {req.level} CONTEXT]
     - Extract vocabulary and grammar relevant to JLPT {req.level}.

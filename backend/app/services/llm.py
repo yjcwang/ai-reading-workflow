@@ -29,17 +29,17 @@ def _mock_json_output(prompt: str) -> str:
         data = {
             "vocab": [
                 {
-                    "surface": "(Mock)練習",
+                    "expression": "(Mock)練習",
                     "reading": "れんしゅう",
-                    "meaning": "practice",
+                    "definition": "practice",
                     "example": "毎日ピアノを練習します。", 
                     "notes": "Appears in study contexts."
                 }
             ],
             "grammar": [
                 {
-                    "pattern": "(Mock)〜てみる",
-                    "explanation": "Try doing something.",
+                    "expression": "(Mock)〜てみる",
+                    "definition": "Try doing something.",
                     "example": "やってみる", 
                     "notes": "Often used for attempts."
                 }
@@ -48,9 +48,9 @@ def _mock_json_output(prompt: str) -> str:
     elif cleaned_prompt.startswith("###FEATURE:EXPLAINER###"):
         data = {
             "type": "vocab",
-            "surface": "(Mock)把握",
+            "expression": "(Mock)把握",
             "reading": "はあく",
-            "meaning": "grasp",
+            "definition": "grasp",
             "example": "情報の背景を把握する",
             "notes": "Formal context."
         }

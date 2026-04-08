@@ -75,10 +75,10 @@ export function ExplainModal({
                   </button>
     
                   <div style={itemSurface}>
-                    {data.surface}{" "}
+                    {data.expression}{" "}
                     {data.reading ? <span style={mutedNormal}>({data.reading})</span> : null}
                   </div>              
-                  <div style={muted}>{data.meaning}</div>
+                  <div style={muted}>{data.definition}</div>
 
                   {data.example ? <div style={example}>{data.example}</div> : null}
 
@@ -105,7 +105,7 @@ export function ExplainModal({
                 ) : (
                   <ul style={list}>
                     {data.vocab.map((v, idx) => (
-                      <li key={`${v.surface}-${idx}`} style={item}>
+                      <li key={`${v.expression}-${idx}`} style={item}>
                         <button
                           className="btn-interactive"
                           style={addBtn}
@@ -113,9 +113,9 @@ export function ExplainModal({
                             onAdd({
                               kind: "word",
                               type: "vocab",
-                              surface: v.surface,
+                              expression: v.expression,
                               reading: v.reading,
-                              meaning: v.meaning,
+                              definition: v.definition,
                               example: v.example,
                               notes: v.notes ?? null,
                             })
@@ -125,9 +125,9 @@ export function ExplainModal({
                           {tUI.explainModal.addToList}
                         </button>
                         <div style={itemSurface}>
-                          {v.surface} {v.reading ? <span style={mutedNormal}>({v.reading})</span> : null}
+                          {v.expression} {v.reading ? <span style={mutedNormal}>({v.reading})</span> : null}
                         </div>
-                        {v.meaning ? <div style={muted}>{v.meaning}</div> : null}
+                        {v.definition ? <div style={muted}>{v.definition}</div> : null}
                         {v.example ? <div style={example}>{v.example}</div> : null}
                         {v.notes ? <div style={mutedSmall}>{v.notes}</div> : null}
                       </li>
@@ -147,7 +147,7 @@ export function ExplainModal({
                 ) : (
                   <ul style={list}>
                     {data.grammar.map((g, idx) => (
-                      <li key={`${g.pattern}-${idx}`} style={item}>
+                      <li key={`${g.expression}-${idx}`} style={item}>
                         <button
                           className="btn-interactive"
                           style={addBtn}
@@ -155,9 +155,9 @@ export function ExplainModal({
                             onAdd({
                               kind: "word",
                               type: "grammar",
-                              surface: g.pattern,
+                              expression: g.expression,
                               reading: null,
-                              meaning: g.explanation,
+                              definition: g.definition,
                               example: g.example,
                               notes: g.notes ?? null,
                             })
@@ -166,8 +166,8 @@ export function ExplainModal({
                         >
                           {tUI.explainModal.addToList}
                         </button>
-                        <div style={itemSurface}>{g.pattern}</div>
-                        {g.explanation ? <div style={muted}>{g.explanation}</div> : null}
+                        <div style={itemSurface}>{g.expression}</div>
+                        {g.definition ? <div style={muted}>{g.definition}</div> : null}
                         {g.example ? <div style={example}>{g.example}</div> : null}
                         {g.notes ? <div style={mutedSmall}>{g.notes}</div> : null}
                       </li>

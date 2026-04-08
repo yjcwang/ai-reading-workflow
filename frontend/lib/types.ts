@@ -3,16 +3,16 @@ export type TargetLang = "zh" | "en";
 export type Level = "N5" | "N4" | "N3" | "N2" | "N1";
 
 export type VocabItem = {
-  surface: string;
+  expression: string;
   reading?: string;
-  meaning: string;
+  definition: string;
   example: string;
   notes?: string;
 };
 
 export type GrammarItem = {
-  pattern: string;
-  explanation: string;
+  expression: string;
+  definition: string;
   example: string;
   notes?: string;
 };
@@ -27,9 +27,9 @@ export type ExplainType = "vocab" | "grammar";
 export type ExplainWordResponse = {
   kind: "word";
   type: ExplainType;
-  surface: string;
+  expression: string;
   reading?: string | null;
-  meaning: string;
+  definition: string;
   example: string;
   notes?: string | null;
 };

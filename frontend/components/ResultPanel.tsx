@@ -9,8 +9,8 @@ type Props = {
   data: AnalyzeResponse;
   error: string | null;
   analyzeLoading: boolean;
-  onDeleteVocab: (surface: string) => void;   
-  onDeleteGrammar: (pattern: string) => void;
+  onDeleteVocab: (expression: string) => void;
+  onDeleteGrammar: (expression: string) => void;
   onExportPdf: () => void;          
   exporting: boolean;               
   exportError: string | null;
@@ -54,18 +54,18 @@ export function ResultPanel({ data, error, analyzeLoading: loading, onDeleteVoca
               <li style={empty}>{tUI.resultPanel.noData}</li>
             ) : (
               data.vocab.map((v, i) => (
-                <li key={v.surface} style={item}> 
-                  <div style={{ fontWeight: 700 }}>{v.surface} {v.reading ? <span style={muted}>({v.reading})</span> : null}</div>
+                <li key={v.expression} style={item}>
+                  <div style={{ fontWeight: 700 }}>{v.expression} {v.reading ? <span style={muted}>({v.reading})</span> : null}</div>
                   {/*delete button*/}
                   <button
                     className="btn-interactive"
                     style={deleteBtn}
-                    onClick={() => onDeleteVocab(v.surface)}
+                    onClick={() => onDeleteVocab(v.expression)}
                     title="Delete"
                   >
                     {tUI.resultPanel.deleteItem}
                   </button>
-                  {v.meaning ? <div style={muted}>{v.meaning}</div> : null}
+                  {v.definition ? <div style={muted}>{v.definition}</div> : null}
                   {v.example ? <div style={example}>{v.example}</div> : null}
                   {v.notes ? <div style={mutedSmall}>{v.notes}</div> : null}
                 </li>
@@ -84,18 +84,18 @@ export function ResultPanel({ data, error, analyzeLoading: loading, onDeleteVoca
               <li style={empty}>{tUI.resultPanel.noData}</li>
             ) : (
               data.grammar.map((g, i) => (
-                <li key={g.pattern} style={item}>
-                  <div style={{ fontWeight: 700 }}>{g.pattern}</div>
+                <li key={g.expression} style={item}>
+                  <div style={{ fontWeight: 700 }}>{g.expression}</div>
                   {/*delete button*/}
                   <button
                     className="btn-interactive"
                     style={deleteBtn}
-                    onClick={() => onDeleteGrammar(g.pattern)}
+                    onClick={() => onDeleteGrammar(g.expression)}
                     title="Delete"
                   >
                     {tUI.resultPanel.deleteItem}
                   </button>
-                  {g.explanation ? <div style={muted}>{g.explanation}</div> : null}
+                  {g.definition ? <div style={muted}>{g.definition}</div> : null}
                   {g.example ? <div style={example}>{g.example}</div> : null}
                   {g.notes ? <div style={mutedSmall}>{g.notes}</div> : null}
                 </li>

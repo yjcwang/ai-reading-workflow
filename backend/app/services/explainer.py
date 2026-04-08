@@ -23,7 +23,7 @@ def explain_word(req: ExplainRequest) -> ExplainWordResponse:
     You are a Japanese language expert and translator. 
     Your task is to analyze the selected text and provide explanations EXCLUSIVELY in {target_lang_full}.
     [STRICT LANGUAGE RULES]
-    - ALL "meaning" and "notes" fields MUST be written in {target_lang_full}.
+    - ALL "definition" and "notes" fields MUST be written in {target_lang_full}.
     [JLPT {req.level} CONTEXT]
     - The learner's level is JLPT {req.level}. 
     [MORE rules]

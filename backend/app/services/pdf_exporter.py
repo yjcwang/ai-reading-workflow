@@ -94,18 +94,16 @@ class PDFExporter:
                 "main_title": "Summary List",
                 "vocab_title": "Vocabulary",
                 "grammar_title": "Grammar",
-                "meaning": "Meaning",
+                "definition": "Definition",
                 "example": "Example",
-                "explanation": "Explanation",
                 "notes": "Notes"
             },
             "zh": {
                 "main_title": "总结列表",
                 "vocab_title": "词汇",
                 "grammar_title": "语法",
-                "meaning": "释义",
+                "definition": "释义",
                 "example": "例",
-                "explanation": "讲解",
                 "notes": "备注"
             }
         }
@@ -129,14 +127,14 @@ class PDFExporter:
 
         for i, v in enumerate(data.vocab, 1):
             # 单词与读音 (JP)
-            jp_title = f"<b>{i}. {v.surface}</b>"
+            jp_title = f"<b>{i}. {v.expression}</b>"
             if v.reading:
                 jp_title += f" ({v.reading})"
             elements.append(Paragraph(self._fmt_mix(jp_title, "JP"), self.styles['JP_Content']))
 
             # 含义 (SC)
-            if v.meaning:
-                elements.append(Paragraph(self._fmt_mix(f"<i>{t['meaning']}:</i> {v.meaning}", "SC"), self.styles['CN_Body']))
+            if v.definition:
+                elements.append(Paragraph(self._fmt_mix(f"<i>{t['definition']}:</i> {v.definition}", "SC"), self.styles['CN_Body']))
             
             # 例句 (JP)
             if v.example:
@@ -155,10 +153,10 @@ class PDFExporter:
             
             for i, g in enumerate(data.grammar, 1):
                 # 语法模式 (JP)
-                elements.append(Paragraph(self._fmt_mix(f"{i}. {g.pattern}", "JP"), self.styles['JP_Content']))
+                elements.append(Paragraph(self._fmt_mix(f"{i}. {g.expression}", "JP"), self.styles['JP_Content']))
                 
                 # 解释 (SC)
-                elements.append(Paragraph(self._fmt_mix(f"{t['explanation']}: {g.explanation}", "SC"), self.styles['CN_Body']))
+                elements.append(Paragraph(self._fmt_mix(f"{t['definition']}: {g.definition}", "SC"), self.styles['CN_Body']))
                 
                 # --- 新增：语法例句 (JP) ---
                 if hasattr(g, 'example') and g.example:

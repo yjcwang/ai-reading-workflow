@@ -6,14 +6,14 @@ export function addItemFromExplain(
 ): AnalyzeResponse {
   if (item.type === "vocab") {
     const newItem = {
-      surface: item.surface,
+      expression: item.expression,
       reading: item.reading ?? undefined,
-      meaning: item.meaning,
+      definition: item.definition,
       example: item.example,
       notes: item.notes ?? undefined,
     };
 
-    if (prev.vocab.some((v) => v.surface === newItem.surface)) {
+    if (prev.vocab.some((v) => v.expression === newItem.expression)) {
       return prev;
     }
 
@@ -24,13 +24,13 @@ export function addItemFromExplain(
   }
 
   const newItem = {
-    pattern: item.surface,
-    explanation: item.meaning,
+    expression: item.expression,
+    definition: item.definition,
     example: item.example,
     notes: item.notes ?? undefined,
   };
 
-  if (prev.grammar.some((g) => g.pattern === newItem.pattern)) {
+  if (prev.grammar.some((g) => g.expression === newItem.expression)) {
     return prev;
   }
 
@@ -40,22 +40,22 @@ export function addItemFromExplain(
   };
 }
 
-export function deleteVocabBySurface(
+export function deleteVocabByExpression(
   prev: AnalyzeResponse,
-  surface: string,
+  expression: string,
 ): AnalyzeResponse {
   return {
     ...prev,
-    vocab: prev.vocab.filter((v) => v.surface !== surface),
+    vocab: prev.vocab.filter((v) => v.expression !== expression),
   };
 }
 
-export function deleteGrammarByPattern(
+export function deleteGrammarByExpression(
   prev: AnalyzeResponse,
-  pattern: string,
+  expression: string,
 ): AnalyzeResponse {
   return {
     ...prev,
-    grammar: prev.grammar.filter((g) => g.pattern !== pattern),
+    grammar: prev.grammar.filter((g) => g.expression !== expression),
   };
 }
