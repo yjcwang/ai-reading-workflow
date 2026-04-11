@@ -170,9 +170,7 @@ const explainBtn: React.CSSProperties = {
   padding: "6px 10px",
   borderRadius: 12,
   border: "1px solid var(--border)",
-  background: "rgba(var(--accent-rgb), 0.1)",
-  backdropFilter: "blur(3px)",
-  WebkitBackdropFilter: "blur(3px)",
+  background: "var(--accent-soft)",
 
   color: "var(--text)",
   cursor: "pointer",
