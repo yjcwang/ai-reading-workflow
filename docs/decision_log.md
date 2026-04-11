@@ -96,6 +96,19 @@ The application required users to manually find and paste Japanese text before a
 - Extract `LanguageConfirmModal` and `TextGeneratorModal` from `InputPanel` as separate component
 - Move `InputPanel` styles into `InputPanel.module.css` 
 
+## 2026-04-11 Add Persistent Result Storage with SQLModel Layers (Issue #18)
+
+### Context
+The app needed a persistent way to save analyzed reading results and retrieve them later. The previous flow only handled in-memory request and response data, without a database-backed structure for saved results, vocab items, and grammar items.
+
+### Decision
+- Add SQLite persistence with SQLModel under `backend/app/db`
+- Introduce table models `Result`, `Vocab`, and `Grammar` under `backend/app/models`
+- Introduce `ResultRepository` to isolate raw database read/write operations
+- Introduce `ResultService` to coordinate save, list, detail, and delete flows
+- Add request and response schemas for saved results in `backend/app/schemas.py`
+- Add REST endpoints for saved results in `backend/app/api/routes.py`
+
 
 
 

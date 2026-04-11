@@ -1,5 +1,4 @@
 """Database engine and session helpers."""
-# 连接数据库,提供 session, 初始化表
 
 from pathlib import Path
 
@@ -18,9 +17,11 @@ engine = create_engine(
 
 
 def get_session():
+    # FastAPI injects one Session per request through Depends(get_session).
     with Session(engine) as session:
         yield session
 
 
 def create_db_and_tables() -> None:
+    # create_all() creates missing tables from imported SQLModel table classes.
     SQLModel.metadata.create_all(engine)

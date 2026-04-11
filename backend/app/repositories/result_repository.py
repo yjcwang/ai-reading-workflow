@@ -1,11 +1,12 @@
 """Data access helpers for result records."""
-# 纯数据库读写: insert, select, delete, 不负责service, http
+
 from sqlmodel import Session, select
 
 from app.models.result import Grammar, Result, Vocab
 
 
 class ResultRepository:
+    # Repository layer handles raw database reads and writes only.
     def create_result(
         self,
         session: Session,
@@ -20,6 +21,7 @@ class ResultRepository:
             title=title,
         )
         session.add(result)
+        # flush() pushes the INSERT now so result.id is available before commit().
         session.flush()
         session.refresh(result)
         return result
@@ -68,7 +70,8 @@ class ResultRepository:
         session.add_all(rows)
         session.flush()
         return rows
-
+    
+    # SELECT * FROM results WHERE id = ?
     def get_result_by_id(self, session: Session, result_id: str) -> Result | None:
         statement = select(Result).where(Result.id == result_id)
         return session.exec(statement).first()
@@ -77,15 +80,18 @@ class ResultRepository:
         statement = select(Result).order_by(Result.created_at.desc())
         return list(session.exec(statement).all())
 
+    # SELECT * FROM vocab_items WHERE result_id = ?
     def list_vocab_by_result_id(self, session: Session, result_id: str) -> list[Vocab]:
         statement = select(Vocab).where(Vocab.result_id == result_id)
         return list(session.exec(statement).all())
 
+    # SELECT * FROM grammar_items WHERE result_id = ?
     def list_grammar_by_result_id(self, session: Session, result_id: str) -> list[Grammar]:
         statement = select(Grammar).where(Grammar.result_id == result_id)
         return list(session.exec(statement).all())
 
     def delete_result(self, session: Session, result: Result) -> None:
+        # Child rows are deleted first 
         vocab_items = self.list_vocab_by_result_id(session, result.id)
         grammar_items = self.list_grammar_by_result_id(session, result.id)
 

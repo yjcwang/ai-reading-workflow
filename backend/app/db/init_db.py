@@ -1,4 +1,5 @@
 """Database initialization entrypoint."""
+
 from app.db.session import create_db_and_tables
 
 

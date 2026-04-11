@@ -21,20 +21,23 @@ from app.services.pdf_exporter import build_pdf_bytes
 from app.services.result_service import ResultService
 from app.services.text_generator import generate_text
 
-# controller layer, engage service
-
+# Controller layer: receives HTTP requests and delegates actual work to services.
 router = APIRouter()
 result_service = ResultService()
 
-# AnalyzeRequest, AnalyzeResponse are two Pydantic objects defined in schemas, to constraint in- and output format
+
 @router.post("/analyze", response_model=AnalyzeResponse)
 def analyze_endpoint(req: AnalyzeRequest):
     return analyze_text(req)
 
+
 @router.post("/explain", response_model=ExplainResponse)
 def explain_endpoint(req: ExplainRequest):
-    if req.mode == "word": return explain_word(req)
-    else: return explain_sentence(req)
+    if req.mode == "word":
+        return explain_word(req)
+    else:
+        return explain_sentence(req)
+
 
 @router.post("/export_pdf")
 def export_pdf_endpoint(req: ExportPDFRequest):
@@ -45,9 +48,11 @@ def export_pdf_endpoint(req: ExportPDFRequest):
         headers={"Content-Disposition": 'attachment; filename={"my-list.pdf"}'},
     )
 
+
 @router.post("/generate-text", response_model=GenerateTextResponse)
 def generate_text_endpoint(req: GenerateTextRequest):
     return generate_text(req)
+
 
 @router.post("/results", response_model=SavedResultResponse)
 def save_result_endpoint(
@@ -78,5 +83,3 @@ def delete_result_endpoint(
     session: Session = Depends(get_session),
 ):
     return result_service.delete_result(session, result_id)
-
-

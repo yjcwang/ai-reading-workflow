@@ -1,4 +1,5 @@
 """Result SQLModel table definitions."""
+
 from datetime import datetime
 from typing import List, Optional
 from uuid import uuid4
@@ -11,6 +12,7 @@ def generate_uuid() -> str:
 
 
 class Result(SQLModel, table=True):
+    # Parent table: one saved reading result.
     __tablename__ = "results"
 
     id: str = Field(default_factory=generate_uuid, primary_key=True, index=True)
@@ -19,11 +21,13 @@ class Result(SQLModel, table=True):
     created_at: datetime = Field(default_factory=datetime.utcnow, index=True)
     title: Optional[str] = None
 
+    # Relationship fields make it possible to navigate related rows in Python.
     vocab_items: List["Vocab"] = Relationship(back_populates="result")
     grammar_items: List["Grammar"] = Relationship(back_populates="result")
 
 
 class Vocab(SQLModel, table=True):
+    # Child table: each row belongs to one Result through result_id.
     __tablename__ = "vocab_items"
 
     id: str = Field(default_factory=generate_uuid, primary_key=True, index=True)
@@ -38,6 +42,7 @@ class Vocab(SQLModel, table=True):
 
 
 class Grammar(SQLModel, table=True):
+    # Child table: each row belongs to one Result through result_id.
     __tablename__ = "grammar_items"
 
     id: str = Field(default_factory=generate_uuid, primary_key=True, index=True)

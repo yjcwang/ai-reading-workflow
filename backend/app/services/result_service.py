@@ -1,5 +1,5 @@
 """Business logic for result operations."""
-# 组织业务流程, 决定先创建 result，再创建 vocab，再创建 grammar
+
 from fastapi import HTTPException
 from sqlmodel import Session
 
@@ -7,8 +7,8 @@ from app.repositories.result_repository import ResultRepository
 from app.schemas import (
     ResultSummaryResponse,
     SaveResultRequest,
-    SavedResultResponse,
     SavedGrammarItem,
+    SavedResultResponse,
     SavedVocabItem,
 )
 
@@ -18,6 +18,7 @@ class ResultService:
         self.repository = repository or ResultRepository()
 
     def save_result(self, session: Session, req: SaveResultRequest) -> SavedResultResponse:
+        # Save the parent row first so its id can be used by child vocab/grammar rows.
         result = self.repository.create_result(
             session,
             text=req.text,
@@ -37,6 +38,7 @@ class ResultService:
             grammar_items=[item.model_dump() for item in req.grammar],
         )
 
+        # Commit once so the whole save operation succeeds or fails as one transaction.
         session.commit()
         session.refresh(result)
 
@@ -69,6 +71,7 @@ class ResultService:
         if not result:
             raise HTTPException(status_code=404, detail="Result not found")
 
+        # Repository returns ORM rows; service maps them into API response schemas.
         vocab_items = self.repository.list_vocab_by_result_id(session, result_id)
         grammar_items = self.repository.list_grammar_by_result_id(session, result_id)
 
