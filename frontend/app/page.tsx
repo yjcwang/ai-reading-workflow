@@ -100,6 +100,10 @@ export default function Page() {
     setHistoryOpen(false);
   }
 
+  async function handleDeleteSavedResult(resultId: string) {
+    await savedResultsFeature.removeSavedResult(resultId);
+  }
+
   async function handleSaveCurrentResult() {
     const currentText = analyzeFeature.lockedText?.trim() || text.trim();
     const hasResult = analyzeFeature.data.vocab.length > 0 || analyzeFeature.data.grammar.length > 0;
@@ -234,8 +238,10 @@ export default function Page() {
           loading={savedResultsFeature.historyLoading}
           error={savedResultsFeature.historyError}
           loadingResultId={savedResultsFeature.historyLoadingResultId}
+          deletingResultId={savedResultsFeature.historyDeletingResultId}
           onClose={() => setHistoryOpen(false)}
           onLoad={handleLoadSavedResult}
+          onDelete={handleDeleteSavedResult}
           onRefresh={savedResultsFeature.refreshHistory}
         />
       </div>

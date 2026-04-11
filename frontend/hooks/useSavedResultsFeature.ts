@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getSavedResultDetail, getSavedResults, saveResult } from "@/lib/api";
+import { deleteSavedResult, getSavedResultDetail, getSavedResults, saveResult } from "@/lib/api";
 import type {
   ResultSummaryResponse,
   SaveResultRequest,
@@ -13,6 +13,7 @@ export function useSavedResultsFeature() {
   const [historyLoading, setHistoryLoading] = useState(false);
   const [historyError, setHistoryError] = useState<string | null>(null);
   const [historyLoadingResultId, setHistoryLoadingResultId] = useState<string | null>(null);
+  const [historyDeletingResultId, setHistoryDeletingResultId] = useState<string | null>(null);
   const [saveLoading, setSaveLoading] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [saveSuccess, setSaveSuccess] = useState<string | null>(null);
@@ -84,11 +85,28 @@ export function useSavedResultsFeature() {
     }
   }
 
+  async function removeSavedResult(resultId: string): Promise<boolean> {
+    setHistoryDeletingResultId(resultId);
+    setHistoryError(null);
+
+    try {
+      await deleteSavedResult(resultId);
+      setHistoryList((prev) => prev.filter((item) => item.id !== resultId));
+      return true;
+    } catch (e: any) {
+      setHistoryError(e?.message ?? "Unknown error");
+      return false;
+    } finally {
+      setHistoryDeletingResultId(null);
+    }
+  }
+
   return {
     historyList,
     historyLoading,
     historyError,
     historyLoadingResultId,
+    historyDeletingResultId,
     saveLoading,
     saveError,
     saveSuccess,
@@ -96,5 +114,6 @@ export function useSavedResultsFeature() {
     refreshHistory,
     saveCurrentResult,
     fetchSavedResultDetail,
+    removeSavedResult,
   };
 }

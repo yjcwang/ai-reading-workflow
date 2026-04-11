@@ -10,8 +10,10 @@ type Props = {
   loading: boolean;
   error: string | null;
   loadingResultId: string | null;
+  deletingResultId: string | null;
   onClose: () => void;
   onLoad: (resultId: string) => void;
+  onDelete: (resultId: string) => void;
   onRefresh: () => void;
 };
 
@@ -21,8 +23,10 @@ export function SavedResultsPanel({
   loading,
   error,
   loadingResultId,
+  deletingResultId,
   onClose,
   onLoad,
+  onDelete,
   onRefresh,
 }: Props) {
   return (
@@ -60,9 +64,15 @@ export function SavedResultsPanel({
 
         <div style={content}>
           {loading ? (
-            <div style={emptyState}>Loading history...</div>
+            <div style={emptyState}>
+              <div style={stateTitle}>Loading history...</div>
+              <div style={stateText}>Fetching your saved reading results.</div>
+            </div>
           ) : results.length === 0 ? (
-            <div style={emptyState}>No saved results yet.</div>
+            <div style={emptyState}>
+              <div style={stateTitle}>No saved results yet.</div>
+              <div style={stateText}>Save a result from the right panel and it will appear here.</div>
+            </div>
           ) : (
             <ul style={list}>
               {results.map((item) => (
@@ -75,9 +85,17 @@ export function SavedResultsPanel({
                   <div style={cardActions}>
                     <button
                       className="btn-interactive"
+                      style={dangerButton}
+                      onClick={() => onDelete(item.id)}
+                      disabled={deletingResultId === item.id || loadingResultId === item.id}
+                    >
+                      {deletingResultId === item.id ? "Deleting..." : "Delete"}
+                    </button>
+                    <button
+                      className="btn-interactive"
                       style={primaryButton}
                       onClick={() => onLoad(item.id)}
-                      disabled={loadingResultId === item.id}
+                      disabled={loadingResultId === item.id || deletingResultId === item.id}
                     >
                       {loadingResultId === item.id ? "Loading..." : "Load"}
                     </button>
@@ -223,6 +241,7 @@ const preview: React.CSSProperties = {
 const cardActions: React.CSSProperties = {
   display: "flex",
   justifyContent: "flex-end",
+  gap: 8,
 };
 
 const primaryButton: React.CSSProperties = {
@@ -244,12 +263,31 @@ const secondaryButton: React.CSSProperties = {
   cursor: "pointer",
 };
 
+const dangerButton: React.CSSProperties = {
+  border: "1px solid var(--border)",
+  background: "transparent",
+  color: "var(--text)",
+  borderRadius: 14,
+  padding: "8px 12px",
+  cursor: "pointer",
+};
+
 const emptyState: React.CSSProperties = {
   opacity: 0.7,
   padding: 20,
   border: "1px dashed var(--border)",
   borderRadius: 16,
   background: "var(--surface)",
+};
+
+const stateTitle: React.CSSProperties = {
+  fontWeight: 700,
+  marginBottom: 6,
+};
+
+const stateText: React.CSSProperties = {
+  fontSize: 14,
+  lineHeight: 1.5,
 };
 
 const errorBox: React.CSSProperties = {
