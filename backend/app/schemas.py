@@ -1,8 +1,9 @@
 from pydantic import BaseModel, Field
 from typing import List, Optional, Literal, Union
+from datetime import datetime
 
 # define Request and Response structure with pydantic model
-
+# analyzer ------------  
 class AnalyzeRequest(BaseModel):
     text: str = Field(..., min_length=1, description="Japanese text to analyze")
     level: Optional[str] = Field(default="N2", description="e.g., N5-N1 or beginner/intermediate") # equal with: str | None
@@ -25,7 +26,7 @@ class AnalyzeResponse(BaseModel):
     vocab: List[VocabItem]
     grammar: List[GrammarItem]
 
-
+# explainer ------------   
 class ExplainRequest(BaseModel):
     mode: Literal["sentence", "word"] = "word"
     selected_text: str = Field(..., min_length=1)
@@ -54,10 +55,12 @@ class ExplainSentenceResponse(BaseModel):
 
 ExplainResponse = Union[ExplainWordResponse, ExplainSentenceResponse]
 
+# PDF exporter ------------  
 class ExportPDFRequest(BaseModel):
     data: AnalyzeResponse
     target_lang: str = "en" 
-    
+
+# text generator ------------    
 # notice that request schema in backend has a 'level' field more than in backend
 class GenerateTextRequest(BaseModel):
     level: Literal["N5", "N4", "N3", "N2", "N1"]
@@ -68,3 +71,42 @@ class GenerateTextRequest(BaseModel):
 class GenerateTextResponse(BaseModel):
     title: str
     text: str
+
+# database ------------
+class SavedVocabItem(BaseModel):
+    expression: str
+    reading: Optional[str] = None
+    definition: str
+    example: str
+    notes: Optional[str] = None
+
+class SavedGrammarItem(BaseModel):
+    expression: str
+    definition: str
+    example: str
+    notes: Optional[str] = None
+
+class SaveResultRequest(BaseModel):
+    text: str = Field(..., min_length=1)
+    level: str = Field(..., min_length=1)
+    title: Optional[str] = None
+    vocab: list[SavedVocabItem]
+    grammar: list[SavedGrammarItem]
+
+
+class SavedResultResponse(BaseModel):
+    id: str
+    text: str
+    level: str
+    created_at: datetime
+    title: Optional[str] = None
+    vocab: list[SavedVocabItem]
+    grammar: list[SavedGrammarItem]
+
+
+class ResultSummaryResponse(BaseModel):
+    id: str
+    text: str
+    level: str
+    created_at: datetime
+    title: Optional[str] = None
