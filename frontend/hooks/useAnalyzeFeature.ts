@@ -49,6 +49,13 @@ export function useAnalyzeFeature({
     setLoading(false);
   }
 
+  function loadSavedResult(savedText: string, savedData: AnalyzeResponse) {
+    setLockedText(savedText);
+    setData(savedData);
+    setError(null);
+    setLoading(false);
+  }
+
   return {
     data,
     setData,
@@ -56,6 +63,7 @@ export function useAnalyzeFeature({
     error,
     lockedText,
     handleAnalyzeRequest,
+    loadSavedResult,
     resetAnalyze,
   };
 }

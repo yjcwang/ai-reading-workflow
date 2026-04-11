@@ -45,6 +45,7 @@ type Props = {
 
   targetLang: TargetLang;
   onLanguageChange: (lang: TargetLang) => void;
+  onOpenHistory: () => void;
 };
 
 export function InputPanel({
@@ -62,6 +63,7 @@ export function InputPanel({
   getMode,
   targetLang, 
   onLanguageChange,
+  onOpenHistory,
   generateRequest: generateRequest,
   onGenerateRequestChange: onGenerateRequestChange,
   onGenerateRequest,
@@ -81,7 +83,6 @@ export function InputPanel({
   const handleLanguageChange = (newLang: TargetLang) => {
     if (newLang === targetLang) return;
 
-    // 鏋舵瀯閫昏緫锛氬鏋滄病鏈夐攣瀹氭枃鏈紝璇存槑娌＄粨鏋滐紝鐩存帴鍒囷紱濡傛灉鏈夛紝鍒欏脊绐楃‘璁?
     if (!lockedText) {
       onLanguageChange(newLang);
     } else {
@@ -102,6 +103,13 @@ export function InputPanel({
       <div className={styles.rowBetween}>
         <div className={styles.leftTools}>
           <div style={{ fontWeight: 700 }}>{tUI.inputPanel.inputTitle}</div>
+          <button
+            className={`${styles.ghostBtnSmall} btn-interactive`}
+            onClick={onOpenHistory}
+            disabled={analyzeLoading}
+          >
+            History
+          </button>
           {!lockedText && (
             <button
               className={`${styles.ghostBtnSmall} btn-interactive`}

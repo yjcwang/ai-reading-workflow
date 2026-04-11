@@ -4,12 +4,14 @@ import React, { useState} from "react";
 import { InputPanel } from "@/components/InputPanel";
 import { ResultPanel } from "@/components/ResultPanel";
 import { ExplainModal } from "@/components/ExplainModal";
+import { SavedResultsPanel } from "@/components/SavedResultsPanel";
 import { useTheme } from "@/hooks/useTheme";
 import { useTargetLang } from "@/hooks/useTargetLang";
 import { useExplainFeature, inferExplainMode } from "@/hooks/useExplainFeature";
 import { useAnalyzeFeature } from "@/hooks/useAnalyzeFeature";
 import { useExportPdf } from "@/hooks/useExportPdf";
 import { useGenerateTextFeature } from "@/hooks/useGenerateTextFeature";
+import { useSavedResultsFeature } from "@/hooks/useSavedResultsFeature";
 import {
   addItemFromExplain,
   deleteGrammarByExpression,
@@ -19,6 +21,7 @@ import type {
   ExplainWordResponse,
   Level,
   GenerateTextRequest,
+  SavedResultResponse,
 } from "@/lib/types";
 import { DEFAULT_GENERATE_REQUEST } from "@/lib/types";
 
@@ -28,6 +31,7 @@ export default function Page() {
   const [generateRequest, setGenerateRequest] = useState<GenerateTextRequest>(
     DEFAULT_GENERATE_REQUEST 
   );
+  const [historyOpen, setHistoryOpen] = useState(false);
 
   /* ---------- Toggle theme ---------- */
   const { theme, toggleTheme } = useTheme();
@@ -78,12 +82,45 @@ export default function Page() {
     level,
     targetLang,
   });
+  const savedResultsFeature = useSavedResultsFeature();
 
   async function handleExplainRequest(payload: {
     selectedText: string;
     context: string;
   }) {
     await explainFeature.handleExplainRequest(payload);
+  }
+
+  async function handleOpenHistory() {
+    setHistoryOpen(true);
+    await savedResultsFeature.refreshHistory();
+  }
+
+  async function handleLoadSavedResult(resultId: string) {
+    const saved = await savedResultsFeature.fetchSavedResultDetail(resultId);
+    if (saved) {
+      applySavedResult(saved);
+      setHistoryOpen(false);
+    }
+  }
+
+  function applySavedResult(saved: SavedResultResponse) {
+    setText(saved.text);
+    analyzeFeature.loadSavedResult(saved.text, {
+      vocab: saved.vocab.map((item) => ({
+        expression: item.expression,
+        reading: item.reading ?? undefined,
+        definition: item.definition,
+        example: item.example,
+        notes: item.notes ?? undefined,
+      })),
+      grammar: saved.grammar.map((item) => ({
+        expression: item.expression,
+        definition: item.definition,
+        example: item.example,
+        notes: item.notes ?? undefined,
+      })),
+    });
   }
 
   /* ---------- Clear all ---------- */
@@ -144,6 +181,7 @@ export default function Page() {
           getMode={inferExplainMode}
           targetLang={targetLang}
           onLanguageChange={handleLanguageChangeWithReset}
+          onOpenHistory={handleOpenHistory}
           generateRequest={generateRequest}
           onGenerateRequestChange={handleGenerateRequestChange}
           onGenerateRequest={handleGenerateRequest}
@@ -169,6 +207,17 @@ export default function Page() {
           onClose={explainFeature.closeExplain}
           onAdd={handleAddFromModal}
           targetLang={targetLang}
+        />
+        <SavedResultsPanel
+          open={historyOpen}
+          targetLang={targetLang}
+          results={savedResultsFeature.historyList}
+          loading={savedResultsFeature.historyLoading}
+          error={savedResultsFeature.historyError}
+          loadingResultId={savedResultsFeature.historyLoadingResultId}
+          onClose={() => setHistoryOpen(false)}
+          onLoad={handleLoadSavedResult}
+          onRefresh={savedResultsFeature.refreshHistory}
         />
       </div>
 
