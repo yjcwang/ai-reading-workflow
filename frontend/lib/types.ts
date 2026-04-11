@@ -66,3 +66,44 @@ export type GenerateTextResponse = {
   text: string;
 };
 
+export type SavedVocabItem = {
+  expression: string;
+  reading?: string | null;
+  definition: string;
+  example: string;
+  notes?: string | null;
+};
+
+export type SavedGrammarItem = {
+  expression: string;
+  definition: string;
+  example: string;
+  notes?: string | null;
+};
+
+export type SaveResultRequest = {
+  text: string;
+  level: Level;
+  title?: string | null;
+  vocab: SavedVocabItem[];
+  grammar: SavedGrammarItem[];
+};
+
+export type SavedResultResponse = {
+  id: string;
+  text: string;
+  level: string;
+  created_at: string;
+  title?: string | null;
+  vocab: SavedVocabItem[];
+  grammar: SavedGrammarItem[];
+};
+
+export type ResultSummaryResponse = {
+  id: string;
+  text: string;
+  level: string;
+  created_at: string;
+  title?: string | null;
+};
+

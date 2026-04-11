@@ -4,6 +4,9 @@ import type {
   ExplainResponse, 
   GenerateTextRequest,
   GenerateTextResponse, 
+  ResultSummaryResponse,
+  SaveResultRequest,
+  SavedResultResponse,
   TargetLang} from "./types";
 
 
@@ -77,4 +80,50 @@ export async function generateText(
 
   if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
   return (await resp.json()) as GenerateTextResponse;
+}
+
+export async function saveResult(
+  payload: SaveResultRequest,
+): Promise<SavedResultResponse> {
+  const BASE_URL = getBackendBaseUrl();
+
+  const resp = await fetch(BASE_URL + "/api/results", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+
+  if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+  return (await resp.json()) as SavedResultResponse;
+}
+
+export async function getSavedResults(): Promise<ResultSummaryResponse[]> {
+  const BASE_URL = getBackendBaseUrl();
+
+  const resp = await fetch(BASE_URL + "/api/results");
+
+  if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+  return (await resp.json()) as ResultSummaryResponse[];
+}
+
+export async function getSavedResultDetail(
+  resultId: string,
+): Promise<SavedResultResponse> {
+  const BASE_URL = getBackendBaseUrl();
+
+  const resp = await fetch(BASE_URL + `/api/results/${resultId}`);
+
+  if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+  return (await resp.json()) as SavedResultResponse;
+}
+
+export async function deleteSavedResult(resultId: string): Promise<{ status: string }> {
+  const BASE_URL = getBackendBaseUrl();
+
+  const resp = await fetch(BASE_URL + `/api/results/${resultId}`, {
+    method: "DELETE",
+  });
+
+  if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+  return (await resp.json()) as { status: string };
 }
