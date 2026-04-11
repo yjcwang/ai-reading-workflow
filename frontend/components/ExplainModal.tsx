@@ -205,11 +205,9 @@ const overlay: React.CSSProperties = {
 const modalCard: React.CSSProperties = {
   width: "min(500px, 100%)", 
   borderRadius: 16, 
-  background: "rgba(var(--panel-rgb), 0.5)", 
-  backdropFilter: "blur(8px)",
-  WebkitBackdropFilter: "blur(8px)",
+  background: "var(--panel)",
   border: "1px solid var(--border)",
-  boxShadow: "var(--shadow)",
+  boxShadow: "0 24px 60px rgba(0,0,0,0.12)",
   padding: 20,
   color: "var(--text)",
   transform: "translateY(-20px)",

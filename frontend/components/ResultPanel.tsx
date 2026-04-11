@@ -1,9 +1,8 @@
 "use client";
 
 import React from "react";
-import type { AnalyzeResponse} from "@/lib/types";
+import type { AnalyzeResponse, TargetLang } from "@/lib/types";
 import { UI_STRINGS } from "@/lib/i18n";
-import { TargetLang } from "@/lib/types";
 
 type Props = {
   data: AnalyzeResponse;
@@ -11,52 +10,84 @@ type Props = {
   analyzeLoading: boolean;
   onDeleteVocab: (expression: string) => void;
   onDeleteGrammar: (expression: string) => void;
-  onExportPdf: () => void;          
-  exporting: boolean;               
+  onSaveResult: () => void;
+  onExportPdf: () => void;
+  saving: boolean;
+  saveError: string | null;
+  saveSuccess: string | null;
+  saveSuccessLeaving: boolean;
+  exporting: boolean;
   exportError: string | null;
   targetLang: TargetLang;
 };
 
-export function ResultPanel({ data, error, analyzeLoading: loading, onDeleteVocab, onDeleteGrammar, onExportPdf, exporting, exportError, targetLang}: Props) {
+export function ResultPanel({
+  data,
+  error,
+  analyzeLoading: loading,
+  onDeleteVocab,
+  onDeleteGrammar,
+  onSaveResult,
+  onExportPdf,
+  saving,
+  saveError,
+  saveSuccess,
+  saveSuccessLeaving,
+  exporting,
+  exportError,
+  targetLang,
+}: Props) {
   const tUI = UI_STRINGS[targetLang];
-  return ( 
-    // information display top margin
-    <div style={card}> 
+  const hasResult = data.vocab.length > 0 || data.grammar.length > 0;
+
+  return (
+    <div style={card}>
       <div style={rowBetween}>
         <div style={{ fontWeight: 700 }}>{tUI.resultPanel.resultTitle}</div>
-        <div style={{ opacity: 0.7, fontSize: 13 }}> 
-          {data.vocab.length} {tUI.common.word} · {data.grammar.length} {tUI.common.grammar}  
+        <div style={{ opacity: 0.7, fontSize: 13 }}>
+          {data.vocab.length} {tUI.common.word} · {data.grammar.length} {tUI.common.grammar}
         </div>
-        <button
-          className="btn-interactive"
-          style={exportBtn}
-          onClick={onExportPdf}
-          disabled={loading || exporting || (data.vocab.length === 0 && data.grammar.length === 0)}
-          title="Export PDF"
-        >
-          {exporting ? tUI.resultPanel.exporting : tUI.resultPanel.exportPdf}
-        </button>
+        <div style={headerActions}>
+          <button
+            className="btn-interactive"
+            style={saveBtn}
+            onClick={onSaveResult}
+            disabled={loading || saving || !hasResult}
+            title="Save Result"
+          >
+            {saving ? "Saving..." : "Save Result"}
+          </button>
+          <button
+            className="btn-interactive"
+            style={exportBtn}
+            onClick={onExportPdf}
+            disabled={loading || exporting || !hasResult}
+            title="Export PDF"
+          >
+            {exporting ? tUI.resultPanel.exporting : tUI.resultPanel.exportPdf}
+          </button>
+        </div>
       </div>
-      
-      {/*Error message*/}
-      {error ? <div style={errorBox}>{tUI.common.error}: {error}</div> : null} 
+
+      {error ? <div style={errorBox}>{tUI.common.error}: {error}</div> : null}
+      {saveError ? <div style={errorBox}>Save error: {saveError}</div> : null}
+      {saveSuccess ? <div style={{ ...successBox, ...(saveSuccessLeaving ? successBoxLeaving : null) }}>{saveSuccess}</div> : null}
       {exportError ? <div style={errorBox}>{tUI.resultPanel.exportPdf}{tUI.common.error}: {exportError}</div> : null}
 
-      {/*Content*/}
       <div style={twoCols}>
-        <div> {/*Vocab item*/}
+        <div>
           <div style={sectionTitle}>{tUI.resultPanel.vocabTitle}</div>
-          <ul style={list}> 
+          <ul style={list}>
             {loading ? (
               <li style={empty}>{tUI.common.loading}</li>
-            ) :
-            data.vocab.length === 0 ? ( 
+            ) : data.vocab.length === 0 ? (
               <li style={empty}>{tUI.resultPanel.noData}</li>
             ) : (
-              data.vocab.map((v, i) => (
+              data.vocab.map((v) => (
                 <li key={v.expression} style={item}>
-                  <div style={{ fontWeight: 700 }}>{v.expression} {v.reading ? <span style={muted}>({v.reading})</span> : null}</div>
-                  {/*delete button*/}
+                  <div style={{ fontWeight: 700 }}>
+                    {v.expression} {v.reading ? <span style={muted}>({v.reading})</span> : null}
+                  </div>
                   <button
                     className="btn-interactive"
                     style={deleteBtn}
@@ -74,19 +105,17 @@ export function ResultPanel({ data, error, analyzeLoading: loading, onDeleteVoca
           </ul>
         </div>
 
-        <div> {/*Grammar item*/}
+        <div>
           <div style={sectionTitle}>{tUI.resultPanel.grammarTitle}</div>
           <ul style={list}>
             {loading ? (
               <li style={empty}>{tUI.common.loading}</li>
-            ) :
-            data.grammar.length === 0 ? (
+            ) : data.grammar.length === 0 ? (
               <li style={empty}>{tUI.resultPanel.noData}</li>
             ) : (
-              data.grammar.map((g, i) => (
+              data.grammar.map((g) => (
                 <li key={g.expression} style={item}>
                   <div style={{ fontWeight: 700 }}>{g.expression}</div>
-                  {/*delete button*/}
                   <button
                     className="btn-interactive"
                     style={deleteBtn}
@@ -125,6 +154,11 @@ const rowBetween: React.CSSProperties = {
   marginBottom: 10,
 };
 
+const headerActions: React.CSSProperties = {
+  display: "flex",
+  gap: 10,
+};
+
 const twoCols: React.CSSProperties = {
   display: "grid",
   gridTemplateColumns: "1fr 1fr",
@@ -147,8 +181,18 @@ const item: React.CSSProperties = {
   background: "var(--surface)",
   borderRadius: 14,
   padding: 10,
-  position: "relative", 
+  position: "relative",
   paddingRight: 56,
+};
+
+const saveBtn: React.CSSProperties = {
+  border: "1px solid var(--border-strong)",
+  background: "var(--text)",
+  color: "var(--text-invert)",
+  borderRadius: 14,
+  padding: "10px 12px",
+  cursor: "pointer",
+  fontWeight: 700,
 };
 
 const exportBtn: React.CSSProperties = {
@@ -167,14 +211,13 @@ const deleteBtn: React.CSSProperties = {
   background: "transparent",
   color: "var(--text)",
   border: "1px solid var(--border)",
-  position: "absolute", 
+  position: "absolute",
   top: 10,
   right: 10,
   boxShadow: "0 6px 18px rgba(0,0,0,0.12)",
 };
 
 const empty: React.CSSProperties = { opacity: 0.6, padding: 10 };
-
 const muted: React.CSSProperties = { opacity: 0.8, marginTop: 6, fontSize: 13 };
 const mutedSmall: React.CSSProperties = { opacity: 0.65, marginTop: 6, fontSize: 12 };
 const example: React.CSSProperties = { opacity: 0.85, marginTop: 6, fontStyle: "italic", fontSize: 13 };
@@ -186,4 +229,21 @@ const errorBox: React.CSSProperties = {
   borderRadius: 14,
   padding: 10,
   marginBottom: 10,
+};
+
+const successBox: React.CSSProperties = {
+  border: "1px solid #296246",
+  background: "#0f1d16",
+  color: "#bff2cf",
+  borderRadius: 14,
+  padding: 10,
+  marginBottom: 10,
+  opacity: 1,
+  transform: "translateY(0)",
+  transition: "opacity 240ms ease, transform 240ms ease",
+};
+
+const successBoxLeaving: React.CSSProperties = {
+  opacity: 0,
+  transform: "translateY(-4px)",
 };

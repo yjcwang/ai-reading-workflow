@@ -25,11 +25,22 @@ export function SavedResultsPanel({
   onLoad,
   onRefresh,
 }: Props) {
-  if (!open) return null;
-
   return (
-    <div style={overlay} onMouseDown={onClose}>
-      <aside style={panel} onMouseDown={(e) => e.stopPropagation()}>
+    <div
+      style={{
+        ...overlay,
+        ...(open ? overlayVisible : overlayHidden),
+      }}
+      onMouseDown={open ? onClose : undefined}
+      aria-hidden={!open}
+    >
+      <aside
+        style={{
+          ...panel,
+          ...(open ? panelVisible : panelHidden),
+        }}
+        onMouseDown={(e) => e.stopPropagation()}
+      >
         <div style={header}>
           <div>
             <div style={title}>History</div>
@@ -98,6 +109,17 @@ const overlay: React.CSSProperties = {
   inset: 0,
   zIndex: 9998,
   background: "rgba(15, 18, 28, 0.18)",
+  transition: "opacity 320ms ease",
+};
+
+const overlayVisible: React.CSSProperties = {
+  opacity: 1,
+  pointerEvents: "auto",
+};
+
+const overlayHidden: React.CSSProperties = {
+  opacity: 0,
+  pointerEvents: "none",
 };
 
 const panel: React.CSSProperties = {
@@ -114,6 +136,18 @@ const panel: React.CSSProperties = {
   display: "flex",
   flexDirection: "column",
   gap: 16,
+  transition: "transform 420ms cubic-bezier(0.22, 1, 0.36, 1), opacity 320ms ease",
+  willChange: "transform, opacity",
+};
+
+const panelVisible: React.CSSProperties = {
+  opacity: 1,
+  transform: "translateX(0)",
+};
+
+const panelHidden: React.CSSProperties = {
+  opacity: 0,
+  transform: "translateX(-72px)",
 };
 
 const header: React.CSSProperties = {

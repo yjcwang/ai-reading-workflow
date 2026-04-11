@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState} from "react";
+import React, { useState } from "react";
 import { InputPanel } from "@/components/InputPanel";
 import { ResultPanel } from "@/components/ResultPanel";
 import { ExplainModal } from "@/components/ExplainModal";
@@ -19,8 +19,9 @@ import {
 } from "@/lib/item-helpers";
 import type {
   ExplainWordResponse,
-  Level,
   GenerateTextRequest,
+  Level,
+  SaveResultRequest,
   SavedResultResponse,
 } from "@/lib/types";
 import { DEFAULT_GENERATE_REQUEST } from "@/lib/types";
@@ -29,29 +30,33 @@ export default function Page() {
   const [level, setLevel] = useState<Level>("N2");
   const [text, setText] = useState("");
   const [generateRequest, setGenerateRequest] = useState<GenerateTextRequest>(
-    DEFAULT_GENERATE_REQUEST 
+    DEFAULT_GENERATE_REQUEST,
   );
   const [historyOpen, setHistoryOpen] = useState(false);
 
-  /* ---------- Toggle theme ---------- */
   const { theme, toggleTheme } = useTheme();
-
-  /* ---------- Controll Language ---------- */
   const { targetLang, handleLanguageChange } = useTargetLang();
 
-  /* ---------- Analyzer actions ---------- */
   const analyzeFeature = useAnalyzeFeature({
     level,
     targetLang,
+  });
+
+  const generateFeature = useGenerateTextFeature({ level });
+  const explainFeature = useExplainFeature({
+    level,
+    targetLang,
+  });
+  const savedResultsFeature = useSavedResultsFeature();
+  const exportFeature = useExportPdf({
+    filename: "my-list.pdf",
   });
 
   async function handleAnalyzeRequest() {
     await analyzeFeature.handleAnalyzeRequest(text);
   }
 
-  /* ---------- Generate text ---------- */
-  const generateFeature = useGenerateTextFeature({ level });
-  function handleGenerateRequestChange(patch: Partial<GenerateTextRequest>) { // patch is update of only a part, e.g. { topic: "校园生活" }
+  function handleGenerateRequestChange(patch: Partial<GenerateTextRequest>) {
     setGenerateRequest((prev) => ({
       ...prev,
       ...patch,
@@ -60,10 +65,8 @@ export default function Page() {
 
   async function handleGenerateRequest(): Promise<boolean> {
     const topic = generateRequest.topic.trim();
+    if (!topic) return false;
 
-    if (!topic) {
-      return false;
-    }
     const request = {
       ...generateRequest,
       topic,
@@ -76,13 +79,6 @@ export default function Page() {
     setText(generatedText);
     return true;
   }
-
-  /* ---------- Explainer actions ---------- */
-  const explainFeature = useExplainFeature({
-    level,
-    targetLang,
-  });
-  const savedResultsFeature = useSavedResultsFeature();
 
   async function handleExplainRequest(payload: {
     selectedText: string;
@@ -98,10 +94,38 @@ export default function Page() {
 
   async function handleLoadSavedResult(resultId: string) {
     const saved = await savedResultsFeature.fetchSavedResultDetail(resultId);
-    if (saved) {
-      applySavedResult(saved);
-      setHistoryOpen(false);
-    }
+    if (!saved) return;
+
+    applySavedResult(saved);
+    setHistoryOpen(false);
+  }
+
+  async function handleSaveCurrentResult() {
+    const currentText = analyzeFeature.lockedText?.trim() || text.trim();
+    const hasResult = analyzeFeature.data.vocab.length > 0 || analyzeFeature.data.grammar.length > 0;
+
+    if (!currentText || !hasResult) return;
+
+    const payload: SaveResultRequest = {
+      text: currentText,
+      level,
+      title: null,
+      vocab: analyzeFeature.data.vocab.map((item) => ({
+        expression: item.expression,
+        reading: item.reading,
+        definition: item.definition,
+        example: item.example,
+        notes: item.notes,
+      })),
+      grammar: analyzeFeature.data.grammar.map((item) => ({
+        expression: item.expression,
+        definition: item.definition,
+        example: item.example,
+        notes: item.notes,
+      })),
+    };
+
+    await savedResultsFeature.saveCurrentResult(payload);
   }
 
   function applySavedResult(saved: SavedResultResponse) {
@@ -123,7 +147,6 @@ export default function Page() {
     });
   }
 
-  /* ---------- Clear all ---------- */
   function onClear() {
     setText("");
     setGenerateRequest(DEFAULT_GENERATE_REQUEST);
@@ -132,19 +155,16 @@ export default function Page() {
     exportFeature.resetExport();
   }
 
-  /* ---------- Change Language ---------- */
   function handleLanguageChangeWithReset(newLang: typeof targetLang) {
     if (newLang === targetLang) return;
     onClear();
     handleLanguageChange(newLang);
   }
-  
-  /* ---------- Add from Modal ---------- */
+
   function handleAddFromModal(item: ExplainWordResponse) {
     analyzeFeature.setData((prev) => addItemFromExplain(prev, item));
   }
 
-  /* ---------- Delete from list on ResultPanel ---------- */
   function handleDeleteVocab(expression: string) {
     analyzeFeature.setData((prev) => deleteVocabByExpression(prev, expression));
   }
@@ -153,16 +173,10 @@ export default function Page() {
     analyzeFeature.setData((prev) => deleteGrammarByExpression(prev, expression));
   }
 
-  /* ---------- Export and Download PDF ---------- */
-  const exportFeature = useExportPdf({
-    filename: "my-list.pdf",
-  });
-
   async function handleExportPdf() {
     await exportFeature.handleExportPdf(analyzeFeature.data, targetLang);
   }
 
-  /* ---------- Render ---------- */
   return (
     <main style={page}>
       <div style={grid}>
@@ -188,13 +202,18 @@ export default function Page() {
           generateLoading={generateFeature.generateLoading}
           generateError={generateFeature.generateError}
         />
-        <ResultPanel 
-          data={analyzeFeature.data} 
-          error={analyzeFeature.error} 
-          analyzeLoading={analyzeFeature.analyzeLoading} 
+        <ResultPanel
+          data={analyzeFeature.data}
+          error={analyzeFeature.error}
+          analyzeLoading={analyzeFeature.analyzeLoading}
           onDeleteVocab={handleDeleteVocab}
           onDeleteGrammar={handleDeleteGrammar}
+          onSaveResult={handleSaveCurrentResult}
           onExportPdf={handleExportPdf}
+          saving={savedResultsFeature.saveLoading}
+          saveError={savedResultsFeature.saveError}
+          saveSuccess={savedResultsFeature.saveSuccess}
+          saveSuccessLeaving={savedResultsFeature.saveSuccessLeaving}
           exporting={exportFeature.exporting}
           exportError={exportFeature.exportError}
           targetLang={targetLang}
@@ -220,7 +239,6 @@ export default function Page() {
           onRefresh={savedResultsFeature.refreshHistory}
         />
       </div>
-
     </main>
   );
 }
