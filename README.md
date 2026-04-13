@@ -1,93 +1,187 @@
+# JP Reading Assistant
 
+JP Reading Assistant 是一个面向日语阅读学习的全栈项目。它支持输入或生成日语文章，调用 LLM 提取词汇和语法要点，进一步做单词或句子解释，并把整理后的结果保存到本地历史数据库中，方便后续回看和复习。
 
-# JP Reading Assistant (日语阅读助手)
+当前项目已经包含完整的“生成 -> 编辑 -> 分析 -> 保存 -> 历史加载 -> PDF 导出”闭环。
 
-[](https://www.google.com/search?q=https://github.com/yjcwang/jp-reading-assistant)
-[](https://www.python.org/)
+## 核心功能
 
-**JP Reading Assistant** 是一款基于大语言模型（LLM）驱动的智能化日语学习工具。它能够深度解析日文长篇文本，自动提取核心词汇与关键语法，并提供高质量的释义与示例，旨在为学习者构建从阅读到习得的闭环体验。
+- 输入日语原文，按 JLPT 等级分析重点词汇和语法
+- 用 AI 按主题、长度、风格生成日语阅读材料
+- 高亮单词或句子，触发更细粒度的解释
+- 手动编辑分析结果，整理个人学习清单
+- 导出当前结果为 PDF
+- 支持中英文输出切换
+- 支持浅色/深色主题切换
+- 支持历史记录保存、列表浏览、详情加载和删除
 
------
+## 项目结构
 
-## ✨ 功能介绍 (Feature Overview)
+```text
+jp-reading-assistant/
+├─ backend/
+│  ├─ app/
+│  │  ├─ api/            # FastAPI 路由
+│  │  ├─ db/             # SQLite / SQLModel 初始化
+│  │  ├─ models/         # Result / Vocab / Grammar 表模型
+│  │  ├─ repositories/   # 数据访问层
+│  │  ├─ services/       # Analyzer / Explainer / ResultService / PDF 等
+│  │  ├─ schemas.py      # 请求响应模型
+│  │  └─ main.py         # FastAPI 入口
+│  └─ .env.example
+├─ frontend/
+│  ├─ app/               # Next.js App Router
+│  ├─ components/        # 页面组件与历史面板
+│  ├─ hooks/             # Feature hooks
+│  └─ lib/               # API、类型、i18n、纯函数工具
+└─ docs/
+   ├─ decision_log.md
+   └─ architecture.md
+```
 
-JP Reading Assistant 面向真实的日语阅读学习场景，围绕“获取文章、锁定内容、AI 分析、手动整理、导出复习”构建完整流程，帮助用户把一篇日语文章快速转化为可操作的学习材料。
+## 后端能力概览
 
-- **自由输入或生成文章**：用户可以直接粘贴自己的日语文章，也可以让 AI 按指定主题生成对应内容，作为阅读练习素材。
-- **锁定当前文章并提取重点词汇与语法**：当文章确定后，用户可以将其锁定，AI 会分析已锁定文章，识别其中符合JLPT等级的单词和语法点，并生成结构化结果。
-- **右侧列表支持自由编辑**：用户可以根据自己的学习目标，对右侧的词汇和语法列表自由增删改
-- **支持高亮单个单词进行解释**：在阅读过程中，用户可以高亮某个单词，查看释义、用法或说明，并选择加入右侧列表。
-- **支持高亮语法或单句进行分析**：用户也可以针对单个语法点或某一句内容发起解释请求，获取更细粒度的句子分析，再决定是否添加到学习列表。
-- **支持 PDF 导出**：整理完成后的右侧学习列表可以导出为 PDF，方便离线复习、打印和归档。
-- **支持中英双语与暗色模式**：整个应用支持中文与英文界面切换，并提供暗色模式，以适配不同用户习惯和使用环境。
+后端基于 FastAPI，主要接口包括：
 
------
+- `POST /api/analyze`：分析文章，输出词汇和语法
+- `POST /api/explain`：解释单词或句子
+- `POST /api/generate-text`：生成阅读材料
+- `POST /api/export_pdf`：导出 PDF
+- `POST /api/results`：保存当前结果到数据库
+- `GET /api/results`：获取历史记录列表
+- `GET /api/results/{result_id}`：获取历史详情
+- `DELETE /api/results/{result_id}`：删除历史记录
+- `GET /health`：健康检查
 
-## 🏗️ 详细架构设计 (Detailed Architecture)
+LLM 调用统一通过 `backend/app/services/llm.py` 处理，已支持：
 
-项目采用前后端分离的现代 Web 架构，核心设计原则为 **关注点分离 (SoC)** 与 **类型驱动开发**。
+- `mock`
+- `ollama`
+- `openai`
+- `gemini`
+- `deepseek`
 
-### 1\. 后端架构 (FastAPI)
+并带有结构化输出和自动重试能力。
 
-后端位于 `backend/` 目录下，采用 Service 模式进行解耦：
+## 数据与持久化概览
 
-  * **API 路由层 (`app/api/routes.py`)**: 负责处理 HTTP 请求、输入验证及响应分发。
-  * **服务层 (`app/services/`)**:
-      * **Analyzer**: 负责长文本分析，提取符合难度的单词与语法列表。
-      * **Explainer**: 针对特定词汇或语法点生成深度解析。
-      * **LLM Module**: 核心抽象层。支持 Ollama、Deepseek、OpenAI 和 Gemini，集成了 `tenacity` 自动重试机制，并强制要求 LLM 返回基于 Pydantic 的结构化 JSON 数据。
-      * **PDF Exporter**: 集成 `NotoSansSC` 字体支持，生成支持多语言的离线学习笔记。
+项目使用本地 `SQLite` 持久化已保存的阅读结果，数据层基于 `SQLModel`。数据库文件位于 `backend/app/app.db`，FastAPI 启动时会自动执行建表逻辑。
 
-### 2\. 前端架构 (Next.js + TypeScript)
+当前保存结构分为三层：
 
-前端位于 `frontend/` 目录下，采用 **Feature Hooks** 模式：
+- `Result`：原文、JLPT 等级、标题、创建时间
+- `Vocab`：词汇条目
+- `Grammar`：语法条目
 
-  * **Feature Hooks (`hooks/`)**: 将复杂的异步业务逻辑（如分析流、解释流、PDF 导出）从 UI 组件中抽离。例如 `useAnalyzeFeature` 封装了状态转换与 API 调用逻辑。
-  * **Pure Helpers (`lib/`)**: 包含 `item-helpers` 等纯函数，负责处理结果转换与数据格式化，确保 UI 组件仅负责渲染。
-  * **i18n 引擎**: 支持 Session 级别的语言锁定，确保 UI 文字与 LLM 输出语言同步切换。
+后端按分层组织这部分逻辑：
 
------
+- `backend/app/models/result.py`：表模型
+- `backend/app/db/session.py`：数据库连接与 Session
+- `backend/app/repositories/result_repository.py`：数据库读写
+- `backend/app/services/result_service.py`：保存、列表、详情、删除流程
 
-## 🔄 数据流向 (Data Flow)
+保存时标题由后端生成；如果标题生成失败，会回退到正文截断预览。
 
-一个典型的请求从发起分析到生成结果的过程如下：
+## 前端能力概览
 
-1.  **用户触发**: 用户在 `InputPanel` 输入日文文本并点击“分析”。
-2.  **前端分发**: `useAnalyzeFeature` Hook 捕获输入，发送包含原始文本与 `targetLang`（目标语言）的 POST 请求至后端 `/api/analyze` 接口。
-3.  **Prompt 路由**: 后端 `Analyzer` 服务接收请求，根据预定义的 System Prompt 和 Metadata Tags（如 `###FEATURE:ANALYZER###`）构造 LLM 调用参数。
-4.  **LLM 处理**:
-      * `llm.py` 调度配置好的 Provider（如 Deepseek）。
-      * 通过 `response_model` 确保 LLM 返回的内容严格符合 `AnalyzeResponse` 模型。
-      * 若发生超时或格式错误，`tenacity` 将自动触发指数退避重试。
-5.  **结果转换**: 后端返回结构化 JSON。前端 `ResultPanel` 接收数据，通过 `item-helpers` 进行渲染处理，并实时更新 UI 状态。
-6.  **持久化与扩展**: 用户可点击分析结果中的卡片。此时 `useExplainFeature` 将发起二次请求，调用 `Explainer` 服务获取更详细的语法上下文。
+前端基于 Next.js App Router + TypeScript，主要采用 feature hook 组织页面逻辑：
 
------
+- `useAnalyzeFeature`
+- `useExplainFeature`
+- `useGenerateTextFeature`
+- `useExportPdf`
+- `useSavedResultsFeature`
+- `useTheme`
+- `useTargetLang`
 
-## 🚀 快速运行指南
+这让 `page.tsx` 主要负责状态编排和组件组合，异步业务流分散到各自 hook 中。
 
-### 1\. 后端准备 (Python 3.10+)
+## 环境变量
+
+### backend/.env
+
+先复制：
+
+```bash
+cd backend
+cp .env.example .env
+```
+
+当前后端配置项实际包括：
+
+```env
+LLM_PROVIDER_ANALYZER=gemini
+LLM_PROVIDER_EXPLAINER=ollama
+LLM_PROVIDER_TRANSLATOR=ollama
+LLM_PROVIDER_TEXT_GENERATOR=ollama
+
+OPENAI_API_KEY=your_key_here
+OPENAI_MODEL=gpt-4o-mini
+
+GEMINI_API_KEY=your_key_here
+GEMINI_MODEL=gemini-3-flash-preview
+
+DEEPSEEK_API_KEY=your_key_here
+DEEPSEEK_MODEL=deepseek-chat
+
+OLLAMA_MODEL=qwen2.5:7b
+```
+
+注意：
+
+- `.env.example` 里目前没有把所有 provider 变量都列全，但代码里已经支持上面这些字段
+- 如果使用 OpenAI / Gemini / DeepSeek，需要填对应 API Key
+
+### frontend/.env
+
+前端至少需要：
+
+```env
+NEXT_PUBLIC_BACKEND_URL=http://127.0.0.1:8000
+```
+
+## 本地启动
+
+### 1. 启动后端
 
 ```bash
 cd backend
 python -m venv .venv
-# 激活环境: Windows 使用 .\.venv\Scripts\Activate.ps1 | macOS/Linux 使用 source .venv/bin/activate
-pip install -r requirements.txt
-
-# 配置文件
-cp .env.example .env
-# 编辑 .env 设置 LLM_PROVIDER_ANALYZER=deepseek 等
 ```
 
-### 2\. 启动服务
+Windows:
 
-**后端 (Default: 8000):**
+```bash
+.\.venv\Scripts\Activate.ps1
+```
+
+macOS / Linux:
+
+```bash
+source .venv/bin/activate
+```
+
+安装依赖：
+
+```bash
+pip install -r ..\requirements.txt
+```
+
+或在 macOS / Linux:
+
+```bash
+pip install -r ../requirements.txt
+```
+
+启动服务：
 
 ```bash
 uvicorn app.main:app --reload
 ```
 
-**前端 (Default: 3000):**
+启动时会自动初始化 SQLite 数据库和缺失表。
+
+### 2. 启动前端
 
 ```bash
 cd frontend
@@ -95,10 +189,36 @@ npm install
 npm run dev
 ```
 
------
+默认访问：
 
-## 🛠️ 技术栈总结
+- 前端：`http://localhost:3000`
+- 后端：`http://127.0.0.1:8000`
 
-  * **Backend**: FastAPI, Pydantic, Tenacity, Uvicorn.
-  * **Frontend**: Next.js (App Router), TypeScript, Tailwind CSS, Lucide Icons.
-  * **LLM**: Ollama (Qwen), Deepseek, Google Gemini, OpenAI.
+## 技术栈
+
+- Backend: FastAPI, Pydantic v2, SQLModel, Uvicorn, Tenacity
+- Frontend: Next.js 16, React 19, TypeScript
+- Database: SQLite
+- LLM Providers: Ollama, OpenAI, Gemini, DeepSeek, Mock
+- PDF: ReportLab 字体资源方案（Noto Sans JP / SC）
+
+## 当前状态
+
+根据 `docs/decision_log.md`，项目已完成这些关键演进：
+
+- Prompt metadata routing
+- i18n 支持
+- PDF 导出增强
+- LLM 结构化输出与自动重试
+- DeepSeek 接入
+- 前端 feature hooks 重构
+- AI 阅读文本生成
+- 输入面板拆分
+- SQLite 持久化历史记录
+- 前端历史面板与保存流
+- 保存标题改为后端生成
+
+## 相关文档
+
+- [架构草稿](docs/architecture.md)
+- [决策记录](docs/decision_log.md)
