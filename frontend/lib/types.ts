@@ -62,7 +62,6 @@ export const DEFAULT_GENERATE_REQUEST: GenerateTextRequest = {
 };
 
 export type GenerateTextResponse = {
-  title: string;
   text: string;
 };
 
@@ -84,7 +83,6 @@ export type SavedGrammarItem = {
 export type SaveResultRequest = {
   text: string;
   level: Level;
-  title?: string | null;
   vocab: SavedVocabItem[];
   grammar: SavedGrammarItem[];
 };

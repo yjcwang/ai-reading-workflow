@@ -109,6 +109,29 @@ The app needed a persistent way to save analyzed reading results and retrieve th
 - Add request and response schemas for saved results in `backend/app/schemas.py`
 - Add REST endpoints for saved results in `backend/app/api/routes.py`
 
+## 2026-04-13 Add Frontend Saved History Flow (Issue #19)
+
+### Context
+After adding persistent storage, frontend needed a way to browse, load, refresh, and delete saved reading results from database.
+
+### Decision
+- Add saved history panel UI for listing database-backed results
+- Add frontend API and feature-hook flow for save, list, detail, and delete actions
+- Keep `page.tsx` as orchestration layer for history open, load, and delete handlers
+- Support i18n
+
+## 2026-04-13 Refine Saved Result Title Ownership and Backend Title Generation
+
+### Context
+After adding database-backed saved results, title ownership became unclear. The frontend always sent `title: null` when saving, while `/generate-text` also returned a `title` that was never used.
+
+### Decision
+- Move saved-result title generation fully to backend `ResultService`
+- Add dedicated `title_generator` service for database save flow
+- Remove `title` from `SaveResultRequest` and `GenerateTextResponse` in both frontend and backend schemas
+- Keep `title` in saved-result response models because history UI still depends on it
+- Keep fallback preview title in `ResultService` if LLM title generation fails
+
 
 
 

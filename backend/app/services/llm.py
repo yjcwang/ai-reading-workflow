@@ -60,8 +60,11 @@ def _mock_json_output(prompt: str) -> str:
         }
     elif cleaned_prompt.startswith("###FEATURE:TEXT_GENERATOR###"):
         data = {
-            "title": "(Mock) This is a title.",
             "text": "(Mock) 近年、情報へのアクセスはかつてないほど容易になった一方で 表面的な理解にとどまってしまうケースも増えているように感じる。"
+        }
+    elif cleaned_prompt.startswith("###FEATURE:TITLE_GENERATOR###"):
+        data = {
+            "title": "(Mock) Saved Reading Title"
         }
     else:
         preview = prompt[:50].replace("\n", " ")

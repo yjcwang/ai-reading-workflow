@@ -69,8 +69,11 @@ class GenerateTextRequest(BaseModel):
     style: Literal["daily", "blog", "news", "conversation", "science"] = "daily"
 
 class GenerateTextResponse(BaseModel):
-    title: str
     text: str
+
+
+class GenerateTitleResponse(BaseModel):
+    title: str
 
 # database ------------
 class SavedVocabItem(BaseModel):
@@ -89,7 +92,6 @@ class SavedGrammarItem(BaseModel):
 class SaveResultRequest(BaseModel):
     text: str = Field(..., min_length=1)
     level: str = Field(..., min_length=1)
-    title: Optional[str] = None
     vocab: list[SavedVocabItem]
     grammar: list[SavedGrammarItem]
 

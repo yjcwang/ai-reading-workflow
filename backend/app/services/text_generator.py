@@ -4,7 +4,7 @@ from app.config import settings
 
 
 def generate_text(req: GenerateTextRequest) -> GenerateTextResponse:
-    print("Generator working")
+    print("Text Generator working")
     print("=== Generate Request ===")
     print("level:", req.level)
     print("topic:", req.topic)
@@ -27,7 +27,6 @@ def generate_text(req: GenerateTextRequest) -> GenerateTextResponse:
     - Do not add extra fields.
     [CONTENT RULES]
     - Write ONLY in Japanese.
-    - The title must be short and natural Japanese.
     - The text must be coherent, natural, and readable.
     - Keep the difficulty aligned with JLPT {req.level}.
     - Avoid vocabulary and grammar far above JLPT {req.level}.

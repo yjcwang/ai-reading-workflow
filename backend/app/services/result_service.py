@@ -1,5 +1,7 @@
 """Business logic for result operations."""
 
+import logging
+
 from fastapi import HTTPException
 from sqlmodel import Session
 
@@ -11,6 +13,9 @@ from app.schemas import (
     SavedResultResponse,
     SavedVocabItem,
 )
+from app.services.title_generator import generate_title_from_text
+
+logger = logging.getLogger(__name__)
 
 
 class ResultService:
@@ -18,12 +23,18 @@ class ResultService:
         self.repository = repository or ResultRepository()
 
     def save_result(self, session: Session, req: SaveResultRequest) -> SavedResultResponse:
+        try:
+            title = generate_title_from_text(text=req.text, level=req.level)
+        except Exception:
+            logger.exception("Failed to generate title for saved result")
+            title = self._build_fallback_title(req.text)
+
         # Save the parent row first so its id can be used by child vocab/grammar rows.
         result = self.repository.create_result(
             session,
             text=req.text,
             level=req.level,
-            title=req.title,
+            title=title,
         )
 
         self.repository.create_vocab_items(
@@ -109,3 +120,9 @@ class ResultService:
         session.commit()
 
         return {"status": "ok"}
+
+    def _build_fallback_title(self, text: str, max_length: int = 20) -> str:
+        compact = " ".join(text.split()).strip()
+        if len(compact) <= max_length:
+            return compact
+        return compact[:max_length].rstrip() + "..."

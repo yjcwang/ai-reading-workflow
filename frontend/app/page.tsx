@@ -113,7 +113,6 @@ export default function Page() {
     const payload: SaveResultRequest = {
       text: currentText,
       level,
-      title: null,
       vocab: analyzeFeature.data.vocab.map((item) => ({
         expression: item.expression,
         reading: item.reading,
