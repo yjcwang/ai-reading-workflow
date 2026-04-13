@@ -108,7 +108,7 @@ export function InputPanel({
             onClick={onOpenHistory}
             disabled={analyzeLoading}
           >
-            History
+            {tUI.inputPanel.history}
           </button>
           {!lockedText && (
             <button

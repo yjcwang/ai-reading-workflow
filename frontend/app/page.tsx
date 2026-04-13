@@ -47,7 +47,7 @@ export default function Page() {
     level,
     targetLang,
   });
-  const savedResultsFeature = useSavedResultsFeature();
+  const savedResultsFeature = useSavedResultsFeature(targetLang);
   const exportFeature = useExportPdf({
     filename: "my-list.pdf",
   });

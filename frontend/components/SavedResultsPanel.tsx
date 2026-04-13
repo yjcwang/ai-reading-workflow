@@ -2,6 +2,7 @@
 
 import React from "react";
 import type { ResultSummaryResponse, TargetLang } from "@/lib/types";
+import { UI_STRINGS } from "@/lib/i18n";
 
 type Props = {
   open: boolean;
@@ -19,6 +20,7 @@ type Props = {
 
 export function SavedResultsPanel({
   open,
+  targetLang,
   results,
   loading,
   error,
@@ -29,6 +31,8 @@ export function SavedResultsPanel({
   onDelete,
   onRefresh,
 }: Props) {
+  const tUI = UI_STRINGS[targetLang];
+
   return (
     <div
       style={{
@@ -47,31 +51,31 @@ export function SavedResultsPanel({
       >
         <div style={header}>
           <div>
-            <div style={title}>History</div>
-            <div style={subtitle}>{results.length} saved result{results.length === 1 ? "" : "s"}</div>
+            <div style={title}>{tUI.historyPanel.title}</div>
+            <div style={subtitle}>{results.length} {tUI.historyPanel.savedResults}</div>
           </div>
           <div style={headerActions}>
             <button className="btn-interactive" style={secondaryButton} onClick={onRefresh} disabled={loading}>
-              Refresh
+              {tUI.historyPanel.refresh}
             </button>
             <button className="btn-interactive" style={secondaryButton} onClick={onClose}>
-              Close
+              {tUI.historyPanel.close}
             </button>
           </div>
         </div>
 
-        {error ? <div style={errorBox}>History error: {error}</div> : null}
+        {error ? <div style={errorBox}>{tUI.historyPanel.errorPrefix}: {error}</div> : null}
 
         <div style={content}>
           {loading ? (
             <div style={emptyState}>
-              <div style={stateTitle}>Loading history...</div>
-              <div style={stateText}>Fetching your saved reading results.</div>
+              <div style={stateTitle}>{tUI.historyPanel.loadingTitle}</div>
+              <div style={stateText}>{tUI.historyPanel.loadingText}</div>
             </div>
           ) : results.length === 0 ? (
             <div style={emptyState}>
-              <div style={stateTitle}>No saved results yet.</div>
-              <div style={stateText}>Save a result from the right panel and it will appear here.</div>
+              <div style={stateTitle}>{tUI.historyPanel.emptyTitle}</div>
+              <div style={stateText}>{tUI.historyPanel.emptyText}</div>
             </div>
           ) : (
             <ul style={list}>
@@ -89,7 +93,7 @@ export function SavedResultsPanel({
                       onClick={() => onDelete(item.id)}
                       disabled={deletingResultId === item.id || loadingResultId === item.id}
                     >
-                      {deletingResultId === item.id ? "Deleting..." : "Delete"}
+                      {deletingResultId === item.id ? tUI.historyPanel.deleting : tUI.historyPanel.delete}
                     </button>
                     <button
                       className="btn-interactive"
@@ -97,7 +101,7 @@ export function SavedResultsPanel({
                       onClick={() => onLoad(item.id)}
                       disabled={loadingResultId === item.id || deletingResultId === item.id}
                     >
-                      {loadingResultId === item.id ? "Loading..." : "Load"}
+                      {loadingResultId === item.id ? tUI.historyPanel.loadLoading : tUI.historyPanel.load}
                     </button>
                   </div>
                 </li>

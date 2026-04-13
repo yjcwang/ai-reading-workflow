@@ -53,9 +53,9 @@ export function ResultPanel({
             style={saveBtn}
             onClick={onSaveResult}
             disabled={loading || saving || !hasResult}
-            title="Save Result"
+            title={tUI.resultPanel.saveResult}
           >
-            {saving ? "Saving..." : "Save Result"}
+            {saving ? tUI.resultPanel.savingResult : tUI.resultPanel.saveResult}
           </button>
           <button
             className="btn-interactive"
@@ -70,7 +70,7 @@ export function ResultPanel({
       </div>
 
       {error ? <div style={errorBox}>{tUI.common.error}: {error}</div> : null}
-      {saveError ? <div style={errorBox}>Save error: {saveError}</div> : null}
+      {saveError ? <div style={errorBox}>{tUI.resultPanel.saveError}: {saveError}</div> : null}
       {saveSuccess ? <div style={{ ...successBox, ...(saveSuccessLeaving ? successBoxLeaving : null) }}>{saveSuccess}</div> : null}
       {exportError ? <div style={errorBox}>{tUI.resultPanel.exportPdf}{tUI.common.error}: {exportError}</div> : null}
 

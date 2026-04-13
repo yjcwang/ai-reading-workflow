@@ -2,13 +2,16 @@
 
 import { useEffect, useState } from "react";
 import { deleteSavedResult, getSavedResultDetail, getSavedResults, saveResult } from "@/lib/api";
+import { UI_STRINGS } from "@/lib/i18n";
 import type {
   ResultSummaryResponse,
   SaveResultRequest,
   SavedResultResponse,
+  TargetLang,
 } from "@/lib/types";
 
-export function useSavedResultsFeature() {
+export function useSavedResultsFeature(targetLang: TargetLang) {
+  const tUI = UI_STRINGS[targetLang];
   const [historyList, setHistoryList] = useState<ResultSummaryResponse[]>([]);
   const [historyLoading, setHistoryLoading] = useState(false);
   const [historyError, setHistoryError] = useState<string | null>(null);
@@ -61,7 +64,7 @@ export function useSavedResultsFeature() {
     try {
       const saved = await saveResult(payload);
       await refreshHistory();
-      setSaveSuccess("Saved to history.");
+      setSaveSuccess(tUI.resultPanel.saveSuccess);
       return saved;
     } catch (e: any) {
       setSaveError(e?.message ?? "Unknown error");
