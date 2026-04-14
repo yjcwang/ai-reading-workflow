@@ -1,5 +1,5 @@
-from pydantic_settings import BaseSettings
 from typing import Literal
+from pydantic_settings import BaseSettings
 
 # entrance to get env setting (e.g OpenAI key, temperature)
 
@@ -19,6 +19,10 @@ class Settings(BaseSettings):
 
     DEEPSEEK_API_KEY: str | None = None
     DEEPSEEK_MODEL: str = "deepseek-chat"
+
+    DATABASE_URL: str | None = None
+    SQLITE_DB_PATH: str = "app/app.db"
+    ALLOWED_ORIGINS: str = "http://localhost:3000,http://127.0.0.1:3000"
 
     
 
