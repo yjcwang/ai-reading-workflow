@@ -194,6 +194,22 @@ npm run dev
 - 前端：`http://localhost:3000`
 - 后端：`http://127.0.0.1:8000`
 
+### Windows quick start
+
+Use the helper scripts in the project root:
+```powershell
+.\start-dev.ps1
+```
+First-time setup:
+```powershell
+.\start-dev.ps1 -Install
+```
+Skip opening the browser:
+```powershell
+.\start-dev.ps1 -NoBrowser
+```
+
+
 ## 技术栈
 
 - Backend: FastAPI, Pydantic v2, SQLModel, Uvicorn, Tenacity
