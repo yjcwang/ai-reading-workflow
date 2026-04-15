@@ -132,6 +132,18 @@ After adding database-backed saved results, title ownership became unclear. The 
 - Keep `title` in saved-result response models because history UI still depends on it
 - Keep fallback preview title in `ResultService` if LLM title generation fails
 
+## 2026-04-15 First Public Deployment with Vercel + Render
+
+### Context
+The project needed a simple hosted setup for small-scale external testing without introducing Docker or custom infrastructure.
+
+### Decision
+- Deploy frontend to Vercel and backend to Render
+- Keep frontend backend URL configurable via `NEXT_PUBLIC_BACKEND_URL`
+- Add backend environment-based config for `ALLOWED_ORIGINS`, `DATABASE_URL`, and `SQLITE_DB_PATH`
+- Add `.python-version` to pin Render Python to `3.11.11`
+
+
 
 
 
