@@ -193,6 +193,7 @@ export default function Page() {
           onAnalyzeRequest={handleAnalyzeRequest}
           onClear={onClear}
           onExplainRequest={handleExplainRequest}
+          explainLoading={explainFeature.explainLoading}
           theme={theme}
           onToggleTheme={toggleTheme}
           getMode={inferExplainMode}

@@ -39,7 +39,8 @@ type Props = {
   onAnalyzeRequest: () => void;
   onClear: () => void;
 
-  onExplainRequest?: (payload: { selectedText: string; context: string }) => void;
+  onExplainRequest?: (payload: { selectedText: string; context: string }) => Promise<void> | void;
+  explainLoading?: boolean;
 
   theme: "light" | "dark";
   onToggleTheme: () => void;
@@ -60,6 +61,7 @@ export function InputPanel({
   onAnalyzeRequest: onConfirm,
   onClear,
   onExplainRequest,
+  explainLoading,
   theme,
   onToggleTheme,
   getMode,
@@ -231,6 +233,7 @@ export function InputPanel({
             style={lockedBox}
             disabled={analyzeLoading}
             onExplainRequest={(payload) => onExplainRequest?.(payload)}
+            explainLoading={explainLoading}
             getMode={getMode}
             targetLang={targetLang}
           />

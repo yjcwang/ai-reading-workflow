@@ -28,7 +28,7 @@ export function useExplainFeature({
   const [explainData, setExplainData] = useState<ExplainResponse | null>(null);
 
   async function handleExplainRequest(payload: ExplainPayload) {
-    setExplainOpen(true);
+    setExplainOpen(false);
     setExplainLoading(true);
     setExplainError(null);
     setExplainData(null);
@@ -52,8 +52,10 @@ export function useExplainFeature({
       } else {
         setExplainData(res);
       }
-    } catch (e: any) {
-      setExplainError(e?.message ?? "Unknown error");
+      setExplainOpen(true);
+    } catch (e: unknown) {
+      setExplainError(e instanceof Error ? e.message : "Unknown error");
+      setExplainOpen(true);
     } finally {
       setExplainLoading(false);
     }

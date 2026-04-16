@@ -1,6 +1,9 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useEffectEvent, useRef, useState } from "react";
+import Image from "next/image";
+import loadingIcon from "@/icons/loading.svg";
+import styles from "./InputPanel.module.css";
 import { UI_STRINGS } from "@/lib/i18n";
 import { TargetLang } from "@/lib/types";
 
@@ -12,27 +15,49 @@ type ExplainRequestPayload = {
 type Props = {
   text: string;
   style?: React.CSSProperties;
-  onExplainRequest: (payload: ExplainRequestPayload) => void;
+  onExplainRequest: (payload: ExplainRequestPayload) => Promise<void> | void;
   disabled?: boolean;
-  // mode decision is made by page.tsx, render explainBtn depending on given mode
+  explainLoading?: boolean;
   getMode?: (selectedText: string) => "word" | "sentence";
   targetLang: TargetLang;
 };
 
-export function LockedTextViewer({ text, style, onExplainRequest, disabled, getMode, targetLang}: Props) {
+export function LockedTextViewer({
+  text,
+  style,
+  onExplainRequest,
+  disabled,
+  explainLoading,
+  getMode,
+  targetLang,
+}: Props) {
   const tUI = UI_STRINGS[targetLang];
-
   const boxRef = useRef<HTMLDivElement | null>(null);
 
-  const [selectedText, setSelectedText] = useState<string>("");
+  const [selectedText, setSelectedText] = useState("");
   const [btnPos, setBtnPos] = useState<{ top: number; left: number } | null>(null);
+  const [explainSubmitting, setExplainSubmitting] = useState(false);
+  const busyAnchorRef = useRef<{
+    top: number;
+    left: number;
+    scrollTop: number;
+    scrollLeft: number;
+  } | null>(null);
+  const btnPosRef = useRef<{ top: number; left: number } | null>(null);
+  const explainBusyRef = useRef(false);
 
+  const explainBusy = !!disabled || !!explainLoading || explainSubmitting;
   const mode = getMode ? getMode(selectedText) : "word";
-  const explainBtnLabel = mode === "sentence" ? tUI.lockedTextViewer.explainBtnScentence : tUI.lockedTextViewer.explainBtnWord;
+  const explainBtnLabel =
+    mode === "sentence"
+      ? tUI.lockedTextViewer.explainBtnScentence
+      : tUI.lockedTextViewer.explainBtnWord;
 
-  // 1) 根据 selection 更新按钮位置和选中文字
-  function updateSelection() {
-    if (disabled) return;
+  explainBusyRef.current = explainBusy;
+  btnPosRef.current = btnPos;
+
+  const updateSelection = useEffectEvent(() => {
+    if (explainBusy) return;
 
     const el = boxRef.current;
     const sel = window.getSelection();
@@ -42,17 +67,13 @@ export function LockedTextViewer({ text, style, onExplainRequest, disabled, getM
       return;
     }
 
-    const raw = sel.toString();
-    const t = raw.trim();
-
-    // 没有有效选中：隐藏按钮
+    const t = sel.toString().trim();
     if (!t || t.length < 2) {
       setSelectedText("");
       setBtnPos(null);
       return;
     }
 
-    // 确保选中发生在 lockedText 容器内部
     const anchorNode = sel.anchorNode;
     if (!anchorNode || !el.contains(anchorNode)) {
       setSelectedText("");
@@ -60,31 +81,25 @@ export function LockedTextViewer({ text, style, onExplainRequest, disabled, getM
       return;
     }
 
-    // 滚动边界检测 
     const containerRect = el.getBoundingClientRect();
     const selRect = sel.getRangeAt(0).getBoundingClientRect();
+    const isVisible =
+      selRect.bottom > containerRect.top && selRect.top < containerRect.bottom;
 
-    const isVisible = 
-      selRect.bottom > containerRect.top && 
-      selRect.top < containerRect.bottom;
-
-    if (!isVisible) { // 如果文字不可见，直接隐藏按钮和文字高亮
-      setBtnPos(null); 
+    if (!isVisible) {
+      setBtnPos(null);
       setSelectedText("");
       window.getSelection()?.removeAllRanges();
       return;
     }
 
-    // 计算按钮位置：在选区右下角稍微偏移一点
     const margin = 8;
     let top = selRect.bottom + margin;
     let left = selRect.right + margin;
 
-    // 防止按钮跑出屏幕右侧
     const BTN_W = 90;
     left = Math.min(left, window.innerWidth - BTN_W - 8);
 
-    // 防止按钮跑出屏幕底部（简单处理：如果太靠下，就放到上面）
     const BTN_H = 32;
     if (top > window.innerHeight - BTN_H - 8) {
       top = selRect.top - BTN_H - margin;
@@ -92,19 +107,31 @@ export function LockedTextViewer({ text, style, onExplainRequest, disabled, getM
 
     setSelectedText(t);
     setBtnPos({ top, left });
-  }
+  });
 
-  // 监听 mouseup / keyup（最小实现）
   useEffect(() => {
     function onMouseUp() {
       updateSelection();
     }
+
     function onKeyUp() {
       updateSelection();
     }
+
     function onScroll() {
-      // 滚动时 selection 的 rect 会变化，重新算一次
-      if (btnPos) updateSelection();
+      const el = boxRef.current;
+      const currentBtnPos = btnPosRef.current;
+      if (!currentBtnPos) return;
+
+      if (explainBusyRef.current && el && busyAnchorRef.current) {
+        const { top, left, scrollTop, scrollLeft } = busyAnchorRef.current;
+        const nextTop = top - (el.scrollTop - scrollTop);
+        const nextLeft = left - (el.scrollLeft - scrollLeft);
+        setBtnPos({ top: nextTop, left: nextLeft });
+        return;
+      }
+
+      updateSelection();
     }
 
     document.addEventListener("mouseup", onMouseUp);
@@ -116,64 +143,108 @@ export function LockedTextViewer({ text, style, onExplainRequest, disabled, getM
       document.removeEventListener("keyup", onKeyUp);
       window.removeEventListener("scroll", onScroll, true);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [disabled, btnPos]);
+  }, []);
 
-  // 点击 Explain：把 payload 抛给 page.tsx
-  function handleExplainClick() {
-    if (disabled) return;
-    if (!selectedText) return;
+  useEffect(() => {
+    if (explainLoading) return;
+    setExplainSubmitting(false);
+  }, [explainLoading]);
 
-    onExplainRequest({
-      selectedText,
-      context: text, 
-    });
+  async function handleExplainClick() {
+    if (explainBusy || !selectedText) return;
 
-    // 点击后可以隐藏按钮（避免重复触发）
-    setBtnPos(null);
+    const el = boxRef.current;
+    if (btnPos && el) {
+      busyAnchorRef.current = {
+        top: btnPos.top,
+        left: btnPos.left,
+        scrollTop: el.scrollTop,
+        scrollLeft: el.scrollLeft,
+      };
+    }
+
+    setExplainSubmitting(true);
+    window.getSelection()?.removeAllRanges();
+
+    try {
+      await onExplainRequest({
+        selectedText,
+        context: text,
+      });
+    } finally {
+      busyAnchorRef.current = null;
+      setBtnPos(null);
+      setSelectedText("");
+      setExplainSubmitting(false);
+    }
   }
 
   return (
     <>
-      {/* lockedText 展示区 */}
-      <div ref={boxRef} style={style}>
+      <div
+        ref={boxRef}
+        style={{
+          ...style,
+          userSelect: explainBusy ? "none" : style?.userSelect,
+        }}
+      >
         {text}
       </div>
 
-      {/* 浮动 Explain 按钮 */}
       {btnPos && (
         <button
           onClick={handleExplainClick}
-          disabled={disabled}
+          disabled={explainBusy}
           className="btn-interactive"
           style={{
             ...explainBtn,
             top: btnPos.top,
             left: btnPos.left,
+            ...(explainBusy ? explainBtnBusy : null),
           }}
         >
-          {explainBtnLabel}
+          {explainBusy ? (
+            <Image
+              src={loadingIcon}
+              alt=""
+              width={16}
+              height={16}
+              aria-hidden="true"
+              className={styles.loadingSpin}
+            />
+          ) : (
+            explainBtnLabel
+          )}
         </button>
       )}
     </>
   );
 }
 
-
-
 const explainBtn: React.CSSProperties = {
   position: "fixed",
-  
   zIndex: 9999,
   fontWeight: 600,
-
   padding: "6px 10px",
   borderRadius: 12,
   border: "1px solid var(--border)",
   background: "var(--accent-soft)",
-
   color: "var(--text)",
   cursor: "pointer",
+  opacity: 1,
   boxShadow: "0 6px 18px rgba(0,0,0,0.12)",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+};
 
+const explainBtnBusy: React.CSSProperties = {
+  minWidth: 44,
+  minHeight: 36,
+  padding: "8px 12px",
+  border: "1px solid var(--border)",
+  background: "var(--accent-soft)",
+  boxShadow: "0 8px 24px rgba(0,0,0,0.2)",
+  opacity: 1,
+  cursor: "default",
 };

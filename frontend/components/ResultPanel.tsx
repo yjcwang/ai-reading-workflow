@@ -1,6 +1,9 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
+import loadingIcon from "@/icons/loading.svg";
+import styles from "./InputPanel.module.css";
 import type { AnalyzeResponse, TargetLang } from "@/lib/types";
 import { UI_STRINGS } from "@/lib/i18n";
 
@@ -55,7 +58,18 @@ export function ResultPanel({
             disabled={loading || saving || !hasResult}
             title={tUI.resultPanel.saveResult}
           >
-            {saving ? tUI.resultPanel.savingResult : tUI.resultPanel.saveResult}
+            {saving ? (
+              <Image
+                src={loadingIcon}
+                alt=""
+                width={16}
+                height={16}
+                className={styles.loadingSpin}
+                aria-hidden="true"
+              />
+            ) : (
+              tUI.resultPanel.saveResult
+            )}
           </button>
           <button
             className="btn-interactive"
@@ -64,7 +78,18 @@ export function ResultPanel({
             disabled={loading || exporting || !hasResult}
             title="Export PDF"
           >
-            {exporting ? tUI.resultPanel.exporting : tUI.resultPanel.exportPdf}
+            {exporting ? (
+              <Image
+                src={loadingIcon}
+                alt=""
+                width={16}
+                height={16}
+                className={styles.loadingSpin}
+                aria-hidden="true"
+              />
+            ) : (
+              tUI.resultPanel.exportPdf
+            )}
           </button>
         </div>
       </div>
