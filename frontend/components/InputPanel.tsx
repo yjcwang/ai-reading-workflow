@@ -1,7 +1,9 @@
 "use client";
 
 import React , { useState } from "react";
+import Image from "next/image";
 import styles from "./InputPanel.module.css";
+import loadingIcon from "@/icons/loading.svg";
 import type {
   Level,
   GenerateTextRequest,
@@ -116,9 +118,20 @@ export function InputPanel({
               <button
                 className={`${styles.ghostBtnSmall} btn-interactive`}
                 onClick={() => setGenerateModalOpen((prev) => !prev)}
-                disabled={analyzeLoading}
+                disabled={analyzeLoading || generateLoading}
               >
-                {tUI.generator.title}
+                {generateLoading ? (
+                  <Image
+                    src={loadingIcon}
+                    alt=""
+                    width={16}
+                    height={16}
+                    className={styles.loadingSpin}
+                    aria-hidden="true"
+                  />
+                ) : (
+                  tUI.generator.title
+                )}
               </button>
               <TextGeneratorModal
                 open={generateModalOpen}
@@ -130,10 +143,8 @@ export function InputPanel({
                 onClose={() => setGenerateModalOpen(false)}
                 onGenerateRequestChange={onGenerateRequestChange}
                 onGenerate={async () => {
-                  const success = await onGenerateRequest();
-                  if (success) {
-                    setGenerateModalOpen(false);
-                  }
+                  setGenerateModalOpen(false);
+                  await onGenerateRequest();
                 }}
               />
             </div>
@@ -195,7 +206,18 @@ export function InputPanel({
           />
           <div className={styles.actionRow}>
             <button className={`${styles.primaryBtn} btn-interactive`} onClick={onConfirm} disabled={!canConfirm}>
-              {tUI.inputPanel.analyzeBtn}
+              {analyzeLoading ? (
+                <Image
+                  src={loadingIcon}
+                  alt=""
+                  width={16}
+                  height={16}
+                  className={styles.loadingSpin}
+                  aria-hidden="true"
+                />
+              ) : (
+                tUI.inputPanel.analyzeBtn
+              )}
             </button>
             <button className={`${styles.ghostBtn} btn-interactive`} onClick={onClear} disabled={analyzeLoading && draftText.length === 0}>
               {tUI.common.clear}
@@ -216,7 +238,14 @@ export function InputPanel({
           <div className={styles.lockedActions}>
             {analyzeLoading ? (
               <button className={`${styles.ghostBtn} btn-interactive`} disabled >
-                {tUI.common.loading}
+                <Image
+                  src={loadingIcon}
+                  alt=""
+                  width={16}
+                  height={16}
+                  className={styles.loadingSpin}
+                  aria-hidden="true"
+                />
               </button>
             ) : (
               <button className={`${styles.ghostBtn} btn-interactive`} onClick={onClear}>

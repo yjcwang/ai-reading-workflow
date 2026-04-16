@@ -121,6 +121,21 @@
   cursor: pointer;
 }
 
+.loadingSpin {
+  animation: spin 1s linear infinite;
+  transform-origin: center;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .actionRow {
   display: flex;
   gap: 10px;
