@@ -1,6 +1,8 @@
 "use client";
 
 import React from "react";
+import historyIcon from "@/icons/history.svg";
+import deleteIcon from "@/icons/delete.svg";
 import type { ResultSummaryResponse, TargetLang } from "@/lib/types";
 import { UI_STRINGS } from "@/lib/i18n";
 
@@ -50,8 +52,18 @@ export function SavedResultsPanel({
         onMouseDown={(e) => e.stopPropagation()}
       >
         <div style={header}>
-          <div>
-            <div style={title}>{tUI.historyPanel.title}</div>
+          <div style={titleBlock}>
+            <div style={titleRow}>
+              <span
+                style={{
+                  ...headerIcon,
+                  WebkitMaskImage: `url(${historyIcon.src})`,
+                  maskImage: `url(${historyIcon.src})`,
+                }}
+                aria-hidden="true"
+              />
+              <div style={title}>{tUI.historyPanel.title}</div>
+            </div>
             <div style={subtitle}>{results.length} {tUI.historyPanel.savedResults}</div>
           </div>
           <div style={headerActions}>
@@ -92,8 +104,21 @@ export function SavedResultsPanel({
                       style={dangerButton}
                       onClick={() => onDelete(item.id)}
                       disabled={deletingResultId === item.id || loadingResultId === item.id}
+                      title={tUI.historyPanel.delete}
+                      aria-label={tUI.historyPanel.delete}
                     >
-                      {deletingResultId === item.id ? tUI.historyPanel.deleting : tUI.historyPanel.delete}
+                      {deletingResultId === item.id ? (
+                        tUI.historyPanel.deleting
+                      ) : (
+                        <span
+                          style={{
+                            ...actionIcon,
+                            WebkitMaskImage: `url(${deleteIcon.src})`,
+                            maskImage: `url(${deleteIcon.src})`,
+                          }}
+                          aria-hidden="true"
+                        />
+                      )}
                     </button>
                     <button
                       className="btn-interactive"
@@ -179,9 +204,34 @@ const header: React.CSSProperties = {
   gap: 12,
 };
 
+const titleBlock: React.CSSProperties = {
+  display: "flex",
+  flexDirection: "column",
+};
+
+const titleRow: React.CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  gap: 10,
+};
+
 const headerActions: React.CSSProperties = {
   display: "flex",
   gap: 10,
+};
+
+const headerIcon: React.CSSProperties = {
+  width: 24,
+  height: 24,
+  display: "inline-block",
+  backgroundColor: "var(--text)",
+  WebkitMaskRepeat: "no-repeat",
+  maskRepeat: "no-repeat",
+  WebkitMaskPosition: "center",
+  maskPosition: "center",
+  WebkitMaskSize: "contain",
+  maskSize: "contain",
+  flexShrink: 0,
 };
 
 const title: React.CSSProperties = {
@@ -268,12 +318,30 @@ const secondaryButton: React.CSSProperties = {
 };
 
 const dangerButton: React.CSSProperties = {
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
   border: "1px solid var(--border)",
   background: "transparent",
   color: "var(--text)",
   borderRadius: 14,
-  padding: "8px 12px",
+  minWidth: 40,
+  minHeight: 40,
+  padding: 8,
   cursor: "pointer",
+};
+
+const actionIcon: React.CSSProperties = {
+  width: 18,
+  height: 18,
+  display: "inline-block",
+  backgroundColor: "currentColor",
+  WebkitMaskRepeat: "no-repeat",
+  maskRepeat: "no-repeat",
+  WebkitMaskPosition: "center",
+  maskPosition: "center",
+  WebkitMaskSize: "contain",
+  maskSize: "contain",
 };
 
 const emptyState: React.CSSProperties = {

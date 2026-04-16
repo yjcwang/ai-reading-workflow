@@ -3,6 +3,7 @@
 import React from "react";
 import Image from "next/image";
 import loadingIcon from "@/icons/loading.svg";
+import deleteIcon from "@/icons/delete.svg";
 import styles from "./InputPanel.module.css";
 import type { AnalyzeResponse, TargetLang } from "@/lib/types";
 import { UI_STRINGS } from "@/lib/i18n";
@@ -117,9 +118,17 @@ export function ResultPanel({
                     className="btn-interactive"
                     style={deleteBtn}
                     onClick={() => onDeleteVocab(v.expression)}
-                    title="Delete"
+                    title={tUI.resultPanel.deleteItem}
+                    aria-label={tUI.resultPanel.deleteItem}
                   >
-                    {tUI.resultPanel.deleteItem}
+                    <span
+                      style={{
+                        ...deleteIconMask,
+                        WebkitMaskImage: `url(${deleteIcon.src})`,
+                        maskImage: `url(${deleteIcon.src})`,
+                      }}
+                      aria-hidden="true"
+                    />
                   </button>
                   {v.definition ? <div style={muted}>{v.definition}</div> : null}
                   {v.example ? <div style={example}>{v.example}</div> : null}
@@ -145,9 +154,17 @@ export function ResultPanel({
                     className="btn-interactive"
                     style={deleteBtn}
                     onClick={() => onDeleteGrammar(g.expression)}
-                    title="Delete"
+                    title={tUI.resultPanel.deleteItem}
+                    aria-label={tUI.resultPanel.deleteItem}
                   >
-                    {tUI.resultPanel.deleteItem}
+                    <span
+                      style={{
+                        ...deleteIconMask,
+                        WebkitMaskImage: `url(${deleteIcon.src})`,
+                        maskImage: `url(${deleteIcon.src})`,
+                      }}
+                      aria-hidden="true"
+                    />
                   </button>
                   {g.definition ? <div style={muted}>{g.definition}</div> : null}
                   {g.example ? <div style={example}>{g.example}</div> : null}
@@ -231,15 +248,32 @@ const exportBtn: React.CSSProperties = {
 };
 
 const deleteBtn: React.CSSProperties = {
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
   borderRadius: 14,
-  padding: "6px 10px",
+  width: 36,
+  height: 36,
+  padding: 8,
   background: "transparent",
   color: "var(--text)",
   border: "1px solid var(--border)",
   position: "absolute",
   top: 10,
   right: 10,
-  boxShadow: "0 6px 18px rgba(0,0,0,0.12)",
+};
+
+const deleteIconMask: React.CSSProperties = {
+  width: 18,
+  height: 18,
+  display: "inline-block",
+  backgroundColor: "currentColor",
+  WebkitMaskRepeat: "no-repeat",
+  maskRepeat: "no-repeat",
+  WebkitMaskPosition: "center",
+  maskPosition: "center",
+  WebkitMaskSize: "contain",
+  maskSize: "contain",
 };
 
 const empty: React.CSSProperties = { opacity: 0.6, padding: 10 };

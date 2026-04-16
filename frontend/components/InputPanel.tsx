@@ -4,6 +4,11 @@ import React , { useState } from "react";
 import Image from "next/image";
 import styles from "./InputPanel.module.css";
 import loadingIcon from "@/icons/loading.svg";
+import clearIcon from "@/icons/clear.svg";
+import lightIcon from "@/icons/light.svg";
+import darkIcon from "@/icons/dark.svg";
+import historyIcon from "@/icons/history.svg";
+import aiIcon from "@/icons/ai.svg";
 import type {
   Level,
   GenerateTextRequest,
@@ -82,6 +87,8 @@ export function InputPanel({
   const [generateModalOpen, setGenerateModalOpen] = useState(false);
 
   const tUI = UI_STRINGS[targetLang];
+  const themeIcon = theme === "light" ? lightIcon : darkIcon;
+  const themeLabel = theme === "light" ? tUI.inputPanel.lightMode : tUI.inputPanel.darkMode;
 
   // select language will open a confirmation window
   const handleLanguageChange = (newLang: TargetLang) => {
@@ -108,17 +115,22 @@ export function InputPanel({
         <div className={styles.leftTools}>
           <div style={{ fontWeight: 700 }}>{tUI.inputPanel.inputTitle}</div>
           <button
-            className={`${styles.ghostBtnSmall} btn-interactive`}
+            className={`${styles.ghostBtnSmall} ${styles.iconLabelBtn} btn-interactive`}
             onClick={onOpenHistory}
             disabled={analyzeLoading}
           >
+            <span
+              className={styles.iconMask}
+              aria-hidden="true"
+              style={{ WebkitMaskImage: `url(${historyIcon.src})`, maskImage: `url(${historyIcon.src})` }}
+            />
             {tUI.inputPanel.history}
           </button>
           {!lockedText && (
             <div className={styles.generatorMenu}>
               {/* AI generator popover is anchored below this trigger button. */}
               <button
-                className={`${styles.ghostBtnSmall} btn-interactive`}
+                className={`${styles.ghostBtnSmall} ${styles.iconLabelBtn} btn-interactive`}
                 onClick={() => setGenerateModalOpen((prev) => !prev)}
                 disabled={analyzeLoading || generateLoading}
               >
@@ -132,7 +144,14 @@ export function InputPanel({
                     aria-hidden="true"
                   />
                 ) : (
-                  tUI.generator.title
+                  <>
+                    <span
+                      className={styles.iconMask}
+                      aria-hidden="true"
+                      style={{ WebkitMaskImage: `url(${aiIcon.src})`, maskImage: `url(${aiIcon.src})` }}
+                    />
+                    {tUI.generator.title}
+                  </>
                 )}
               </button>
               <TextGeneratorModal
@@ -155,11 +174,17 @@ export function InputPanel({
         <div className={styles.rightTools}>
           {/* Toggle Theme Light/Dark*/}
           <button
-            className={`${styles.ghostBtnSmall} btn-interactive`}
+            className={`${styles.ghostBtnSmall} ${styles.iconBtn} btn-interactive`}
             onClick={onToggleTheme}
             disabled={analyzeLoading}
+            aria-label={themeLabel}
+            title={themeLabel}
           >
-            {theme === "light" ? tUI.inputPanel.lightMode : tUI.inputPanel.darkMode}
+            <span
+              className={styles.iconMask}
+              aria-hidden="true"
+              style={{ WebkitMaskImage: `url(${themeIcon.src})`, maskImage: `url(${themeIcon.src})` }}
+            />
           </button>
           {/* Language Switch EN/ZH */}
           <select
@@ -221,8 +246,18 @@ export function InputPanel({
                 tUI.inputPanel.analyzeBtn
               )}
             </button>
-            <button className={`${styles.ghostBtn} btn-interactive`} onClick={onClear} disabled={analyzeLoading && draftText.length === 0}>
-              {tUI.common.clear}
+            <button
+              className={`${styles.ghostBtn} ${styles.iconBtn} btn-interactive`}
+              onClick={onClear}
+              disabled={analyzeLoading && draftText.length === 0}
+              aria-label={tUI.common.clear}
+              title={tUI.common.clear}
+            >
+              <span
+                className={styles.iconMask}
+                aria-hidden="true"
+                style={{ WebkitMaskImage: `url(${clearIcon.src})`, maskImage: `url(${clearIcon.src})` }}
+              />
             </button>
           </div>
         </>
@@ -251,8 +286,17 @@ export function InputPanel({
                 />
               </button>
             ) : (
-              <button className={`${styles.ghostBtn} btn-interactive`} onClick={onClear}>
-                {tUI.common.clear}
+              <button
+                className={`${styles.ghostBtn} ${styles.iconBtn} btn-interactive`}
+                onClick={onClear}
+                aria-label={tUI.common.clear}
+                title={tUI.common.clear}
+              >
+                <span
+                  className={styles.iconMask}
+                  aria-hidden="true"
+                  style={{ WebkitMaskImage: `url(${clearIcon.src})`, maskImage: `url(${clearIcon.src})` }}
+                />
               </button>
             )}
             <span className={styles.lockedHint}>

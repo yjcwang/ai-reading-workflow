@@ -121,6 +121,38 @@
   cursor: pointer;
 }
 
+.iconBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  min-height: 40px;
+  padding: 8px;
+}
+
+.iconLabelBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.iconMask {
+  width: 20px;
+  height: 20px;
+  display: block;
+  background-color: currentColor;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+}
+
+.iconBtn:disabled .iconMask {
+  background-color: color-mix(in srgb, var(--text) 35%, transparent);
+}
+
 .loadingSpin {
   animation: spin 1s linear infinite;
   transform-origin: center;
