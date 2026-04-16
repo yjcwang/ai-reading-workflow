@@ -111,13 +111,32 @@ export function InputPanel({
             {tUI.inputPanel.history}
           </button>
           {!lockedText && (
-            <button
-              className={`${styles.ghostBtnSmall} btn-interactive`}
-              onClick={() => setGenerateModalOpen(true)}
-              disabled={analyzeLoading}
-            >
-              {tUI.generator.title}
-            </button>
+            <div className={styles.generatorMenu}>
+              {/* AI generator popover is anchored below this trigger button. */}
+              <button
+                className={`${styles.ghostBtnSmall} btn-interactive`}
+                onClick={() => setGenerateModalOpen((prev) => !prev)}
+                disabled={analyzeLoading}
+              >
+                {tUI.generator.title}
+              </button>
+              <TextGeneratorModal
+                open={generateModalOpen}
+                targetLang={targetLang}
+                generateRequest={generateRequest}
+                analyzeLoading={analyzeLoading}
+                generateLoading={generateLoading}
+                generateError={generateError}
+                onClose={() => setGenerateModalOpen(false)}
+                onGenerateRequestChange={onGenerateRequestChange}
+                onGenerate={async () => {
+                  const success = await onGenerateRequest();
+                  if (success) {
+                    setGenerateModalOpen(false);
+                  }
+                }}
+              />
+            </div>
           )}
         </div>
         <div className={styles.rightTools}>
@@ -162,24 +181,6 @@ export function InputPanel({
             onClose={() => setPendingLang(null)}
             onConfirm={confirmLangChange}
           />
-          {/* Text generator modal */}
-          <TextGeneratorModal
-            open={generateModalOpen}
-            targetLang={targetLang}
-            generateRequest={generateRequest}
-            analyzeLoading={analyzeLoading}
-            generateLoading={generateLoading}
-            generateError={generateError}
-            onClose={() => setGenerateModalOpen(false)}
-            onGenerateRequestChange={onGenerateRequestChange}
-            onGenerate={async () => {
-              const success = await onGenerateRequest();
-              if (success) {
-                setGenerateModalOpen(false);
-              }
-            }}
-          />
-
         </div>
       </div>
 

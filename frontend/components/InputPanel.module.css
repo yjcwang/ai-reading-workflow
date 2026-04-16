@@ -18,6 +18,27 @@
   gap: 10px;
 }
 
+.generatorMenu {
+  position: relative;
+}
+
+.generatorPopover {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+  z-index: 40;
+  width: min(380px, calc(100vw - 48px));
+  border-radius: 18px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.18);
+  padding: 20px;
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
 .rightTools {
   display: flex;
   align-items: center;
@@ -118,4 +139,12 @@
   font-size: 13px;
   line-height: 1.4;
   font-style: italic;
+}
+
+@media (max-width: 900px) {
+  .generatorPopover {
+    left: 0;
+    right: auto;
+    width: min(280px, calc(100vw - 48px));
+  }
 }
