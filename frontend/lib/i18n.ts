@@ -18,6 +18,7 @@ export const UI_STRINGS = {
       langConfirmMessage: "切换语言会清空当前所有结果，是否继续？",
       confirm: "确认",
       cancel: "取消",
+      lockedTextHint: "选中文字可解释词汇或句子",
     },
     generator: {
       title: "AI 生成",
@@ -94,6 +95,7 @@ export const UI_STRINGS = {
       langConfirmMessage: "Changing the language will clear all current results. Do you want to proceed?",
       confirm: "Confirm",
       cancel: "Cancel",
+      lockedTextHint: "Select text to explain a word or sentence.",
     },
     generator: {
       title: "AI Generator",

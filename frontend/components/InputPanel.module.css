@@ -108,4 +108,14 @@
 
 .lockedActions {
   margin-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.lockedHint {
+  color: color-mix(in srgb, var(--text) 45%, transparent);
+  font-size: 13px;
+  line-height: 1.4;
+  font-style: italic;
 }

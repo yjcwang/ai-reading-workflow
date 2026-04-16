@@ -222,6 +222,9 @@ export function InputPanel({
                 {tUI.common.clear}
               </button>
             )}
+            <span className={styles.lockedHint}>
+              {tUI.inputPanel.lockedTextHint}
+            </span>
           </div>
         </>
       )}
