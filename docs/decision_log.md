@@ -143,6 +143,17 @@ The project needed a simple hosted setup for small-scale external testing withou
 - Add backend environment-based config for `ALLOWED_ORIGINS`, `DATABASE_URL`, and `SQLITE_DB_PATH`
 - Add `.python-version` to pin Render Python to `3.11.11`
 
+## 2026-04-17 Frontend UX Refinement (Issue #5)
+
+### Context
+Recent frontend updates focused on making the interface clearer and easier to use.
+
+### Decision
+- Replace text-only buttons with icon/ icon + text combinations
+- Add a broader set of open-source Google Fonts icons across the UI
+- Add loading animations to improve async feedback
+- Refine the overall interaction design to be more user-friendly
+
 
 
 
