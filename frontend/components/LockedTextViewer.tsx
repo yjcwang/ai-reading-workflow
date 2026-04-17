@@ -5,7 +5,7 @@ import Image from "next/image";
 import loadingIcon from "@/icons/loading.svg";
 import aiIcon from "@/icons/ai.svg";
 import styles from "./InputPanel.module.css";
-import { buttonSm, maskedIconStyle} from "@/components/buttonStyles";
+import { buttonSm, buttonMd, maskedIconStyle} from "@/components/buttonStyles";
 import { UI_STRINGS } from "@/lib/i18n";
 import { TargetLang } from "@/lib/types";
 
@@ -279,17 +279,17 @@ const explainBtn: React.CSSProperties = {
 };
 
 const mobileExplainBtn: React.CSSProperties = {
-  ...buttonSm,
+  ...buttonMd,
   position: "fixed",
   left: "50%",
-  bottom: "calc(env(safe-area-inset-bottom, 0px) + 16px)",
+  bottom: "calc(env(safe-area-inset-bottom, 0px) + 30px)",
   transform: "translateX(-50%)",
   zIndex: 9999,
   minWidth: 168,
   fontWeight: 600,
-  background: "var(--accent)",
-  color: "var(--text-invert)",
-  border: "1px solid transparent",
+  background: "var(--accent-soft)",
+  color: "var(--text)",
+  border: "1px solid var(--border)",
   boxShadow: "0 12px 30px rgba(0,0,0,0.22)",
 };
 

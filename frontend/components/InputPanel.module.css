@@ -153,9 +153,7 @@
 
 @media (max-width: 900px) {
   .generatorPopover {
-    left: 0;
-    right: auto;
-    width: min(280px, calc(100vw - 48px));
+    width: min(320px, calc(100vw - 32px));
   }
 }
 
@@ -188,6 +186,28 @@
   .lockedActions {
     flex-wrap: wrap;
     gap: 8px;
+  }
+
+  .generatorPopover {
+    position: fixed;
+    left: 16px;
+    right: 16px;
+    top: 50%;
+    width: auto;
+    max-width: none;
+    max-height: min(80dvh, 640px);
+    overflow-y: auto;
+    transform: translateY(-50%);
+    z-index: 9997;
+    padding: 18px;
+  }
+
+  .generatorPopoverVisible {
+    transform: translateY(-50%);
+  }
+
+  .generatorPopoverHidden {
+    transform: translateY(calc(-50% - 18px));
   }
 }
 
