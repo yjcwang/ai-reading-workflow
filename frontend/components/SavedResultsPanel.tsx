@@ -3,6 +3,9 @@
 import React from "react";
 import historyIcon from "@/icons/history.svg";
 import deleteIcon from "@/icons/delete.svg";
+import closeIcon from "@/icons/close.svg";
+import refreshIcon from "@/icons/refresh.svg";
+import { iconButtonGhost, iconButtonGhostStrong, maskedIconStyle } from "@/components/iconButtonStyles";
 import type { ResultSummaryResponse, TargetLang } from "@/lib/types";
 import { UI_STRINGS } from "@/lib/i18n";
 
@@ -67,11 +70,24 @@ export function SavedResultsPanel({
             <div style={subtitle}>{results.length} {tUI.historyPanel.savedResults}</div>
           </div>
           <div style={headerActions}>
-            <button className="btn-interactive" style={secondaryButton} onClick={onRefresh} disabled={loading}>
-              {tUI.historyPanel.refresh}
+            <button
+              className="btn-interactive"
+              style={secondaryButton}
+              onClick={onRefresh}
+              disabled={loading}
+              title={tUI.historyPanel.refresh}
+              aria-label={tUI.historyPanel.refresh}
+            >
+              <span style={maskedIconStyle(refreshIcon.src)} aria-hidden="true" />
             </button>
-            <button className="btn-interactive" style={secondaryButton} onClick={onClose}>
-              {tUI.historyPanel.close}
+            <button
+              className="btn-interactive"
+              style={secondaryButton}
+              onClick={onClose}
+              title={tUI.historyPanel.close}
+              aria-label={tUI.historyPanel.close}
+            >
+              <span style={maskedIconStyle(closeIcon.src)} aria-hidden="true" />
             </button>
           </div>
         </div>
@@ -110,14 +126,7 @@ export function SavedResultsPanel({
                       {deletingResultId === item.id ? (
                         tUI.historyPanel.deleting
                       ) : (
-                        <span
-                          style={{
-                            ...actionIcon,
-                            WebkitMaskImage: `url(${deleteIcon.src})`,
-                            maskImage: `url(${deleteIcon.src})`,
-                          }}
-                          aria-hidden="true"
-                        />
+                        <span style={maskedIconStyle(deleteIcon.src)} aria-hidden="true" />
                       )}
                     </button>
                     <button
@@ -309,39 +318,11 @@ const primaryButton: React.CSSProperties = {
 };
 
 const secondaryButton: React.CSSProperties = {
-  border: "1px solid var(--border-strong)",
-  background: "transparent",
-  color: "var(--text)",
-  borderRadius: 14,
-  padding: "8px 12px",
-  cursor: "pointer",
+  ...iconButtonGhostStrong,
 };
 
 const dangerButton: React.CSSProperties = {
-  display: "inline-flex",
-  alignItems: "center",
-  justifyContent: "center",
-  border: "1px solid var(--border)",
-  background: "transparent",
-  color: "var(--text)",
-  borderRadius: 14,
-  minWidth: 40,
-  minHeight: 40,
-  padding: 8,
-  cursor: "pointer",
-};
-
-const actionIcon: React.CSSProperties = {
-  width: 18,
-  height: 18,
-  display: "inline-block",
-  backgroundColor: "currentColor",
-  WebkitMaskRepeat: "no-repeat",
-  maskRepeat: "no-repeat",
-  WebkitMaskPosition: "center",
-  maskPosition: "center",
-  WebkitMaskSize: "contain",
-  maskSize: "contain",
+  ...iconButtonGhost,
 };
 
 const emptyState: React.CSSProperties = {
