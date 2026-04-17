@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import Image from "next/image";
 import loadingIcon from "@/icons/loading.svg";
 import deleteIcon from "@/icons/delete.svg";
+import downloadIcon from "@/icons/download.svg";
 import styles from "./InputPanel.module.css";
 import { iconButtonSm, maskedIconStyle } from "@/components/iconButtonStyles";
 import type { AnalyzeResponse, TargetLang } from "@/lib/types";
@@ -79,7 +80,7 @@ export function ResultPanel({
             style={exportBtn}
             onClick={onExportPdf}
             disabled={loading || exporting || !hasResult}
-            title="Export PDF"
+            title="PDF"
           >
             {exporting ? (
               <Image
@@ -91,7 +92,10 @@ export function ResultPanel({
                 aria-hidden="true"
               />
             ) : (
-              tUI.resultPanel.exportPdf
+              <>
+                <span style={maskedIconStyle(downloadIcon.src, 18)} aria-hidden="true" />
+                PDF
+              </>
             )}
           </button>
         </div>
@@ -252,6 +256,10 @@ const saveBtn: React.CSSProperties = {
 };
 
 const exportBtn: React.CSSProperties = {
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
+  gap: 2,
   border: "1px solid var(--border-strong)",
   background: "rgba(var(--accent-rgb), 0.2)",
   color: "var(--text)",
