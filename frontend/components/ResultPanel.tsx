@@ -1,10 +1,11 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import loadingIcon from "@/icons/loading.svg";
 import deleteIcon from "@/icons/delete.svg";
 import styles from "./InputPanel.module.css";
+import { iconButtonSm, maskedIconStyle } from "@/components/iconButtonStyles";
 import type { AnalyzeResponse, TargetLang } from "@/lib/types";
 import { UI_STRINGS } from "@/lib/i18n";
 
@@ -43,6 +44,7 @@ export function ResultPanel({
 }: Props) {
   const tUI = UI_STRINGS[targetLang];
   const hasResult = data.vocab.length > 0 || data.grammar.length > 0;
+  const [activeDeleteKey, setActiveDeleteKey] = useState<string | null>(null);
 
   return (
     <div style={card}>
@@ -110,25 +112,28 @@ export function ResultPanel({
               <li style={empty}>{tUI.resultPanel.noData}</li>
             ) : (
               data.vocab.map((v) => (
-                <li key={v.expression} style={item}>
-                  <div style={{ fontWeight: 700 }}>
+                <li
+                  key={v.expression}
+                  style={item}
+                  onMouseEnter={() => setActiveDeleteKey(`vocab:${v.expression}`)}
+                  onMouseLeave={() => setActiveDeleteKey((current) => (current === `vocab:${v.expression}` ? null : current))}
+                >
+                  <div style={itemTitle}>
                     {v.expression} {v.reading ? <span style={muted}>({v.reading})</span> : null}
                   </div>
                   <button
                     className="btn-interactive"
-                    style={deleteBtn}
+                    style={{
+                      ...deleteBtn,
+                      ...(activeDeleteKey === `vocab:${v.expression}` ? deleteBtnVisible : deleteBtnHidden),
+                    }}
                     onClick={() => onDeleteVocab(v.expression)}
                     title={tUI.resultPanel.deleteItem}
                     aria-label={tUI.resultPanel.deleteItem}
+                    onFocus={() => setActiveDeleteKey(`vocab:${v.expression}`)}
+                    onBlur={() => setActiveDeleteKey((current) => (current === `vocab:${v.expression}` ? null : current))}
                   >
-                    <span
-                      style={{
-                        ...deleteIconMask,
-                        WebkitMaskImage: `url(${deleteIcon.src})`,
-                        maskImage: `url(${deleteIcon.src})`,
-                      }}
-                      aria-hidden="true"
-                    />
+                    <span style={maskedIconStyle(deleteIcon.src, 14)} aria-hidden="true" />
                   </button>
                   {v.definition ? <div style={muted}>{v.definition}</div> : null}
                   {v.example ? <div style={example}>{v.example}</div> : null}
@@ -148,23 +153,26 @@ export function ResultPanel({
               <li style={empty}>{tUI.resultPanel.noData}</li>
             ) : (
               data.grammar.map((g) => (
-                <li key={g.expression} style={item}>
-                  <div style={{ fontWeight: 700 }}>{g.expression}</div>
+                <li
+                  key={g.expression}
+                  style={item}
+                  onMouseEnter={() => setActiveDeleteKey(`grammar:${g.expression}`)}
+                  onMouseLeave={() => setActiveDeleteKey((current) => (current === `grammar:${g.expression}` ? null : current))}
+                >
+                  <div style={itemTitle}>{g.expression}</div>
                   <button
                     className="btn-interactive"
-                    style={deleteBtn}
+                    style={{
+                      ...deleteBtn,
+                      ...(activeDeleteKey === `grammar:${g.expression}` ? deleteBtnVisible : deleteBtnHidden),
+                    }}
                     onClick={() => onDeleteGrammar(g.expression)}
                     title={tUI.resultPanel.deleteItem}
                     aria-label={tUI.resultPanel.deleteItem}
+                    onFocus={() => setActiveDeleteKey(`grammar:${g.expression}`)}
+                    onBlur={() => setActiveDeleteKey((current) => (current === `grammar:${g.expression}` ? null : current))}
                   >
-                    <span
-                      style={{
-                        ...deleteIconMask,
-                        WebkitMaskImage: `url(${deleteIcon.src})`,
-                        maskImage: `url(${deleteIcon.src})`,
-                      }}
-                      aria-hidden="true"
-                    />
+                    <span style={maskedIconStyle(deleteIcon.src, 14)} aria-hidden="true" />
                   </button>
                   {g.definition ? <div style={muted}>{g.definition}</div> : null}
                   {g.example ? <div style={example}>{g.example}</div> : null}
@@ -224,7 +232,13 @@ const item: React.CSSProperties = {
   borderRadius: 14,
   padding: 10,
   position: "relative",
-  paddingRight: 56,
+  paddingRight: 48,
+};
+
+const itemTitle: React.CSSProperties = {
+  fontWeight: 700,
+  fontSize: 15,
+  lineHeight: 1.4,
 };
 
 const saveBtn: React.CSSProperties = {
@@ -248,38 +262,30 @@ const exportBtn: React.CSSProperties = {
 };
 
 const deleteBtn: React.CSSProperties = {
-  display: "inline-flex",
-  alignItems: "center",
-  justifyContent: "center",
-  borderRadius: 14,
-  width: 36,
-  height: 36,
-  padding: 8,
+  ...iconButtonSm,
   background: "transparent",
   color: "var(--text)",
   border: "1px solid var(--border)",
   position: "absolute",
   top: 10,
   right: 10,
+  transition: "opacity 160ms ease",
 };
 
-const deleteIconMask: React.CSSProperties = {
-  width: 18,
-  height: 18,
-  display: "inline-block",
-  backgroundColor: "currentColor",
-  WebkitMaskRepeat: "no-repeat",
-  maskRepeat: "no-repeat",
-  WebkitMaskPosition: "center",
-  maskPosition: "center",
-  WebkitMaskSize: "contain",
-  maskSize: "contain",
+const deleteBtnHidden: React.CSSProperties = {
+  opacity: 0,
+  pointerEvents: "none",
+};
+
+const deleteBtnVisible: React.CSSProperties = {
+  opacity: 1,
+  pointerEvents: "auto",
 };
 
 const empty: React.CSSProperties = { opacity: 0.6, padding: 10 };
-const muted: React.CSSProperties = { opacity: 0.8, marginTop: 6, fontSize: 13 };
-const mutedSmall: React.CSSProperties = { opacity: 0.65, marginTop: 6, fontSize: 12 };
-const example: React.CSSProperties = { opacity: 0.85, marginTop: 6, fontStyle: "italic", fontSize: 13 };
+const muted: React.CSSProperties = { opacity: 0.8, marginTop: 6, fontSize: 13, lineHeight: 1.5 };
+const mutedSmall: React.CSSProperties = { opacity: 0.65, marginTop: 6, fontSize: 12, lineHeight: 1.5 };
+const example: React.CSSProperties = { opacity: 0.85, marginTop: 6, fontStyle: "italic", fontSize: 13, lineHeight: 1.5 };
 
 const errorBox: React.CSSProperties = {
   border: "1px solid #5a2a2a",

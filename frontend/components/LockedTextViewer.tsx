@@ -211,6 +211,7 @@ export function LockedTextViewer({
               height={16}
               aria-hidden="true"
               className={styles.loadingSpin}
+              style={explainLoadingIcon}
             />
           ) : (
             explainBtnLabel
@@ -247,4 +248,8 @@ const explainBtnBusy: React.CSSProperties = {
   boxShadow: "0 8px 24px rgba(0,0,0,0.2)",
   opacity: 1,
   cursor: "default",
+};
+
+const explainLoadingIcon: React.CSSProperties = {
+  filter: "brightness(0) saturate(100%)",
 };

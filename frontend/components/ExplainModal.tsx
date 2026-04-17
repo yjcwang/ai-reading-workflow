@@ -1,6 +1,9 @@
 "use client";
 
 import React, { useEffect } from "react";
+import addIcon from "@/icons/add.svg";
+import closeIcon from "@/icons/close.svg";
+import { iconButtonGhost, iconButtonTinted, maskedIconStyle } from "@/components/iconButtonStyles";
 import type { ExplainResponse, ExplainWordResponse } from "@/lib/types";
 import { UI_STRINGS } from "@/lib/i18n";
 import { TargetLang } from "@/lib/types";
@@ -43,8 +46,17 @@ export function ExplainModal({
       <div onMouseDown={(e) => e.stopPropagation()} style={modalCard}>
         <div style={headerRow}>
           <div style={title}>{tUI.explainModal.explainTitle}</div>     
-            <button onClick={onClose} style={closeBtn} className="btn-interactive">
-              {tUI.explainModal.close}
+            <button
+              onClick={onClose}
+              style={closeBtn}
+              className="btn-interactive"
+              title={tUI.explainModal.close}
+              aria-label={tUI.explainModal.close}
+            >
+              <span
+                style={maskedIconStyle(closeIcon.src)}
+                aria-hidden="true"
+              />
             </button> 
         </div>
 
@@ -69,9 +81,13 @@ export function ExplainModal({
                     className="btn-interactive"
                     style={addBtn}
                     onClick={() => onAdd(data)}
-                    title="Add to list"
+                    title={tUI.explainModal.addToList}
+                    aria-label={tUI.explainModal.addToList}
                   >
-                    {tUI.explainModal.addToList}
+                    <span
+                      style={maskedIconStyle(addIcon.src)}
+                      aria-hidden="true"
+                    />
                   </button>
     
                   <div style={itemSurface}>
@@ -120,9 +136,13 @@ export function ExplainModal({
                               notes: v.notes ?? null,
                             })
                           }
-                          title="Add vocab"
+                          title={tUI.explainModal.addToList}
+                          aria-label={tUI.explainModal.addToList}
                         >
-                          {tUI.explainModal.addToList}
+                          <span
+                            style={maskedIconStyle(addIcon.src)}
+                            aria-hidden="true"
+                          />
                         </button>
                         <div style={itemSurface}>
                           {v.expression} {v.reading ? <span style={mutedNormal}>({v.reading})</span> : null}
@@ -162,9 +182,13 @@ export function ExplainModal({
                               notes: g.notes ?? null,
                             })
                           }
-                          title="Add grammar"
+                          title={tUI.explainModal.addToList}
+                          aria-label={tUI.explainModal.addToList}
                         >
-                          {tUI.explainModal.addToList}
+                          <span
+                            style={maskedIconStyle(addIcon.src)}
+                            aria-hidden="true"
+                          />
                         </button>
                         <div style={itemSurface}>{g.expression}</div>
                         {g.definition ? <div style={muted}>{g.definition}</div> : null}
@@ -234,29 +258,15 @@ const itemSurface: React.CSSProperties = {
 }
 
 const closeBtn: React.CSSProperties = {
-  display: "flex",
-  gap: "8px",
-  borderRadius: 14,
-  padding: "6px 10px",
-  background: "rgba(var(--accent-rgb), 0.2)",
-  border: "1px solid var(--border)",
-  color: "var(--text)",
-  cursor: "pointer",
-  boxShadow: "0 6px 18px rgba(0,0,0,0.12)",
+  ...iconButtonGhost,
 };
 
 const addBtn: React.CSSProperties = {
-  borderRadius: 14,
-  padding: "6px 10px",
-  background: "transparent",
-  color: "var(--text)",
-  border: "1px solid var(--border)",
+  ...iconButtonTinted,
   position: "absolute", 
   top: 10,
   right: 10,
-  boxShadow: "0 6px 18px rgba(0,0,0,0.12)",
 };
-
 
 
 const body: React.CSSProperties = {
