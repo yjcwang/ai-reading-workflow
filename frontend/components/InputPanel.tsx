@@ -13,6 +13,7 @@ import {
   buttonMd,
   buttonPrimary,
   buttonSecondary,
+  buttonTinted,
   buttonSm,
   iconButtonMd,
   maskedIconStyle,
@@ -251,7 +252,13 @@ export function InputPanel({
                   aria-hidden="true"
                 />
               ) : (
-                tUI.inputPanel.analyzeBtn
+                <>
+                  <span
+                    aria-hidden="true"
+                    style={maskedIconStyle(aiIcon.src, 18)}
+                  />
+                  {tUI.inputPanel.analyzeBtn}
+                </>
               )}
             </button>
             <button
@@ -330,20 +337,15 @@ const lockedBox: React.CSSProperties = {
   lineHeight: 1.5,
 };
 
-const iconLabelBtn: React.CSSProperties = {
-  gap: 8,
-};
 
 const historyBtn: React.CSSProperties = {
-  ...buttonSm,
+  ...buttonMd,
   ...buttonSecondary,
-  ...iconLabelBtn,
 };
 
 const generatorBtn: React.CSSProperties = {
-  ...buttonSm,
-  ...buttonSecondary,
-  ...iconLabelBtn,
+  ...buttonMd,
+  ...buttonTinted,
 };
 
 const themeBtn: React.CSSProperties = {

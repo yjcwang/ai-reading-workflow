@@ -5,11 +5,13 @@ import historyIcon from "@/icons/history.svg";
 import deleteIcon from "@/icons/delete.svg";
 import closeIcon from "@/icons/close.svg";
 import refreshIcon from "@/icons/refresh.svg";
+import loadResultIcon from "@/icons/load_result.svg";
 import {
   buttonSm,
   buttonGhost,
   buttonSecondary,
   buttonTinted,
+  buttonPrimary,
   iconButtonMd,
   iconButtonSm,
   maskedIconStyle,
@@ -86,7 +88,10 @@ export function SavedResultsPanel({
               title={tUI.historyPanel.refresh}
               aria-label={tUI.historyPanel.refresh}
             >
-              <span style={maskedIconStyle(refreshIcon.src)} aria-hidden="true" />
+              <>
+                <span style={maskedIconStyle(refreshIcon.src, 18)} aria-hidden="true" />
+                {tUI.historyPanel.refresh}
+              </>
             </button>
             <button
               className="btn-interactive"
@@ -143,7 +148,10 @@ export function SavedResultsPanel({
                       onClick={() => onLoad(item.id)}
                       disabled={loadingResultId === item.id || deletingResultId === item.id}
                     >
-                      {loadingResultId === item.id ? tUI.historyPanel.loadLoading : tUI.historyPanel.load}
+                      <>
+                        <span style={maskedIconStyle(loadResultIcon.src, 18)} aria-hidden="true" />
+                        {loadingResultId === item.id ? tUI.historyPanel.loadLoading : tUI.historyPanel.load}
+                      </>
                     </button>
                   </div>
                 </li>
@@ -317,11 +325,11 @@ const cardActions: React.CSSProperties = {
 
 const loadResultBtn: React.CSSProperties = {
   ...buttonSm,
-  ...buttonTinted,
+  ...buttonPrimary,
 };
 
 const refreshBtn: React.CSSProperties = {
-  ...iconButtonMd,
+  ...buttonSm,
   ...buttonSecondary,
 };
 

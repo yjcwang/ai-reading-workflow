@@ -73,7 +73,7 @@ export const UI_STRINGS = {
     explainModal: {
       explainTitle: "解释",
       close: "关闭",
-      addToList: "加入列表",
+      addToList: "添加",
     },
   },
   en: {
@@ -150,7 +150,7 @@ export const UI_STRINGS = {
     explainModal: {
       explainTitle: "Explain",
       close: "Close",
-      addToList: "Add to List",
+      addToList: "Add",
     },
   },
 } as const;

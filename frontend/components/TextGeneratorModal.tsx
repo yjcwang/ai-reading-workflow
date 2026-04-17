@@ -2,10 +2,16 @@
 
 import React, { useEffect, useRef } from "react";
 import styles from "./InputPanel.module.css";
+import closeIcon from "@/icons/close.svg";
+import aiIcon from "@/icons/ai.svg";
 import {
+  buttonMd,
   buttonSm,
   buttonGhost,
   buttonTinted,
+  iconButtonSm,
+  iconButtonMd,
+  maskedIconStyle,
 } from "@/components/buttonStyles";
 import type { GenerateTextRequest, TargetLang } from "@/lib/types";
 import { UI_STRINGS } from "@/lib/i18n";
@@ -130,8 +136,10 @@ export function TextGeneratorModal({
           className="btn-interactive"
           onClick={onClose}
           disabled={generateLoading}
+          title={tUI.generator.cancel}
+          aria-label={tUI.generator.cancel}
         >
-          {tUI.generator.cancel}
+          <span style={maskedIconStyle(closeIcon.src, 18)} aria-hidden="true" />
         </button>
         {generateError && (
           <div style={errorText}>
@@ -143,8 +151,13 @@ export function TextGeneratorModal({
           className="btn-interactive"
           onClick={onGenerate}
           disabled={!generateRequest.topic.trim() || analyzeLoading || generateLoading}
+          title={generateLoading ? tUI.generator.generating : tUI.generator.generateBtn}
+          aria-label={generateLoading ? tUI.generator.generating : tUI.generator.generateBtn}
         >
-          {generateLoading ? tUI.generator.generating : tUI.generator.generateBtn}
+          <>
+            <span style={maskedIconStyle(aiIcon.src, 18)} aria-hidden="true" />
+            {generateLoading ? tUI.generator.generating : tUI.generator.generateBtn}
+          </>
         </button>
       </div>
     </div>
@@ -164,15 +177,13 @@ const modalFooter: React.CSSProperties = {
 };
 
 const closeBtn: React.CSSProperties = {
-  ...buttonSm,
+  ...iconButtonMd,
   ...buttonGhost,
-  boxShadow: "0 6px 18px rgba(0,0,0,0.12)",
 };
 
 const confirmBtn: React.CSSProperties = {
-  ...buttonSm,
+  ...buttonMd,
   ...buttonTinted,
-  boxShadow: "0 6px 18px rgba(0,0,0,0.12)",
 };
 
 const errorText: React.CSSProperties = {

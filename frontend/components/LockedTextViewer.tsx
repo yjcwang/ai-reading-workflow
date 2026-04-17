@@ -3,8 +3,9 @@
 import React, { useEffect, useEffectEvent, useRef, useState } from "react";
 import Image from "next/image";
 import loadingIcon from "@/icons/loading.svg";
+import aiIcon from "@/icons/ai.svg";
 import styles from "./InputPanel.module.css";
-import { buttonSm, buttonTinted } from "@/components/buttonStyles";
+import { buttonSm, maskedIconStyle} from "@/components/buttonStyles";
 import { UI_STRINGS } from "@/lib/i18n";
 import { TargetLang } from "@/lib/types";
 
@@ -215,7 +216,16 @@ export function LockedTextViewer({
               style={explainLoadingIcon}
             />
           ) : (
-            explainBtnLabel
+            <>
+              <span
+                aria-hidden="true"
+                style={{
+                  display: "inline-flex",
+                  ...maskedIconStyle(aiIcon.src, 16),
+                }}
+              />
+              {explainBtnLabel}
+            </>
           )}
         </button>
       )}
@@ -225,10 +235,12 @@ export function LockedTextViewer({
 
 const explainBtn: React.CSSProperties = {
   ...buttonSm,
-  ...buttonTinted,
   position: "fixed",
   zIndex: 9999,
   fontWeight: 600,
+  background: "var(--accent-soft)",
+  color: "var(--text)",
+  border: "1px solid var(--border)",
   opacity: 1,
   boxShadow: "0 6px 18px rgba(0,0,0,0.12)",
 };
@@ -237,6 +249,8 @@ const explainBtnBusy: React.CSSProperties = {
   minWidth: 44,
   minHeight: 36,
   padding: "8px 12px",
+  background: "var(--accent-soft)",
+  border: "1px solid var(--border)",
   boxShadow: "0 8px 24px rgba(0,0,0,0.2)",
   opacity: 1,
   cursor: "default",

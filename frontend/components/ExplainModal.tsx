@@ -4,10 +4,11 @@ import React, { useEffect } from "react";
 import addIcon from "@/icons/add.svg";
 import closeIcon from "@/icons/close.svg";
 import {
-  buttonTinted,
   buttonGhost,
+  buttonSm,
   iconButtonMd,
   maskedIconStyle,
+  buttonPrimary,
 } from "@/components/buttonStyles";
 import type { ExplainResponse, ExplainWordResponse } from "@/lib/types";
 import { UI_STRINGS } from "@/lib/i18n";
@@ -89,10 +90,13 @@ export function ExplainModal({
                     title={tUI.explainModal.addToList}
                     aria-label={tUI.explainModal.addToList}
                   >
-                    <span
-                      style={maskedIconStyle(addIcon.src)}
-                      aria-hidden="true"
-                    />
+                    <>
+                      <span
+                        style={maskedIconStyle(addIcon.src, 16)}
+                        aria-hidden="true"
+                      />
+                      {tUI.explainModal.addToList}
+                    </>
                   </button>
     
                   <div style={itemSurface}>
@@ -144,10 +148,13 @@ export function ExplainModal({
                           title={tUI.explainModal.addToList}
                           aria-label={tUI.explainModal.addToList}
                         >
-                          <span
-                            style={maskedIconStyle(addIcon.src)}
-                            aria-hidden="true"
-                          />
+                          <>
+                            <span
+                              style={maskedIconStyle(addIcon.src, 16)}
+                              aria-hidden="true"
+                            />
+                            {tUI.explainModal.addToList}
+                          </>
                         </button>
                         <div style={itemSurface}>
                           {v.expression} {v.reading ? <span style={mutedNormal}>({v.reading})</span> : null}
@@ -190,10 +197,13 @@ export function ExplainModal({
                           title={tUI.explainModal.addToList}
                           aria-label={tUI.explainModal.addToList}
                         >
-                          <span
-                            style={maskedIconStyle(addIcon.src)}
-                            aria-hidden="true"
-                          />
+                          <>
+                            <span
+                              style={maskedIconStyle(addIcon.src, 16)}
+                              aria-hidden="true"
+                            />
+                            {tUI.explainModal.addToList}
+                          </>
                         </button>
                         <div style={itemSurface}>{g.expression}</div>
                         {g.definition ? <div style={muted}>{g.definition}</div> : null}
@@ -268,8 +278,8 @@ const closeBtn: React.CSSProperties = {
 };
 
 const addBtn: React.CSSProperties = {
-  ...iconButtonMd,
-  ...buttonTinted,
+  ...buttonSm,
+  ...buttonPrimary,
   position: "absolute", 
   top: 10,
   right: 10,
@@ -319,6 +329,7 @@ const item: React.CSSProperties = {
   background: "rgba(0,0,0,0.03)",
   borderRadius: 14,
   padding: 10,
+  paddingRight: 92,
   position: "relative",
 };
 

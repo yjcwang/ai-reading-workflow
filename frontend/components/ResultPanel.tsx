@@ -5,12 +5,15 @@ import Image from "next/image";
 import loadingIcon from "@/icons/loading.svg";
 import deleteIcon from "@/icons/delete.svg";
 import downloadIcon from "@/icons/download.svg";
+import saveResultIcon from "@/icons/save_result.svg";
 import styles from "./InputPanel.module.css";
 import {
   buttonSm,
+  buttonMd,
   buttonPrimary,
   buttonTinted,
   iconButtonSm,
+  iconButtonMd,
   buttonGhost,
   maskedIconStyle,
 } from "@/components/buttonStyles";
@@ -79,7 +82,10 @@ export function ResultPanel({
                 aria-hidden="true"
               />
             ) : (
-              tUI.resultPanel.saveResult
+              <>
+                <span style={maskedIconStyle(saveResultIcon.src, 18)} aria-hidden="true" />
+                {tUI.resultPanel.saveResult}
+              </>
             )}
           </button>
           <button
@@ -253,13 +259,13 @@ const itemTitle: React.CSSProperties = {
 };
 
 const saveBtn: React.CSSProperties = {
-  ...buttonSm,
-  ...buttonPrimary,
+  ...buttonMd,
+  ...buttonTinted,
 };
 
 const exportBtn: React.CSSProperties = {
-  ...buttonSm,
-  ...buttonTinted,
+  ...buttonMd,
+  ...buttonPrimary,
   gap: 6,
 };
 

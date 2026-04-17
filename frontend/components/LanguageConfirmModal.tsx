@@ -110,11 +110,9 @@ const modalFooter: React.CSSProperties = {
 const closeBtn: React.CSSProperties = {
   ...buttonSm,
   ...buttonGhost,
-  boxShadow: "0 6px 18px rgba(0,0,0,0.12)",
 };
 
 const confirmBtn: React.CSSProperties = {
   ...buttonSm,
   ...buttonTinted,
-  boxShadow: "0 6px 18px rgba(0,0,0,0.12)",
 };
