@@ -3,7 +3,6 @@
 import React, { useState } from "react";
 import { InputPanel } from "@/components/InputPanel";
 import { ResultPanel } from "@/components/ResultPanel";
-import { ExplainModal } from "@/components/ExplainModal";
 import { SavedResultsPanel } from "@/components/SavedResultsPanel";
 import { useTheme } from "@/hooks/useTheme";
 import { useTargetLang } from "@/hooks/useTargetLang";
@@ -194,6 +193,11 @@ export default function Page() {
           onClear={onClear}
           onExplainRequest={handleExplainRequest}
           explainLoading={explainFeature.explainLoading}
+          explainOpen={explainFeature.explainOpen}
+          explainError={explainFeature.explainError}
+          explainData={explainFeature.explainData}
+          onCloseExplain={explainFeature.closeExplain}
+          onAddFromExplain={handleAddFromModal}
           theme={theme}
           onToggleTheme={toggleTheme}
           getMode={inferExplainMode}
@@ -220,15 +224,6 @@ export default function Page() {
           saveSuccessLeaving={savedResultsFeature.saveSuccessLeaving}
           exporting={exportFeature.exporting}
           exportError={exportFeature.exportError}
-          targetLang={targetLang}
-        />
-        <ExplainModal
-          open={explainFeature.explainOpen}
-          explainLoading={explainFeature.explainLoading}
-          error={explainFeature.explainError}
-          data={explainFeature.explainData}
-          onClose={explainFeature.closeExplain}
-          onAdd={handleAddFromModal}
           targetLang={targetLang}
         />
         <SavedResultsPanel

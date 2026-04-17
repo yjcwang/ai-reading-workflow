@@ -15,6 +15,7 @@ import {
 } from "@/components/buttonStyles";
 import type { GenerateTextRequest, TargetLang } from "@/lib/types";
 import { UI_STRINGS } from "@/lib/i18n";
+import { usePresenceTransition } from "@/hooks/usePresenceTransition";
 
 type Props = {
   open: boolean;
@@ -40,6 +41,10 @@ export function TextGeneratorModal({
   onGenerate,
 }: Props) {
   const panelRef = useRef<HTMLDivElement | null>(null);
+  const { shouldRender, visible } = usePresenceTransition({
+    open,
+    exitMs: POPOVER_TRANSITION_MS,
+  });
 
   // Close the popover when clicking outside it or pressing Escape.
   useEffect(() => {
@@ -68,14 +73,14 @@ export function TextGeneratorModal({
     };
   }, [open, onClose]);
 
-  if (!open) return null;
+  if (!shouldRender) return null;
 
   const tUI = UI_STRINGS[targetLang];
 
   return (
     <div
       ref={panelRef}
-      className={styles.generatorPopover}
+      className={`${styles.generatorPopover} ${visible ? styles.generatorPopoverVisible : styles.generatorPopoverHidden}`}
       onMouseDown={(e) => e.stopPropagation()}
     >
       <div style={modalTitle}>{tUI.generator.title}</div>
@@ -163,6 +168,8 @@ export function TextGeneratorModal({
     </div>
   );
 }
+
+const POPOVER_TRANSITION_MS = 420;
 
 const modalTitle: React.CSSProperties = {
   fontWeight: 700,

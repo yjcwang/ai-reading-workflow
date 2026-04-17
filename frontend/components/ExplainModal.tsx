@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import addIcon from "@/icons/add.svg";
 import closeIcon from "@/icons/close.svg";
 import {
@@ -13,6 +13,7 @@ import {
 import type { ExplainResponse, ExplainWordResponse } from "@/lib/types";
 import { UI_STRINGS } from "@/lib/i18n";
 import { TargetLang } from "@/lib/types";
+import { usePresenceTransition } from "@/hooks/usePresenceTransition";
 
 type Props = {
   open: boolean;
@@ -32,24 +33,52 @@ export function ExplainModal({
   onClose, 
   onAdd,
   targetLang}: Props) {
+  const modalRef = useRef<HTMLDivElement | null>(null);
+  const { shouldRender, visible } = usePresenceTransition({
+    open,
+    exitMs: MODAL_TRANSITION_MS,
+  });
   const tUI = UI_STRINGS[targetLang];
   
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
       if (e.key === "Escape") onClose();
     }
-    if (open) document.addEventListener("keydown", onKeyDown);
-    return () => document.removeEventListener("keydown", onKeyDown);
+
+    function onPointerDown(event: PointerEvent) {
+      const target = event.target;
+      if (!(target instanceof Node)) return;
+      if (modalRef.current?.contains(target)) return;
+
+      event.preventDefault();
+      event.stopPropagation();
+      onClose();
+    }
+
+    if (open) {
+      document.addEventListener("keydown", onKeyDown);
+      document.addEventListener("pointerdown", onPointerDown, true);
+    }
+
+    return () => {
+      document.removeEventListener("keydown", onKeyDown);
+      document.removeEventListener("pointerdown", onPointerDown, true);
+    };
   }, [open, onClose]);
 
-  if (!open) return null;
+  if (!shouldRender) return null;
 
   const isWord = data && "kind" in data && data.kind === "word";
   const isSentence = data && "kind" in data && data.kind === "sentence";
 
    return (
-    <div onMouseDown={onClose} style={overlay}>
-      <div onMouseDown={(e) => e.stopPropagation()} style={modalCard}>
+      <div
+        ref={modalRef}
+        style={{
+          ...modalCard,
+          ...(visible ? modalCardVisible : modalCardHidden),
+        }}
+      >
         <div style={headerRow}>
           <div style={title}>{tUI.explainModal.explainTitle}</div>     
             <button
@@ -224,35 +253,40 @@ export function ExplainModal({
           )}
         </div>
       </div>
-    </div>
   );
 }
 
-
-
-const overlay: React.CSSProperties = {
-  position: "fixed",
-  inset: 0,
-  zIndex: 9998,
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  padding: 16,
-  background: "rgba(0, 0, 0, 0.15)",
-};
+const MODAL_TRANSITION_MS = 420;
 
 const modalCard: React.CSSProperties = {
-  width: "min(500px, 100%)", 
+  position: "absolute",
+  top: 66,
+  right: 26,
+  zIndex: 60,
+  width: "min(500px, calc(100vw - 48px))", 
   borderRadius: 16, 
   background: "var(--panel)",
   border: "1px solid var(--border)",
   boxShadow: "0 24px 60px rgba(0,0,0,0.12)",
   padding: 20,
   color: "var(--text)",
-  transform: "translateY(-20px)",
-  maxHeight: "85vh",
+  maxHeight: "min(80vh, 720px)",
   display: "flex",
   flexDirection: "column",
+  transition: `transform ${MODAL_TRANSITION_MS}ms cubic-bezier(0.22, 1, 0.36, 1), opacity 320ms ease`,
+  willChange: "transform, opacity",
+};
+
+const modalCardVisible: React.CSSProperties = {
+  opacity: 1,
+  transform: "translateY(0)",
+  pointerEvents: "auto",
+};
+
+const modalCardHidden: React.CSSProperties = {
+  opacity: 0,
+  transform: "translateY(-18px)",
+  pointerEvents: "none",
 };
 
 const headerRow: React.CSSProperties = {

@@ -14,18 +14,20 @@ import {
   buttonPrimary,
   buttonSecondary,
   buttonTinted,
-  buttonSm,
   iconButtonMd,
   maskedIconStyle,
 } from "@/components/buttonStyles";
 import type {
   Level,
   GenerateTextRequest,
+  ExplainResponse,
+  ExplainWordResponse,
   TargetLang,
 } from "@/lib/types";
 import { LockedTextViewer } from "@/components/LockedTextViewer";
 import { LanguageConfirmModal } from "@/components/LanguageConfirmModal";
 import { TextGeneratorModal } from "@/components/TextGeneratorModal";
+import { ExplainModal } from "@/components/ExplainModal";
 import { UI_STRINGS } from "@/lib/i18n";
 
 const LEVELS: Level[] = ["N5", "N4", "N3", "N2", "N1"];
@@ -55,6 +57,11 @@ type Props = {
 
   onExplainRequest?: (payload: { selectedText: string; context: string }) => Promise<void> | void;
   explainLoading?: boolean;
+  explainOpen: boolean;
+  explainError: string | null;
+  explainData: ExplainResponse | null;
+  onCloseExplain: () => void;
+  onAddFromExplain: (item: ExplainWordResponse) => void;
 
   theme: "light" | "dark";
   onToggleTheme: () => void;
@@ -76,6 +83,11 @@ export function InputPanel({
   onClear,
   onExplainRequest,
   explainLoading,
+  explainOpen,
+  explainError,
+  explainData,
+  onCloseExplain,
+  onAddFromExplain,
   theme,
   onToggleTheme,
   getMode,
@@ -120,6 +132,15 @@ export function InputPanel({
 
   return (
     <div className={styles.card}>
+      <ExplainModal
+        open={explainOpen}
+        explainLoading={!!explainLoading}
+        error={explainError}
+        data={explainData}
+        onClose={onCloseExplain}
+        onAdd={onAddFromExplain}
+        targetLang={targetLang}
+      />
       <div className={styles.rowBetween}>
         <div className={styles.leftTools}>
           <div style={{ fontWeight: 700 }}>{tUI.inputPanel.inputTitle}</div>
