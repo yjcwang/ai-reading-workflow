@@ -2,6 +2,11 @@
 
 import React, { useEffect, useRef } from "react";
 import styles from "./InputPanel.module.css";
+import {
+  buttonSm,
+  buttonGhost,
+  buttonTinted,
+} from "@/components/buttonStyles";
 import type { GenerateTextRequest, TargetLang } from "@/lib/types";
 import { UI_STRINGS } from "@/lib/i18n";
 
@@ -159,26 +164,14 @@ const modalFooter: React.CSSProperties = {
 };
 
 const closeBtn: React.CSSProperties = {
-  display: "flex",
-  gap: "8px",
-  borderRadius: 14,
-  padding: "6px 10px",
-  background: "transparent",
-  border: "1px solid var(--border)",
-  color: "var(--text)",
-  cursor: "pointer",
+  ...buttonSm,
+  ...buttonGhost,
   boxShadow: "0 6px 18px rgba(0,0,0,0.12)",
 };
 
 const confirmBtn: React.CSSProperties = {
-  display: "flex",
-  gap: "8px",
-  borderRadius: 14,
-  padding: "6px 10px",
-  background: "rgba(var(--accent-rgb), 0.2)",
-  border: "1px solid var(--border)",
-  color: "var(--text)",
-  cursor: "pointer",
+  ...buttonSm,
+  ...buttonTinted,
   boxShadow: "0 6px 18px rgba(0,0,0,0.12)",
 };
 

@@ -9,6 +9,14 @@ import lightIcon from "@/icons/light.svg";
 import darkIcon from "@/icons/dark.svg";
 import historyIcon from "@/icons/history.svg";
 import aiIcon from "@/icons/ai.svg";
+import {
+  buttonMd,
+  buttonPrimary,
+  buttonSecondary,
+  buttonSm,
+  iconButtonMd,
+  maskedIconStyle,
+} from "@/components/buttonStyles";
 import type {
   Level,
   GenerateTextRequest,
@@ -115,14 +123,14 @@ export function InputPanel({
         <div className={styles.leftTools}>
           <div style={{ fontWeight: 700 }}>{tUI.inputPanel.inputTitle}</div>
           <button
-            className={`${styles.ghostBtnSmall} ${styles.iconLabelBtn} btn-interactive`}
+            className="btn-interactive"
+            style={historyBtn}
             onClick={onOpenHistory}
             disabled={analyzeLoading}
           >
             <span
-              className={styles.iconMask}
               aria-hidden="true"
-              style={{ WebkitMaskImage: `url(${historyIcon.src})`, maskImage: `url(${historyIcon.src})` }}
+              style={maskedIconStyle(historyIcon.src, 16)}
             />
             {tUI.inputPanel.history}
           </button>
@@ -130,7 +138,8 @@ export function InputPanel({
             <div className={styles.generatorMenu}>
               {/* AI generator popover is anchored below this trigger button. */}
               <button
-                className={`${styles.ghostBtnSmall} ${styles.iconLabelBtn} btn-interactive`}
+                className="btn-interactive"
+                style={generatorBtn}
                 onClick={() => setGenerateModalOpen((prev) => !prev)}
                 disabled={analyzeLoading || generateLoading}
               >
@@ -146,9 +155,8 @@ export function InputPanel({
                 ) : (
                   <>
                     <span
-                      className={styles.iconMask}
                       aria-hidden="true"
-                      style={{ WebkitMaskImage: `url(${aiIcon.src})`, maskImage: `url(${aiIcon.src})` }}
+                      style={maskedIconStyle(aiIcon.src, 16)}
                     />
                     {tUI.generator.title}
                   </>
@@ -174,16 +182,16 @@ export function InputPanel({
         <div className={styles.rightTools}>
           {/* Toggle Theme Light/Dark*/}
           <button
-            className={`${styles.ghostBtnSmall} ${styles.iconBtn} btn-interactive`}
+            className="btn-interactive"
+            style={themeBtn}
             onClick={onToggleTheme}
             disabled={analyzeLoading}
             aria-label={themeLabel}
             title={themeLabel}
           >
             <span
-              className={styles.iconMask}
               aria-hidden="true"
-              style={{ WebkitMaskImage: `url(${themeIcon.src})`, maskImage: `url(${themeIcon.src})` }}
+              style={maskedIconStyle(themeIcon.src, 18)}
             />
           </button>
           {/* Language Switch EN/ZH */}
@@ -232,7 +240,7 @@ export function InputPanel({
             disabled={analyzeLoading}
           />
           <div className={styles.actionRow}>
-            <button className={`${styles.primaryBtn} btn-interactive`} onClick={onConfirm} disabled={!canConfirm}>
+            <button className="btn-interactive" style={analyzeBtn} onClick={onConfirm} disabled={!canConfirm}>
               {analyzeLoading ? (
                 <Image
                   src={loadingIcon}
@@ -247,16 +255,16 @@ export function InputPanel({
               )}
             </button>
             <button
-              className={`${styles.ghostBtn} ${styles.iconBtn} btn-interactive`}
+              className="btn-interactive"
+              style={clearBtn}
               onClick={onClear}
               disabled={analyzeLoading && draftText.length === 0}
               aria-label={tUI.common.clear}
               title={tUI.common.clear}
             >
               <span
-                className={styles.iconMask}
                 aria-hidden="true"
-                style={{ WebkitMaskImage: `url(${clearIcon.src})`, maskImage: `url(${clearIcon.src})` }}
+                style={maskedIconStyle(clearIcon.src, 18)}
               />
             </button>
           </div>
@@ -275,7 +283,7 @@ export function InputPanel({
 
           <div className={styles.lockedActions}>
             {analyzeLoading ? (
-              <button className={`${styles.ghostBtn} btn-interactive`} disabled >
+              <button className="btn-interactive" style={loadingBtn} disabled >
                 <Image
                   src={loadingIcon}
                   alt=""
@@ -287,15 +295,15 @@ export function InputPanel({
               </button>
             ) : (
               <button
-                className={`${styles.ghostBtn} ${styles.iconBtn} btn-interactive`}
+                className="btn-interactive"
+                style={clearBtn}
                 onClick={onClear}
                 aria-label={tUI.common.clear}
                 title={tUI.common.clear}
               >
                 <span
-                  className={styles.iconMask}
                   aria-hidden="true"
-                  style={{ WebkitMaskImage: `url(${clearIcon.src})`, maskImage: `url(${clearIcon.src})` }}
+                  style={maskedIconStyle(clearIcon.src, 18)}
                 />
               </button>
             )}
@@ -320,4 +328,40 @@ const lockedBox: React.CSSProperties = {
   background: "var(--surface)",
   whiteSpace: "pre-wrap",
   lineHeight: 1.5,
+};
+
+const iconLabelBtn: React.CSSProperties = {
+  gap: 8,
+};
+
+const historyBtn: React.CSSProperties = {
+  ...buttonSm,
+  ...buttonSecondary,
+  ...iconLabelBtn,
+};
+
+const generatorBtn: React.CSSProperties = {
+  ...buttonSm,
+  ...buttonSecondary,
+  ...iconLabelBtn,
+};
+
+const themeBtn: React.CSSProperties = {
+  ...iconButtonMd,
+  ...buttonSecondary,
+};
+
+const clearBtn: React.CSSProperties = {
+  ...iconButtonMd,
+  ...buttonSecondary,
+};
+
+const analyzeBtn: React.CSSProperties = {
+  ...buttonMd,
+  ...buttonPrimary,
+};
+
+const loadingBtn: React.CSSProperties = {
+  ...buttonMd,
+  ...buttonSecondary,
 };

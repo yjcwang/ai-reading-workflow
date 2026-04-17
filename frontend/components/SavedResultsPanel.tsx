@@ -5,7 +5,15 @@ import historyIcon from "@/icons/history.svg";
 import deleteIcon from "@/icons/delete.svg";
 import closeIcon from "@/icons/close.svg";
 import refreshIcon from "@/icons/refresh.svg";
-import { iconButtonGhost, iconButtonGhostStrong, maskedIconStyle } from "@/components/iconButtonStyles";
+import {
+  buttonSm,
+  buttonGhost,
+  buttonSecondary,
+  buttonTinted,
+  iconButtonMd,
+  iconButtonSm,
+  maskedIconStyle,
+} from "@/components/buttonStyles";
 import type { ResultSummaryResponse, TargetLang } from "@/lib/types";
 import { UI_STRINGS } from "@/lib/i18n";
 
@@ -72,7 +80,7 @@ export function SavedResultsPanel({
           <div style={headerActions}>
             <button
               className="btn-interactive"
-              style={secondaryButton}
+              style={refreshBtn}
               onClick={onRefresh}
               disabled={loading}
               title={tUI.historyPanel.refresh}
@@ -82,7 +90,7 @@ export function SavedResultsPanel({
             </button>
             <button
               className="btn-interactive"
-              style={secondaryButton}
+              style={closeBtn}
               onClick={onClose}
               title={tUI.historyPanel.close}
               aria-label={tUI.historyPanel.close}
@@ -117,7 +125,7 @@ export function SavedResultsPanel({
                   <div style={cardActions}>
                     <button
                       className="btn-interactive"
-                      style={dangerButton}
+                      style={deleteResultBtn}
                       onClick={() => onDelete(item.id)}
                       disabled={deletingResultId === item.id || loadingResultId === item.id}
                       title={tUI.historyPanel.delete}
@@ -131,7 +139,7 @@ export function SavedResultsPanel({
                     </button>
                     <button
                       className="btn-interactive"
-                      style={primaryButton}
+                      style={loadResultBtn}
                       onClick={() => onLoad(item.id)}
                       disabled={loadingResultId === item.id || deletingResultId === item.id}
                     >
@@ -307,22 +315,24 @@ const cardActions: React.CSSProperties = {
   gap: 8,
 };
 
-const primaryButton: React.CSSProperties = {
-  border: "1px solid var(--border-strong)",
-  background: "rgba(var(--accent-rgb), 0.2)",
-  color: "var(--text)",
-  borderRadius: 14,
-  padding: "8px 12px",
-  cursor: "pointer",
-  fontWeight: 700,
+const loadResultBtn: React.CSSProperties = {
+  ...buttonSm,
+  ...buttonTinted,
 };
 
-const secondaryButton: React.CSSProperties = {
-  ...iconButtonGhostStrong,
+const refreshBtn: React.CSSProperties = {
+  ...iconButtonMd,
+  ...buttonSecondary,
 };
 
-const dangerButton: React.CSSProperties = {
-  ...iconButtonGhost,
+const closeBtn: React.CSSProperties = {
+  ...iconButtonMd,
+  ...buttonSecondary,
+};
+
+const deleteResultBtn: React.CSSProperties = {
+  ...iconButtonSm,
+  ...buttonGhost,
 };
 
 const emptyState: React.CSSProperties = {

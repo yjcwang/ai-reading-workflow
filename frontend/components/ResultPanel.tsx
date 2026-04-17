@@ -6,7 +6,14 @@ import loadingIcon from "@/icons/loading.svg";
 import deleteIcon from "@/icons/delete.svg";
 import downloadIcon from "@/icons/download.svg";
 import styles from "./InputPanel.module.css";
-import { iconButtonSm, maskedIconStyle } from "@/components/iconButtonStyles";
+import {
+  buttonSm,
+  buttonPrimary,
+  buttonTinted,
+  iconButtonSm,
+  buttonGhost,
+  maskedIconStyle,
+} from "@/components/buttonStyles";
 import type { AnalyzeResponse, TargetLang } from "@/lib/types";
 import { UI_STRINGS } from "@/lib/i18n";
 
@@ -128,8 +135,8 @@ export function ResultPanel({
                   <button
                     className="btn-interactive"
                     style={{
-                      ...deleteBtn,
-                      ...(activeDeleteKey === `vocab:${v.expression}` ? deleteBtnVisible : deleteBtnHidden),
+                      ...deleteItemBtn,
+                      ...(activeDeleteKey === `vocab:${v.expression}` ? deleteItemBtnVisible : deleteItemBtnHidden),
                     }}
                     onClick={() => onDeleteVocab(v.expression)}
                     title={tUI.resultPanel.deleteItem}
@@ -167,8 +174,8 @@ export function ResultPanel({
                   <button
                     className="btn-interactive"
                     style={{
-                      ...deleteBtn,
-                      ...(activeDeleteKey === `grammar:${g.expression}` ? deleteBtnVisible : deleteBtnHidden),
+                      ...deleteItemBtn,
+                      ...(activeDeleteKey === `grammar:${g.expression}` ? deleteItemBtnVisible : deleteItemBtnHidden),
                     }}
                     onClick={() => onDeleteGrammar(g.expression)}
                     title={tUI.resultPanel.deleteItem}
@@ -246,46 +253,31 @@ const itemTitle: React.CSSProperties = {
 };
 
 const saveBtn: React.CSSProperties = {
-  border: "1px solid var(--border-strong)",
-  background: "var(--text)",
-  color: "var(--text-invert)",
-  borderRadius: 14,
-  padding: "10px 12px",
-  cursor: "pointer",
-  fontWeight: 700,
+  ...buttonSm,
+  ...buttonPrimary,
 };
 
 const exportBtn: React.CSSProperties = {
-  display: "inline-flex",
-  alignItems: "center",
-  justifyContent: "center",
-  gap: 2,
-  border: "1px solid var(--border-strong)",
-  background: "rgba(var(--accent-rgb), 0.2)",
-  color: "var(--text)",
-  borderRadius: 14,
-  padding: "10px 12px",
-  cursor: "pointer",
-  fontWeight: 700,
+  ...buttonSm,
+  ...buttonTinted,
+  gap: 6,
 };
 
-const deleteBtn: React.CSSProperties = {
+const deleteItemBtn: React.CSSProperties = {
   ...iconButtonSm,
-  background: "transparent",
-  color: "var(--text)",
-  border: "1px solid var(--border)",
+  ...buttonGhost,
   position: "absolute",
   top: 10,
   right: 10,
   transition: "opacity 160ms ease",
 };
 
-const deleteBtnHidden: React.CSSProperties = {
+const deleteItemBtnHidden: React.CSSProperties = {
   opacity: 0,
   pointerEvents: "none",
 };
 
-const deleteBtnVisible: React.CSSProperties = {
+const deleteItemBtnVisible: React.CSSProperties = {
   opacity: 1,
   pointerEvents: "auto",
 };

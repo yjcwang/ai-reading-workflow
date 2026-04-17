@@ -3,7 +3,12 @@
 import React, { useEffect } from "react";
 import addIcon from "@/icons/add.svg";
 import closeIcon from "@/icons/close.svg";
-import { iconButtonGhost, iconButtonTinted, maskedIconStyle } from "@/components/iconButtonStyles";
+import {
+  buttonTinted,
+  buttonGhost,
+  iconButtonMd,
+  maskedIconStyle,
+} from "@/components/buttonStyles";
 import type { ExplainResponse, ExplainWordResponse } from "@/lib/types";
 import { UI_STRINGS } from "@/lib/i18n";
 import { TargetLang } from "@/lib/types";
@@ -258,11 +263,13 @@ const itemSurface: React.CSSProperties = {
 }
 
 const closeBtn: React.CSSProperties = {
-  ...iconButtonGhost,
+  ...iconButtonMd,
+  ...buttonGhost,
 };
 
 const addBtn: React.CSSProperties = {
-  ...iconButtonTinted,
+  ...iconButtonMd,
+  ...buttonTinted,
   position: "absolute", 
   top: 10,
   right: 10,
