@@ -52,7 +52,7 @@ export const UI_STRINGS = {
       saveError: "保存错误",
       exportPdf: "导出 PDF",
       exporting: "导出中...",
-      noData: "暂无分析结果，请先在左侧输入文本。",
+      noData: "暂无分析结果，请先输入文本。",
       deleteItem: "删除",
     },
     historyPanel: {
@@ -129,7 +129,7 @@ export const UI_STRINGS = {
       saveError: "Save error",
       exportPdf: "Export PDF",
       exporting: "Exporting...",
-      noData: "No data. Please enter text on the left.",
+      noData: "No data. Please enter text.",
       deleteItem: "Delete",
     },
     historyPanel: {

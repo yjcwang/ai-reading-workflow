@@ -39,6 +39,7 @@ export function LockedTextViewer({
   const [selectedText, setSelectedText] = useState("");
   const [btnPos, setBtnPos] = useState<{ top: number; left: number } | null>(null);
   const [explainSubmitting, setExplainSubmitting] = useState(false);
+  const [isCoarsePointer, setIsCoarsePointer] = useState(false);
   const busyAnchorRef = useRef<{
     top: number;
     left: number;
@@ -57,6 +58,20 @@ export function LockedTextViewer({
 
   explainBusyRef.current = explainBusy;
   btnPosRef.current = btnPos;
+
+  useEffect(() => {
+    if (typeof window === "undefined" || !window.matchMedia) return;
+
+    const media = window.matchMedia("(pointer: coarse)");
+    const updatePointerMode = () => setIsCoarsePointer(media.matches);
+
+    updatePointerMode();
+    media.addEventListener("change", updatePointerMode);
+
+    return () => {
+      media.removeEventListener("change", updatePointerMode);
+    };
+  }, []);
 
   const updateSelection = useEffectEvent(() => {
     if (explainBusy) return;
@@ -95,6 +110,12 @@ export function LockedTextViewer({
       return;
     }
 
+    if (isCoarsePointer) {
+      setSelectedText(t);
+      setBtnPos({ top: 0, left: 0 });
+      return;
+    }
+
     const margin = 8;
     let top = selRect.bottom + margin;
     let left = selRect.right + margin;
@@ -113,6 +134,15 @@ export function LockedTextViewer({
 
   useEffect(() => {
     function onMouseUp() {
+      updateSelection();
+    }
+
+    function onTouchEnd() {
+      // Let the browser finish updating native text selection handles first.
+      window.setTimeout(() => updateSelection(), 0);
+    }
+
+    function onSelectionChange() {
       updateSelection();
     }
 
@@ -137,15 +167,19 @@ export function LockedTextViewer({
     }
 
     document.addEventListener("mouseup", onMouseUp);
+    document.addEventListener("touchend", onTouchEnd);
+    document.addEventListener("selectionchange", onSelectionChange);
     document.addEventListener("keyup", onKeyUp);
     window.addEventListener("scroll", onScroll, true);
 
     return () => {
       document.removeEventListener("mouseup", onMouseUp);
+      document.removeEventListener("touchend", onTouchEnd);
+      document.removeEventListener("selectionchange", onSelectionChange);
       document.removeEventListener("keyup", onKeyUp);
       window.removeEventListener("scroll", onScroll, true);
     };
-  }, []);
+  }, [isCoarsePointer]);
 
   useEffect(() => {
     if (explainLoading) return;
@@ -199,9 +233,8 @@ export function LockedTextViewer({
           disabled={explainBusy}
           className="btn-interactive"
           style={{
-            ...explainBtn,
-            top: btnPos.top,
-            left: btnPos.left,
+            ...(isCoarsePointer ? mobileExplainBtn : explainBtn),
+            ...(!isCoarsePointer ? { top: btnPos.top, left: btnPos.left } : null),
             ...(explainBusy ? explainBtnBusy : null),
           }}
         >
@@ -243,6 +276,21 @@ const explainBtn: React.CSSProperties = {
   border: "1px solid var(--border)",
   opacity: 1,
   boxShadow: "0 6px 18px rgba(0,0,0,0.12)",
+};
+
+const mobileExplainBtn: React.CSSProperties = {
+  ...buttonSm,
+  position: "fixed",
+  left: "50%",
+  bottom: "calc(env(safe-area-inset-bottom, 0px) + 16px)",
+  transform: "translateX(-50%)",
+  zIndex: 9999,
+  minWidth: 168,
+  fontWeight: 600,
+  background: "var(--accent)",
+  color: "var(--text-invert)",
+  border: "1px solid transparent",
+  boxShadow: "0 12px 30px rgba(0,0,0,0.22)",
 };
 
 const explainBtnBusy: React.CSSProperties = {
