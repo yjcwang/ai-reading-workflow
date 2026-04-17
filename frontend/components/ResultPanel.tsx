@@ -8,12 +8,10 @@ import downloadIcon from "@/icons/download.svg";
 import saveResultIcon from "@/icons/save_result.svg";
 import styles from "./InputPanel.module.css";
 import {
-  buttonSm,
   buttonMd,
   buttonPrimary,
   buttonTinted,
   iconButtonSm,
-  iconButtonMd,
   buttonGhost,
   maskedIconStyle,
 } from "@/components/buttonStyles";
@@ -60,9 +58,11 @@ export function ResultPanel({
   return (
     <div style={card}>
       <div style={rowBetween}>
-        <div style={{ fontWeight: 700 }}>{tUI.resultPanel.resultTitle}</div>
-        <div style={{ opacity: 0.7, fontSize: 13 }}>
+        <div style={titleBlock}>
+          <div style={{ fontWeight: 700 }}>{tUI.resultPanel.resultTitle}</div>
+          <div style={{ opacity: 0.7, fontSize: 13 }}>
           {data.vocab.length} {tUI.common.word} · {data.grammar.length} {tUI.common.grammar}
+          </div>
         </div>
         <div style={headerActions}>
           <button
@@ -120,7 +120,7 @@ export function ResultPanel({
       {exportError ? <div style={errorBox}>{tUI.resultPanel.exportPdf}{tUI.common.error}: {exportError}</div> : null}
 
       <div style={twoCols}>
-        <div>
+        <div style={section}>
           <div style={sectionTitle}>{tUI.resultPanel.vocabTitle}</div>
           <ul style={list}>
             {loading ? (
@@ -161,7 +161,7 @@ export function ResultPanel({
           </ul>
         </div>
 
-        <div>
+        <div style={section}>
           <div style={sectionTitle}>{tUI.resultPanel.grammarTitle}</div>
           <ul style={list}>
             {loading ? (
@@ -217,19 +217,33 @@ const card: React.CSSProperties = {
 const rowBetween: React.CSSProperties = {
   display: "flex",
   justifyContent: "space-between",
-  alignItems: "center",
+  alignItems: "flex-start",
+  flexWrap: "wrap",
+  gap: 10,
   marginBottom: 10,
+};
+
+const titleBlock: React.CSSProperties = {
+  display: "flex",
+  flexDirection: "column",
+  gap: 4,
+  minWidth: 0,
 };
 
 const headerActions: React.CSSProperties = {
   display: "flex",
+  flexWrap: "wrap",
   gap: 10,
 };
 
 const twoCols: React.CSSProperties = {
   display: "grid",
-  gridTemplateColumns: "1fr 1fr",
+  gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
   gap: 12,
+};
+
+const section: React.CSSProperties = {
+  minWidth: 0,
 };
 
 const sectionTitle: React.CSSProperties = { fontWeight: 500, marginBottom: 8 };

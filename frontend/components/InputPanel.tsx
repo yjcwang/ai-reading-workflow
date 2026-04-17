@@ -348,7 +348,8 @@ export function InputPanel({
 
 const lockedBox: React.CSSProperties = {
   width: "100%",
-  height: "70vh",
+  flex: 1,
+  minHeight: 0,
   overflow: "auto",
   borderRadius: 14,
   padding: 12,

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import styles from "./page.module.css";
 import { InputPanel } from "@/components/InputPanel";
 import { ResultPanel } from "@/components/ResultPanel";
 import { SavedResultsPanel } from "@/components/SavedResultsPanel";
@@ -180,8 +181,8 @@ export default function Page() {
   }
 
   return (
-    <main style={page}>
-      <div style={grid}>
+    <main className={styles.page}>
+      <div className={styles.grid}>
         <InputPanel
           level={level}
           setLevel={setLevel}
@@ -243,17 +244,3 @@ export default function Page() {
     </main>
   );
 }
-
-const page: React.CSSProperties = {
-  height: "100vh",
-  overflow: "hidden",
-  padding: 16,
-};
-
-const grid: React.CSSProperties = {
-  height: "100%",
-  display: "grid",
-  gridTemplateColumns: "1fr 1fr",
-  gap: 16,
-  minHeight: 0,
-};

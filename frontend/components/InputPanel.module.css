@@ -11,13 +11,17 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
   margin-bottom: 10px;
 }
 
 .leftTools {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 10px;
+  min-width: 0;
 }
 
 .generatorMenu {
@@ -58,6 +62,8 @@
 .rightTools {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
   gap: 10px;
 }
 
@@ -67,6 +73,7 @@
   border: 1px solid var(--border);
   border-radius: 14px;
   padding: 8px 10px;
+  min-height: 40px;
 }
 
 .textarea {
@@ -149,5 +156,57 @@
     left: 0;
     right: auto;
     width: min(280px, calc(100vw - 48px));
+  }
+}
+
+@media (max-width: 720px) {
+  .card {
+    padding: 12px;
+  }
+
+  .rowBetween {
+    align-items: stretch;
+  }
+
+  .leftTools,
+  .rightTools {
+    width: 100%;
+  }
+
+  .rightTools {
+    justify-content: flex-start;
+  }
+
+  .select {
+    flex: 1 1 120px;
+  }
+
+  .textarea {
+    height: 240px;
+  }
+
+  .lockedActions {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+}
+
+@media (min-width: 960px) {
+  .card {
+    height: 100%;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .rowBetween,
+  .actionRow,
+  .lockedActions {
+    flex-shrink: 0;
+  }
+
+  .textarea {
+    flex: 1;
+    min-height: 0;
   }
 }

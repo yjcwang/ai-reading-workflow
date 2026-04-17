@@ -6,10 +6,8 @@ import closeIcon from "@/icons/close.svg";
 import aiIcon from "@/icons/ai.svg";
 import {
   buttonMd,
-  buttonSm,
   buttonGhost,
   buttonTinted,
-  iconButtonSm,
   iconButtonMd,
   maskedIconStyle,
 } from "@/components/buttonStyles";
