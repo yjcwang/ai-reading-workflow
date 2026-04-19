@@ -2,7 +2,7 @@
 
 from sqlmodel import Session, select
 
-from app.models.result import Grammar, Result, Vocab
+from app.models.result_models import Grammar, Result, Vocab
 
 
 class ResultRepository:

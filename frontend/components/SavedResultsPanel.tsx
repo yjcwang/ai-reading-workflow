@@ -172,7 +172,7 @@ function buildPreview(text: string, maxLength: number): string {
 function formatDate(value: string): string {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;
-  return date.toLocaleDateString();
+  return date.toLocaleString();
 }
 
 const overlay: React.CSSProperties = {

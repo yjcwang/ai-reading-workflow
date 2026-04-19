@@ -1,6 +1,6 @@
 """Result SQLModel table definitions."""
 
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List, Optional
 from uuid import uuid4
 
@@ -18,7 +18,7 @@ class Result(SQLModel, table=True):
     id: str = Field(default_factory=generate_uuid, primary_key=True, index=True)
     text: str
     level: str = Field(index=True)
-    created_at: datetime = Field(default_factory=datetime.utcnow, index=True)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc), index=True)
     title: Optional[str] = None
 
     # Relationship fields make it possible to navigate related rows in Python.

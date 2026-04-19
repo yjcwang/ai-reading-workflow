@@ -1,6 +1,14 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_serializer
 from typing import List, Optional, Literal, Union
-from datetime import datetime
+from datetime import datetime, timezone
+
+
+def serialize_utc_datetime(value: datetime) -> str:
+    if value.tzinfo is None:
+        value = value.replace(tzinfo=timezone.utc)
+    else:
+        value = value.astimezone(timezone.utc)
+    return value.isoformat().replace("+00:00", "Z")
 
 # define Request and Response structure with pydantic model
 # analyzer ------------  
@@ -105,6 +113,10 @@ class SavedResultResponse(BaseModel):
     vocab: list[SavedVocabItem]
     grammar: list[SavedGrammarItem]
 
+    @field_serializer("created_at")
+    def serialize_created_at(self, value: datetime) -> str:
+        return serialize_utc_datetime(value)
+
 
 class ResultSummaryResponse(BaseModel):
     id: str
@@ -112,3 +124,7 @@ class ResultSummaryResponse(BaseModel):
     level: str
     created_at: datetime
     title: Optional[str] = None
+
+    @field_serializer("created_at")
+    def serialize_created_at(self, value: datetime) -> str:
+        return serialize_utc_datetime(value)
