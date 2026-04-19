@@ -1,90 +1,100 @@
 # JP Reading Assistant
 
-JP Reading Assistant 是一个面向日语阅读学习的全栈项目。它支持输入或生成日语文章，调用 LLM 提取词汇和语法要点，进一步做单词或句子解释，并把整理后的结果保存到本地历史数据库中，方便后续回看和复习。
+[English](README.md) | [简体中文](README.zh.md)
 
-当前项目已经包含完整的“生成 -> 编辑 -> 分析 -> 保存 -> 历史加载 -> PDF 导出”闭环。
+JP Reading Assistant is a full-stack project for Japanese reading practice. It is designed not as a simple translation API demo, but as a usable reading support tool with a complete study workflow. Users can either paste their own Japanese text or generate JLPT-aligned reading material, then analyze vocabulary and grammar, request context-aware explanations for words or sentences, and save the results for later review.
 
-## 核心功能
+The project currently supports a full study loop:
 
-- 输入日语原文，按 JLPT 等级分析重点词汇和语法
-- 用 AI 按主题、长度、风格生成日语阅读材料
-- 高亮单词或句子，触发更细粒度的解释
-- 手动编辑分析结果，整理个人学习清单
-- 导出当前结果为 PDF
-- 支持中英文输出切换
-- 支持浅色/深色主题切换
-- 支持历史记录保存、列表浏览、详情加载和删除
+`Input / Generate Text -> Analyze Vocabulary & Grammar -> Explain Word / Sentence -> Save History -> Reload for Review -> Export PDF`
 
-## 项目结构
+## Who This Is For
+
+- Learners who want reading, lookup, note-taking, and review in one workflow
+- Users who want JLPT-level reading material without manually searching for articles
+- Readers who want to inspect a personal project covering product workflow, AI integration, and deployment
+
+## Core Capabilities
+
+- Analyze pasted Japanese text and extract vocabulary and grammar aligned with JLPT levels
+- Generate reading material by topic, length, and style with AI to reduce the cost of finding practice content
+- Provide context-aware explanations for selected words or sentences instead of acting like a static dictionary
+- Let users manually add or remove analyzed items to build their own study list
+- Save analyzed results into a local database with list, detail, reload, and delete flows
+- Export current study results as PDF for offline review or archiving
+- Support bilingual output and light/dark theme switching
+
+## Project Highlights
+
+- Complete product loop: covers content preparation, analysis, explanation, review, and export instead of showcasing one isolated feature
+- Context-aware reading assistance: `/analyze`, `/explain`, and `/generate-text` have separate responsibilities, and sentence explanation combines translation with analysis
+- Multi-provider LLM abstraction: supports `gemini`, `openai`, `deepseek`, `ollama`, and `mock` behind one integration layer with structured output, JSON validation, and retry logic
+- Persistent history system: stores `Result / Vocab / Grammar` data with `SQLite + SQLModel` and supports save, list, detail, and delete flows
+- Maintainable frontend structure: the main page mainly orchestrates state while analysis, explanation, export, history, theme, and language switching are split into feature hooks
+- Delivery and usability: includes separated frontend/backend deployment support, environment-based config, CORS, health check, and a local bootstrap script
+
+## Project Structure
 
 ```text
 jp-reading-assistant/
 ├─ backend/
 │  ├─ app/
-│  │  ├─ api/            # FastAPI 路由
-│  │  ├─ db/             # SQLite / SQLModel 初始化
-│  │  ├─ models/         # Result / Vocab / Grammar 表模型
-│  │  ├─ repositories/   # 数据访问层
-│  │  ├─ services/       # Analyzer / Explainer / ResultService / PDF 等
-│  │  ├─ schemas.py      # 请求响应模型
-│  │  └─ main.py         # FastAPI 入口
+│  │  ├─ api/            # FastAPI routes
+│  │  ├─ db/             # SQLite / SQLModel initialization
+│  │  ├─ models/         # Result / Vocab / Grammar table models
+│  │  ├─ repositories/   # Data access layer
+│  │  ├─ services/       # Analyzer / Explainer / ResultService / PDF
+│  │  ├─ schemas.py      # Request/response schemas
+│  │  └─ main.py         # FastAPI entry point
 │  └─ .env.example
 ├─ frontend/
 │  ├─ app/               # Next.js App Router
-│  ├─ components/        # 页面组件与历史面板
+│  ├─ components/        # Page components and history panel
 │  ├─ hooks/             # Feature hooks
-│  └─ lib/               # API、类型、i18n、纯函数工具
+│  └─ lib/               # API, types, i18n, and helper utilities
 └─ docs/
    ├─ decision_log.md
    └─ architecture.md
 ```
 
-## 后端能力概览
+## Backend Endpoints
 
-后端基于 FastAPI，主要接口包括：
+The backend is built with FastAPI. Core endpoints include:
 
-- `POST /api/analyze`：分析文章，输出词汇和语法
-- `POST /api/explain`：解释单词或句子
-- `POST /api/generate-text`：生成阅读材料
-- `POST /api/export_pdf`：导出 PDF
-- `POST /api/results`：保存当前结果到数据库
-- `GET /api/results`：获取历史记录列表
-- `GET /api/results/{result_id}`：获取历史详情
-- `DELETE /api/results/{result_id}`：删除历史记录
-- `GET /health`：健康检查
+- `POST /api/analyze`: analyze text and return vocabulary and grammar items
+- `POST /api/explain`: explain a selected word or sentence
+- `POST /api/generate-text`: generate reading material
+- `POST /api/export_pdf`: export a PDF
+- `POST /api/results`: save the current result into the database
+- `GET /api/results`: fetch saved result summaries
+- `GET /api/results/{result_id}`: fetch saved result details
+- `DELETE /api/results/{result_id}`: delete a saved result
+- `GET /health`: health check
 
-LLM 调用统一通过 `backend/app/services/llm.py` 处理，已支持：
+LLM calls are centralized in `backend/app/services/llm.py`, with provider switching, structured output handling, and automatic retry support.
 
-- `mock`
-- `ollama`
-- `openai`
-- `gemini`
-- `deepseek`
+## Data and Persistence
 
-并带有结构化输出和自动重试能力。
+The project uses local `SQLite` with `SQLModel` to persist saved reading results. The database file is stored at `backend/app/app.db`, and tables are initialized automatically when FastAPI starts.
 
-## 数据与持久化概览
+The saved data is organized into three layers:
 
-项目使用本地 `SQLite` 持久化已保存的阅读结果，数据层基于 `SQLModel`。数据库文件位于 `backend/app/app.db`，FastAPI 启动时会自动执行建表逻辑。
+- `Result`: source text, JLPT level, title, created time
+- `Vocab`: vocabulary items
+- `Grammar`: grammar items
 
-当前保存结构分为三层：
+The backend keeps this flow layered:
 
-- `Result`：原文、JLPT 等级、标题、创建时间
-- `Vocab`：词汇条目
-- `Grammar`：语法条目
+- `backend/app/models/result_models.py`: table models
+- `backend/app/db/session.py`: database connection and session management
+- `backend/app/repositories/result_repository.py`: raw database reads and writes
+- `backend/app/services/result_service.py`: save, list, detail, and delete workflows
 
-后端按分层组织这部分逻辑：
+Titles are generated on the backend during save; if generation fails, the service falls back to a truncated text preview.
 
-- `backend/app/models/result.py`：表模型
-- `backend/app/db/session.py`：数据库连接与 Session
-- `backend/app/repositories/result_repository.py`：数据库读写
-- `backend/app/services/result_service.py`：保存、列表、详情、删除流程
+## Frontend Organization
 
-保存时标题由后端生成；如果标题生成失败，会回退到正文截断预览。
-
-## 前端能力概览
-
-前端基于 Next.js App Router + TypeScript，主要采用 feature hook 组织页面逻辑：
+The frontend uses Next.js App Router + TypeScript and organizes page logic with feature hooks:
 
 - `useAnalyzeFeature`
 - `useExplainFeature`
@@ -94,20 +104,20 @@ LLM 调用统一通过 `backend/app/services/llm.py` 处理，已支持：
 - `useTheme`
 - `useTargetLang`
 
-这让 `page.tsx` 主要负责状态编排和组件组合，异步业务流分散到各自 hook 中。
+This keeps `page.tsx` focused on orchestration and component composition while moving async business flows into dedicated hooks, which reduces coupling and makes future extension easier.
 
-## 环境变量
+## Environment Variables
 
 ### backend/.env
 
-先复制：
+Copy first:
 
 ```bash
 cd backend
 cp .env.example .env
 ```
 
-当前后端配置项实际包括：
+Current backend settings include:
 
 ```env
 LLM_PROVIDER_ANALYZER=gemini
@@ -127,22 +137,22 @@ DEEPSEEK_MODEL=deepseek-chat
 OLLAMA_MODEL=qwen2.5:7b
 ```
 
-注意：
+Notes:
 
-- `.env.example` 里目前没有把所有 provider 变量都列全，但代码里已经支持上面这些字段
-- 如果使用 OpenAI / Gemini / DeepSeek，需要填对应 API Key
+- `.env.example` does not yet list every provider-related variable, but the code already supports them
+- If you use OpenAI, Gemini, or DeepSeek, you need to provide the corresponding API key
 
 ### frontend/.env
 
-前端至少需要：
+Frontend requires at least:
 
 ```env
 NEXT_PUBLIC_BACKEND_URL=http://127.0.0.1:8000
 ```
 
-## 本地启动
+## Local Development
 
-### 1. 启动后端
+### 1. Start the Backend
 
 ```bash
 cd backend
@@ -161,27 +171,27 @@ macOS / Linux:
 source .venv/bin/activate
 ```
 
-安装依赖：
+Install dependencies:
 
 ```bash
 pip install -r ..\requirements.txt
 ```
 
-或在 macOS / Linux:
+Or on macOS / Linux:
 
 ```bash
 pip install -r ../requirements.txt
 ```
 
-启动服务：
+Start the server:
 
 ```bash
 uvicorn app.main:app --reload
 ```
 
-启动时会自动初始化 SQLite 数据库和缺失表。
+The app will initialize the SQLite database and any missing tables on startup.
 
-### 2. 启动前端
+### 2. Start the Frontend
 
 ```bash
 cd frontend
@@ -189,52 +199,53 @@ npm install
 npm run dev
 ```
 
-默认访问：
+Default URLs:
 
-- 前端：`http://localhost:3000`
-- 后端：`http://127.0.0.1:8000`
+- Frontend: `http://localhost:3000`
+- Backend: `http://127.0.0.1:8000`
 
-### Windows quick start
+### Windows Quick Start
 
-Use the helper scripts in the project root:
+Use the helper script in the project root:
+
 ```powershell
 .\start-dev.ps1
 ```
+
 First-time setup:
+
 ```powershell
 .\start-dev.ps1 -Install
 ```
+
 Skip opening the browser:
+
 ```powershell
 .\start-dev.ps1 -NoBrowser
 ```
 
-
-## 技术栈
+## Tech Stack
 
 - Backend: FastAPI, Pydantic v2, SQLModel, Uvicorn, Tenacity
 - Frontend: Next.js 16, React 19, TypeScript
 - Database: SQLite
 - LLM Providers: Ollama, OpenAI, Gemini, DeepSeek, Mock
-- PDF: ReportLab 字体资源方案（Noto Sans JP / SC）
+- PDF: ReportLab with Noto Sans JP / SC font assets
 
-## 当前状态
+## Current Status
 
-根据 `docs/decision_log.md`，项目已完成这些关键演进：
+According to `docs/decision_log.md`, the project has already gone through these major iterations:
 
-- Prompt metadata routing
-- i18n 支持
-- PDF 导出增强
-- LLM 结构化输出与自动重试
-- DeepSeek 接入
-- 前端 feature hooks 重构
-- AI 阅读文本生成
-- 输入面板拆分
-- SQLite 持久化历史记录
-- 前端历史面板与保存流
-- 保存标题改为后端生成
+- Prompt metadata routing for distinguishing feature-specific behavior inside the shared LLM layer
+- i18n support across UI, prompt output, and PDF export
+- Structured LLM output, automatic retry, and multi-provider integration
+- AI-generated reading text
+- Frontend refactor into feature hooks and smaller input-related components
+- SQLite-backed saved history and frontend save/load flows
+- Backend-generated save titles
+- First public deployment with separated frontend and backend hosting
 
-## 相关文档
+## Related Docs
 
-- [架构草稿](docs/architecture.md)
-- [决策记录](docs/decision_log.md)
+- [Architecture Notes](docs/architecture.md)
+- [Decision Log](docs/decision_log.md)
