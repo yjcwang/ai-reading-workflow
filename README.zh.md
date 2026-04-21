@@ -1,4 +1,4 @@
-# JP Reading Assistant
+# AI-Powered Japanese Reading Workflow
 
 面向日语阅读学习的 AI 助手，把真实文本转化为结构化学习材料。
 
