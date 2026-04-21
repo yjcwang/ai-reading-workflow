@@ -30,10 +30,27 @@ JP Reading Assistant is a full-stack web application built around a practical re
 
 - [Demo Video Link Here](https://your-demo-link-here)
 
-![Screenshot 1 - Main Interface](docs\assets\main-interface.png)
-![Screenshot 2 - Analysis Results](docs\assets\analysis-result.png)
-![Screenshot 3 - Context Explain Modal](docs\assets\explain-modal.png)
-![Screenshot 4 - History](docs\assets\save-history.png)
+<p align="center">
+  <img src="./docs/assets/main-interface.png" alt="Main Interface" width="880"/>
+  <br/>
+  <em>Main Interface</em>
+</p>
+<p align="center">
+  <img src="./docs/assets/analysis-result.png" alt="Analysis Results" width="880"/>
+  <br/>
+  <em>Analysis Results</em>
+</p>
+<p align="center">
+  <img src="./docs/assets/explain-modal.png" alt="Context Explain Modal" width="880"/>
+  <br/>
+  <em>Context Explain Modal</em>
+</p>
+<p align="center">
+  <img src="./docs/assets/save-history.png" alt="History" width="880"/>
+  <br/>
+  <em>History</em>
+</p>
+
 ## How It Works
 
 1. Input Japanese text manually or generate a passage with AI.
