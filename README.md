@@ -1,37 +1,90 @@
 # JP Reading Assistant
 
+AI-powered Japanese reading assistant for turning real text into structured study material.
+
 [English](README.md) | [简体中文](README.zh.md)
 
-JP Reading Assistant is a full-stack project for Japanese reading practice. It is designed not as a simple translation API demo, but as a usable reading support tool with a complete study workflow. Users can either paste their own Japanese text or generate JLPT-aligned reading material, then analyze vocabulary and grammar, request context-aware explanations for words or sentences, and save the results for later review.
+JP Reading Assistant is a full-stack web application built around a practical reading workflow: bring in or generate apanese text, analyze it into vocabulary and grammar, inspect difficult parts in context, refine the result list, and save the session for later review.
 
-The project currently supports a full study loop:
+## Why This Project Stands Out
 
-`Input / Generate Text -> Analyze Vocabulary & Grammar -> Explain Word / Sentence -> Save History -> Reload for Review -> Export PDF`
+- Structured output pipeline for vocabulary, grammar, translation, and title generation
+- Clear service boundaries between text analysis, explanation, translation, text generation, PDF export, and persistence
+- Real product UX considerations: editable results, history reload, language switching, dark mode, and loading/error states
+- Multi-provider LLM integration behind one backend abstraction layer
 
-## Who This Is For
+## Core Features
 
-- Learners who want reading, lookup, note-taking, and review in one workflow
-- Users who want JLPT-level reading material without manually searching for articles
-- Readers who want to inspect a personal project covering product workflow, AI integration, and deployment
+- Paste Japanese text and analyze it into vocabulary and grammar lists aligned with a selected JLPT level
+- Generate Japanese reading passages by topic, level, length, and style
+- Explain selected text in context
+- Use separate explain modes for short selections and sentence-length selections
+- Edit the result set by adding explained items or removing analysis items
+- Save analyzed sessions into a local SQLite database
+- Reload, browse, refresh, and delete saved results from the history panel
+- Export the current result list as PDF
+- Switch explanation/output language between English and Chinese
+- Toggle between light and dark mode
 
-## Core Capabilities
+## Demo
 
-- Analyze pasted Japanese text and extract vocabulary and grammar aligned with JLPT levels
-- Generate reading material by topic, length, and style with AI to reduce the cost of finding practice content
-- Provide context-aware explanations for selected words or sentences instead of acting like a static dictionary
-- Let users manually add or remove analyzed items to build their own study list
-- Save analyzed results into a local database with list, detail, reload, and delete flows
-- Export current study results as PDF for offline review or archiving
-- Support bilingual output and light/dark theme switching
+- [Demo Video Link Here](https://your-demo-link-here)
 
-## Project Highlights
+[Screenshot 1 - Main Interface]
+(docs\assets\main-interface.png)
+[Screenshot 2 - Analysis Results]
+(docs\assets\analysis-result.png)
+[Screenshot 3 - Context Explain Modal]
+(docs\assets\explain-modal.png)
+[Screenshot 4 - History]
+(docs\assets\save-history.png)
+## How It Works
 
-- Complete product loop: covers content preparation, analysis, explanation, review, and export instead of showcasing one isolated feature
-- Context-aware reading assistance: `/analyze`, `/explain`, and `/generate-text` have separate responsibilities, and sentence explanation combines translation with analysis
-- Multi-provider LLM abstraction: supports `gemini`, `openai`, `deepseek`, `ollama`, and `mock` behind one integration layer with structured output, JSON validation, and retry logic
-- Persistent history system: stores `Result / Vocab / Grammar` data with `SQLite + SQLModel` and supports save, list, detail, and delete flows
-- Maintainable frontend structure: the main page mainly orchestrates state while analysis, explanation, export, history, theme, and language switching are split into feature hooks
-- Delivery and usability: includes separated frontend/backend deployment support, environment-based config, CORS, health check, and a local bootstrap script
+1. Input Japanese text manually or generate a passage with AI.
+2. Lock the text and send it to the analysis pipeline.
+3. The backend returns structured vocabulary and grammar items.
+4. Select a word or sentence to request a contextual explanation.
+5. For sentence explanations, the app runs translation and analysis as separate steps.
+6. Edit the final study list in the UI.
+7. Save the session to SQLite or export it as PDF.
+
+## Tech Stack
+
+- Frontend: Next.js 16, React 19, TypeScript
+- Backend: Python FastAPI, Pydantic v2, SQLModel, Uvicorn
+- Database: SQLite
+- LLM integration: Ollama, OpenAI, Gemini, DeepSeek, Mock provider
+- Reliability: Tenacity-based retry handling for LLM calls
+- PDF export: ReportLab with Noto Sans JP / SC fonts
+
+## Technical Highlights
+
+### Structured LLM Output
+
+- Backend services request JSON-shaped outputs and validate them with Pydantic models
+- LLM responses go through centralized extraction, validation, and retry handling in `backend/app/services/llm.py`
+- Provider switching is handled through a strategy map instead of feature-specific branching throughout the codebase
+
+### Modular Frontend and Backend Design
+
+- Frontend page orchestration stays in `frontend/app/page.tsx`
+- Async product flows are split into feature hooks such as `useAnalyzeFeature`, `useExplainFeature`, `useGenerateTextFeature`, `useExportPdf`, and `useSavedResultsFeature`
+- Backend responsibilities are split across API routes, services, repositories, models, and schemas
+
+### Explain Flow vs. Analysis Flow
+
+- `POST /api/analyze` focuses on extracting learnable vocabulary and grammar from a passage
+- `POST /api/explain` supports two different paths:
+- Word mode returns a focused explanation for the selected text
+- Sentence mode composes translation and full analysis for the selected sentence
+- This separation keeps the UX clearer and avoids overloading one endpoint with mixed responsibilities
+
+### Persistence, History, and Export
+
+- Saved reading sessions are stored in SQLite using `Result`, `Vocab`, and `Grammar` tables
+- The history panel supports list, detail reload, refresh, and delete flows
+- Save titles are generated on the backend, with a fallback preview title if title generation fails
+- Current results can be exported to PDF for offline review
 
 ## Project Structure
 
@@ -40,119 +93,38 @@ jp-reading-assistant/
 ├─ backend/
 │  ├─ app/
 │  │  ├─ api/            # FastAPI routes
-│  │  ├─ db/             # SQLite / SQLModel initialization
-│  │  ├─ models/         # Result / Vocab / Grammar table models
+│  │  ├─ db/             # DB setup and session management
+│  │  ├─ models/         # SQLModel tables
 │  │  ├─ repositories/   # Data access layer
-│  │  ├─ services/       # Analyzer / Explainer / ResultService / PDF
-│  │  ├─ schemas.py      # Request/response schemas
+│  │  ├─ services/       # LLM, analysis, explanation, PDF, persistence
+│  │  ├─ schemas.py      # Request / response contracts
 │  │  └─ main.py         # FastAPI entry point
-│  └─ .env.example
+│  └─ tests/
 ├─ frontend/
 │  ├─ app/               # Next.js App Router
-│  ├─ components/        # Page components and history panel
+│  ├─ components/        # UI panels and modals
 │  ├─ hooks/             # Feature hooks
-│  └─ lib/               # API, types, i18n, and helper utilities
+│  └─ lib/               # API client, i18n, helpers, types
 └─ docs/
-   ├─ decision_log.md
-   └─ architecture.md
+   ├─ architecture.md
+   └─ decision_log.md
 ```
 
-## Backend Endpoints
+## API Surface
 
-The backend is built with FastAPI. Core endpoints include:
+- `POST /api/analyze`
+- `POST /api/explain`
+- `POST /api/generate-text`
+- `POST /api/export_pdf`
+- `POST /api/results`
+- `GET /api/results`
+- `GET /api/results/{result_id}`
+- `DELETE /api/results/{result_id}`
+- `GET /health`
 
-- `POST /api/analyze`: analyze text and return vocabulary and grammar items
-- `POST /api/explain`: explain a selected word or sentence
-- `POST /api/generate-text`: generate reading material
-- `POST /api/export_pdf`: export a PDF
-- `POST /api/results`: save the current result into the database
-- `GET /api/results`: fetch saved result summaries
-- `GET /api/results/{result_id}`: fetch saved result details
-- `DELETE /api/results/{result_id}`: delete a saved result
-- `GET /health`: health check
+## Local Setup
 
-LLM calls are centralized in `backend/app/services/llm.py`, with provider switching, structured output handling, and automatic retry support.
-
-## Data and Persistence
-
-The project uses local `SQLite` with `SQLModel` to persist saved reading results. The database file is stored at `backend/app/app.db`, and tables are initialized automatically when FastAPI starts.
-
-The saved data is organized into three layers:
-
-- `Result`: source text, JLPT level, title, created time
-- `Vocab`: vocabulary items
-- `Grammar`: grammar items
-
-The backend keeps this flow layered:
-
-- `backend/app/models/result_models.py`: table models
-- `backend/app/db/session.py`: database connection and session management
-- `backend/app/repositories/result_repository.py`: raw database reads and writes
-- `backend/app/services/result_service.py`: save, list, detail, and delete workflows
-
-Titles are generated on the backend during save; if generation fails, the service falls back to a truncated text preview.
-
-## Frontend Organization
-
-The frontend uses Next.js App Router + TypeScript and organizes page logic with feature hooks:
-
-- `useAnalyzeFeature`
-- `useExplainFeature`
-- `useGenerateTextFeature`
-- `useExportPdf`
-- `useSavedResultsFeature`
-- `useTheme`
-- `useTargetLang`
-
-This keeps `page.tsx` focused on orchestration and component composition while moving async business flows into dedicated hooks, which reduces coupling and makes future extension easier.
-
-## Environment Variables
-
-### backend/.env
-
-Copy first:
-
-```bash
-cd backend
-cp .env.example .env
-```
-
-Current backend settings include:
-
-```env
-LLM_PROVIDER_ANALYZER=gemini
-LLM_PROVIDER_EXPLAINER=ollama
-LLM_PROVIDER_TRANSLATOR=ollama
-LLM_PROVIDER_TEXT_GENERATOR=ollama
-
-OPENAI_API_KEY=your_key_here
-OPENAI_MODEL=gpt-4o-mini
-
-GEMINI_API_KEY=your_key_here
-GEMINI_MODEL=gemini-3-flash-preview
-
-DEEPSEEK_API_KEY=your_key_here
-DEEPSEEK_MODEL=deepseek-chat
-
-OLLAMA_MODEL=qwen2.5:7b
-```
-
-Notes:
-
-- `.env.example` does not yet list every provider-related variable, but the code already supports them
-- If you use OpenAI, Gemini, or DeepSeek, you need to provide the corresponding API key
-
-### frontend/.env
-
-Frontend requires at least:
-
-```env
-NEXT_PUBLIC_BACKEND_URL=http://127.0.0.1:8000
-```
-
-## Local Development
-
-### 1. Start the Backend
+### Backend
 
 ```bash
 cd backend
@@ -174,24 +146,24 @@ source .venv/bin/activate
 Install dependencies:
 
 ```bash
-pip install -r ..\requirements.txt
-```
-
-Or on macOS / Linux:
-
-```bash
 pip install -r ../requirements.txt
 ```
 
-Start the server:
+Create `backend/.env` from `backend/.env.example`, then start the server:
 
 ```bash
 uvicorn app.main:app --reload
 ```
 
-The app will initialize the SQLite database and any missing tables on startup.
+### Frontend
 
-### 2. Start the Frontend
+Create `frontend/.env` or `frontend/.env.local`:
+
+```env
+NEXT_PUBLIC_BACKEND_URL=http://127.0.0.1:8000
+```
+
+Then run:
 
 ```bash
 cd frontend
@@ -199,53 +171,51 @@ npm install
 npm run dev
 ```
 
-Default URLs:
-
-- Frontend: `http://localhost:3000`
-- Backend: `http://127.0.0.1:8000`
-
 ### Windows Quick Start
 
-Use the helper script in the project root:
+The repository includes a helper script that can bootstrap local development:
 
 ```powershell
 .\start-dev.ps1
 ```
 
-First-time setup:
+First-time dependency install:
 
 ```powershell
 .\start-dev.ps1 -Install
 ```
 
-Skip opening the browser:
+## Environment Notes
 
-```powershell
-.\start-dev.ps1 -NoBrowser
-```
+Current backend configuration supports separate providers for:
 
-## Tech Stack
+- analyzer
+- explainer
+- translator
+- text generator
 
-- Backend: FastAPI, Pydantic v2, SQLModel, Uvicorn, Tenacity
-- Frontend: Next.js 16, React 19, TypeScript
-- Database: SQLite
-- LLM Providers: Ollama, OpenAI, Gemini, DeepSeek, Mock
-- PDF: ReportLab with Noto Sans JP / SC font assets
+The codebase currently includes provider support for:
 
-## Current Status
+- `ollama`
+- `openai`
+- `gemini`
+- `deepseek`
+- `mock`
 
-According to `docs/decision_log.md`, the project has already gone through these major iterations:
+## Realistic Next Improvements
 
-- Prompt metadata routing for distinguishing feature-specific behavior inside the shared LLM layer
-- i18n support across UI, prompt output, and PDF export
-- Structured LLM output, automatic retry, and multi-provider integration
-- AI-generated reading text
-- Frontend refactor into feature hooks and smaller input-related components
-- SQLite-backed saved history and frontend save/load flows
-- Backend-generated save titles
-- First public deployment with separated frontend and backend hosting
+- Improve provider configuration ergonomics and document all supported environment variables more fully
+- Add richer history capabilities such as search, filter, or tagging for saved study sessions
 
-## Related Docs
+## Engineering Challenges and Lessons
 
-- [Architecture Notes](docs/architecture.md)
-- [Decision Log](docs/decision_log.md)
+- LLM integration became more reliable after moving JSON extraction, schema validation, and retry logic into one shared backend layer instead of repeating it in each service
+- Separating page orchestration from feature hooks reduced coupling in the frontend and made the product workflow easier to extend
+- Treating sentence explanation as translation plus analysis produced a cleaner UX and clearer backend responsibilities than forcing one large prompt to do everything
+- One practical engineering challenge was deciding which work belonged to which endpoint and layer; clarifying boundaries between title generation, persistence, analysis, and explanation made the system easier to maintain and extend
+
+## Additional Notes
+
+- The project currently stores history locally in SQLite
+- A lightweight health endpoint and environment-based CORS configuration are included for deployment
+- Related implementation notes are available in [docs/architecture.md](docs/architecture.md) and [docs/decision_log.md](docs/decision_log.md)

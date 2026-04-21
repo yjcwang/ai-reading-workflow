@@ -1,37 +1,90 @@
 # JP Reading Assistant
 
+面向日语阅读学习的 AI 助手，把真实文本转化为结构化学习材料。
+
 [English](README.md) | [简体中文](README.zh.md)
 
-JP Reading Assistant 是一个面向日语阅读学习的全栈项目，目标不是做一个“调用翻译 API 的 Demo”，而是做出一个可持续使用的阅读辅助工具。用户既可以粘贴自己的日语文本，也可以直接生成符合 JLPT 难度的阅读材料；系统会进一步提取词汇和语法要点，支持对单词或句子做上下文相关解释，并将结果保存为可回看的学习记录。
-
-当前项目已经形成完整的学习闭环：
-
-`输入 / 生成文本 -> 分析词汇与语法 -> 解释词语 / 句子 -> 保存历史 -> 加载复习 -> 导出 PDF`
-
-## 适合谁用
-
-- 想把日语阅读、查词、整理笔记放到一个流程里的学习者
-- 想按 JLPT 难度生成练习材料，而不是自己到处找文章的用户
-- 想看一个从产品闭环、AI 接入到部署上线都相对完整的个人项目的读者
-
-## 核心能力
-
-- 输入日语原文并按 JLPT 等级分析重点词汇和语法
-- 用 AI 按主题、长度、风格生成阅读材料，降低找素材成本
-- 对选中的词语或句子进行上下文相关解释，而不是只做静态词典查询
-- 手动增删分析结果，整理个人学习清单
-- 将分析结果保存到本地数据库，支持列表浏览、详情加载和删除
-- 将当前学习结果导出为 PDF，方便离线复习或归档
-- 支持中英文输出切换、浅色/深色主题切换
+JP Reading Assistant 是一个围绕真实阅读流程构建的全栈 Web 应用：输入或实时生成日语文本，提取词汇与语法，针对难点做上下文解释，整理结果列表，并将学习记录保存下来以便后续复习。
 
 ## 项目亮点
 
-- 完整产品闭环：覆盖从阅读材料准备到复习归档的全流程，而不是单点功能展示
-- 上下文相关阅读辅助：`/analyze`、`/explain`、`/generate-text` 分别承担不同职责，句子解释会组合翻译与分析能力
-- 多 LLM provider 抽象：统一接入 `gemini`、`openai`、`deepseek`、`ollama`、`mock`，并提供结构化输出、JSON 校验和自动重试
-- 持久化历史系统：使用 `SQLite + SQLModel` 保存 `Result / Vocab / Grammar` 三层数据，支持保存、列表、详情和删除
-- 可维护前端结构：主页面主要负责编排，分析、解释、导出、历史、主题和语言切换拆分到独立 feature hooks
-- 交付与可用性：支持前后端分离部署、环境变量配置、CORS、health check、本地一键启动脚本
+- 词汇、语法、翻译、标题生成都走结构化输出流程
+- 分析、解释、翻译、文本生成、PDF 导出、持久化职责拆分清晰
+- 具备实际产品 UX 考量：结果可编辑、历史记录可回载、语言切换、暗色模式、加载与错误反馈
+- 后端通过统一抽象层支持多个 LLM provider
+
+## 核心功能
+
+- 输入日语文本，并按所选 JLPT 等级提取词汇和语法点
+- 按主题、等级、长度、风格生成日语阅读材料
+- 对选中的内容进行上下文解释
+- 对短文本和整句使用不同的 explain 流程
+- 支持把解释结果加入列表，或手动删除分析项
+- 将分析结果保存到本地 SQLite 数据库
+- 在历史面板中浏览、刷新、加载、删除已保存结果
+- 将当前结果导出为 PDF
+- 在英文和中文之间切换解释/输出语言
+- 支持浅色与深色模式
+
+## Demo
+
+- [Demo Video Link Here]
+
+[Screenshot 1 - Main Interface]
+
+[Screenshot 2 - Analysis Results]
+
+[Screenshot 3 - Context Explain Modal]
+
+[Screenshot 4 - History / Export / Generator]
+
+## 工作流程
+
+1. 手动输入日语文本，或通过 AI 生成阅读材料。
+2. 锁定当前文本并发起分析请求。
+3. 后端返回结构化的词汇和语法结果。
+4. 选中单词或句子，请求上下文解释。
+5. 如果是句子解释，系统会分开执行翻译和分析。
+6. 用户可以在前端编辑最终学习列表。
+7. 将结果保存到 SQLite，或导出为 PDF。
+
+## 技术栈
+
+- Frontend: Next.js 16, React 19, TypeScript
+- Backend: Python FastAPI, Pydantic v2, SQLModel, Uvicorn
+- Database: SQLite
+- LLM 集成: Ollama, OpenAI, Gemini, DeepSeek, Mock provider
+- 稳定性: 基于 Tenacity 的 LLM 重试机制
+- PDF 导出: ReportLab + Noto Sans JP / SC
+
+## 技术实现重点
+
+### 结构化 LLM 输出
+
+- 后端服务以 JSON 结构为目标输出，并通过 Pydantic 模型校验
+- `backend/app/services/llm.py` 统一负责 JSON 提取、Schema 校验和自动重试
+- provider 切换通过策略映射完成，而不是把分支逻辑散落到各个业务模块
+
+### 模块化前后端设计
+
+- `frontend/app/page.tsx` 主要负责页面编排和状态协调
+- 主要异步流程拆分为 `useAnalyzeFeature`、`useExplainFeature`、`useGenerateTextFeature`、`useExportPdf`、`useSavedResultsFeature`
+- 后端按 API、service、repository、model、schema 分层组织
+
+### 分析流程与解释流程分离
+
+- `POST /api/analyze` 负责从整段文本中提取值得学习的词汇和语法
+- `POST /api/explain` 支持两条路径：
+- 单词模式返回聚焦解释
+- 句子模式组合翻译和分析结果
+- 这种拆分让接口职责更清晰，也更符合阅读场景下的用户预期
+
+### 持久化、历史记录与导出
+
+- 阅读结果通过 `Result`、`Vocab`、`Grammar` 三层表结构存入 SQLite
+- 历史面板支持列表、详情回载、刷新和删除
+- 保存标题由后端生成；如果标题生成失败，会回退到文本截断预览
+- 当前结果可以导出为 PDF，方便离线复习
 
 ## 项目结构
 
@@ -40,119 +93,38 @@ jp-reading-assistant/
 ├─ backend/
 │  ├─ app/
 │  │  ├─ api/            # FastAPI 路由
-│  │  ├─ db/             # SQLite / SQLModel 初始化
-│  │  ├─ models/         # Result / Vocab / Grammar 表模型
+│  │  ├─ db/             # 数据库初始化与 session 管理
+│  │  ├─ models/         # SQLModel 表模型
 │  │  ├─ repositories/   # 数据访问层
-│  │  ├─ services/       # Analyzer / Explainer / ResultService / PDF 等
-│  │  ├─ schemas.py      # 请求响应模型
+│  │  ├─ services/       # LLM、分析、解释、PDF、持久化
+│  │  ├─ schemas.py      # 请求 / 响应契约
 │  │  └─ main.py         # FastAPI 入口
-│  └─ .env.example
+│  └─ tests/
 ├─ frontend/
 │  ├─ app/               # Next.js App Router
-│  ├─ components/        # 页面组件与历史面板
+│  ├─ components/        # UI 面板与弹窗
 │  ├─ hooks/             # Feature hooks
-│  └─ lib/               # API、类型、i18n、纯函数工具
+│  └─ lib/               # API、i18n、辅助函数、类型定义
 └─ docs/
-   ├─ decision_log.md
-   └─ architecture.md
+   ├─ architecture.md
+   └─ decision_log.md
 ```
 
-## 后端接口
+## API 概览
 
-后端基于 FastAPI，核心接口包括：
+- `POST /api/analyze`
+- `POST /api/explain`
+- `POST /api/generate-text`
+- `POST /api/export_pdf`
+- `POST /api/results`
+- `GET /api/results`
+- `GET /api/results/{result_id}`
+- `DELETE /api/results/{result_id}`
+- `GET /health`
 
-- `POST /api/analyze`：分析文章，输出词汇和语法
-- `POST /api/explain`：解释单词或句子
-- `POST /api/generate-text`：生成阅读材料
-- `POST /api/export_pdf`：导出 PDF
-- `POST /api/results`：保存当前结果到数据库
-- `GET /api/results`：获取历史记录列表
-- `GET /api/results/{result_id}`：获取历史详情
-- `DELETE /api/results/{result_id}`：删除历史记录
-- `GET /health`：健康检查
+## 本地运行
 
-LLM 调用统一通过 `backend/app/services/llm.py` 处理，支持多 provider 切换、结构化输出和自动重试。
-
-## 数据与持久化
-
-项目使用本地 `SQLite` 持久化已保存的阅读结果，数据层基于 `SQLModel`。数据库文件位于 `backend/app/app.db`，FastAPI 启动时会自动执行建表逻辑。
-
-当前保存结构分为三层：
-
-- `Result`：原文、JLPT 等级、标题、创建时间
-- `Vocab`：词汇条目
-- `Grammar`：语法条目
-
-后端按分层组织这部分逻辑：
-
-- `backend/app/models/result_models.py`：表模型
-- `backend/app/db/session.py`：数据库连接与 Session
-- `backend/app/repositories/result_repository.py`：数据库读写
-- `backend/app/services/result_service.py`：保存、列表、详情、删除流程
-
-保存时标题由后端生成；如果标题生成失败，会回退到正文截断预览。
-
-## 前端组织
-
-前端基于 Next.js App Router + TypeScript，采用 feature hook 组织页面逻辑：
-
-- `useAnalyzeFeature`
-- `useExplainFeature`
-- `useGenerateTextFeature`
-- `useExportPdf`
-- `useSavedResultsFeature`
-- `useTheme`
-- `useTargetLang`
-
-这让 `page.tsx` 主要负责状态编排和组件组合，异步业务流分散到各自 hook 中，降低了页面耦合度，也更方便继续扩展功能。
-
-## 环境变量
-
-### backend/.env
-
-先复制：
-
-```bash
-cd backend
-cp .env.example .env
-```
-
-当前后端配置项实际包括：
-
-```env
-LLM_PROVIDER_ANALYZER=gemini
-LLM_PROVIDER_EXPLAINER=ollama
-LLM_PROVIDER_TRANSLATOR=ollama
-LLM_PROVIDER_TEXT_GENERATOR=ollama
-
-OPENAI_API_KEY=your_key_here
-OPENAI_MODEL=gpt-4o-mini
-
-GEMINI_API_KEY=your_key_here
-GEMINI_MODEL=gemini-3-flash-preview
-
-DEEPSEEK_API_KEY=your_key_here
-DEEPSEEK_MODEL=deepseek-chat
-
-OLLAMA_MODEL=qwen2.5:7b
-```
-
-注意：
-
-- `.env.example` 里目前没有把所有 provider 变量都列全，但代码里已经支持上面这些字段
-- 如果使用 OpenAI / Gemini / DeepSeek，需要填对应 API Key
-
-### frontend/.env
-
-前端至少需要：
-
-```env
-NEXT_PUBLIC_BACKEND_URL=http://127.0.0.1:8000
-```
-
-## 本地启动
-
-### 1. 启动后端
+### Backend
 
 ```bash
 cd backend
@@ -174,24 +146,24 @@ source .venv/bin/activate
 安装依赖：
 
 ```bash
-pip install -r ..\requirements.txt
-```
-
-或在 macOS / Linux:
-
-```bash
 pip install -r ../requirements.txt
 ```
 
-启动服务：
+先将 `backend/.env.example` 复制为 `backend/.env`，再启动服务：
 
 ```bash
 uvicorn app.main:app --reload
 ```
 
-启动时会自动初始化 SQLite 数据库和缺失表。
+### Frontend
 
-### 2. 启动前端
+创建 `frontend/.env` 或 `frontend/.env.local`：
+
+```env
+NEXT_PUBLIC_BACKEND_URL=http://127.0.0.1:8000
+```
+
+然后运行：
 
 ```bash
 cd frontend
@@ -199,14 +171,9 @@ npm install
 npm run dev
 ```
 
-默认访问：
+### Windows 快速启动
 
-- 前端：`http://localhost:3000`
-- 后端：`http://127.0.0.1:8000`
-
-### Windows quick start
-
-使用项目根目录下的辅助脚本：
+项目根目录已提供启动脚本：
 
 ```powershell
 .\start-dev.ps1
@@ -218,34 +185,37 @@ npm run dev
 .\start-dev.ps1 -Install
 ```
 
-跳过自动打开浏览器：
+## 环境配置说明
 
-```powershell
-.\start-dev.ps1 -NoBrowser
-```
+当前后端支持分别配置以下 provider：
 
-## 技术栈
+- analyzer
+- explainer
+- translator
+- text generator
 
-- Backend: FastAPI, Pydantic v2, SQLModel, Uvicorn, Tenacity
-- Frontend: Next.js 16, React 19, TypeScript
-- Database: SQLite
-- LLM Providers: Ollama, OpenAI, Gemini, DeepSeek, Mock
-- PDF: ReportLab 字体资源方案（Noto Sans JP / SC）
+代码中已支持的 provider 包括：
 
-## 当前状态
+- `ollama`
+- `openai`
+- `gemini`
+- `deepseek`
+- `mock`
 
-根据 `docs/decision_log.md`，项目已经完成这些关键演进：
+## 现实可行的后续改进
 
-- Prompt metadata routing，用于在统一 LLM 调用层中区分不同功能
-- i18n 支持，包括 UI、Prompt 输出和 PDF 导出
-- LLM 结构化输出、自动重试和多 provider 集成
-- AI 阅读文本生成能力
-- 前端 feature hooks 重构与输入面板拆分
-- SQLite 持久化历史记录与历史面板保存流
-- 保存标题改为后端生成
-- 首次公网部署，完成前后端分离上线
+- 改进 provider 配置体验，并把所有支持的环境变量文档化得更完整
+- 为历史记录增加搜索、筛选或标签能力
 
-## 相关文档
+## 工程挑战与经验总结
 
-- [架构草稿](docs/architecture.md)
-- [决策记录](docs/decision_log.md)
+- 把 JSON 提取、Schema 校验和重试逻辑下沉到统一的 LLM 层后，整体稳定性明显高于在各个 service 中重复处理
+- 前端从“大页面组件”拆到 feature hooks 后，职责边界更清晰，后续扩展成本更低
+- 把句子解释设计为“翻译 + 分析”的组合流程，比用一个超大 prompt 同时做所有事情更清晰
+- 一个实际的工程挑战是分清每个接口和每一层到底应该负责什么；把标题生成、数据保存、解释与分析等职责边界明确下来之后，整个系统才更容易维护和扩展
+
+## 补充说明
+
+- 当前历史记录保存在本地 SQLite 中
+- 项目已包含健康检查接口和基于环境变量的 CORS 配置，方便部署
+- 相关设计记录见 [docs/architecture.md](docs/architecture.md) 与 [docs/decision_log.md](docs/decision_log.md)
