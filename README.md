@@ -13,19 +13,6 @@ JP Reading Assistant is a full-stack web application built around a practical re
 - Real product UX considerations: editable results, history reload, language switching, dark mode, and loading/error states
 - Multi-provider LLM integration behind one backend abstraction layer
 
-## Core Features
-
-- Paste Japanese text and analyze it into vocabulary and grammar lists aligned with a selected JLPT level
-- Generate Japanese reading passages by topic, level, length, and style
-- Explain selected text in context
-- Use separate explain modes for short selections and sentence-length selections
-- Edit the result set by adding explained items or removing analysis items
-- Save analyzed sessions into a local SQLite database
-- Reload, browse, refresh, and delete saved results from the history panel
-- Export the current result list as PDF
-- Switch explanation/output language between English and Chinese
-- Toggle between light and dark mode
-
 ## Demo
 
 - [Demo Video Link Here](https://your-demo-link-here)
@@ -50,6 +37,19 @@ JP Reading Assistant is a full-stack web application built around a practical re
   <br/>
   <em>History</em>
 </p>
+
+## Core Features
+
+- Paste Japanese text and analyze it into vocabulary and grammar lists aligned with a selected JLPT level
+- Generate Japanese reading passages by topic, level, length, and style
+- Explain selected text in context
+- Use separate explain modes for short selections and sentence-length selections
+- Edit the result set by adding explained items or removing analysis items
+- Save analyzed sessions into a local SQLite database
+- Reload, browse, refresh, and delete saved results from the history panel
+- Export the current result list as PDF
+- Switch explanation/output language between English and Chinese
+- Toggle between light and dark mode
 
 ## How It Works
 
