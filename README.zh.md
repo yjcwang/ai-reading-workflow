@@ -13,6 +13,31 @@ JP Reading Assistant 是一个围绕真实阅读流程构建的全栈 Web 应用
 - 具备实际产品 UX 考量：结果可编辑、历史记录可回载、语言切换、暗色模式、加载与错误反馈
 - 后端通过统一抽象层支持多个 LLM provider
 
+## Demo
+
+- [Demo Video Link Here](https://your-demo-link-here)
+
+<p align="center">
+  <img src="./docs/assets/main-interface.png" alt="Main Interface" width="880"/>
+  <br/>
+  <em>主界面</em>
+</p>
+<p align="center">
+  <img src="./docs/assets/analysis-result.png" alt="Analysis Results" width="880"/>
+  <br/>
+  <em>分析结果</em>
+</p>
+<p align="center">
+  <img src="./docs/assets/explain-modal.png" alt="Context Explain Modal" width="880"/>
+  <br/>
+  <em>上下文解释面板</em>
+</p>
+<p align="center">
+  <img src="./docs/assets/save-history.png" alt="History" width="880"/>
+  <br/>
+  <em>历史保存</em>
+</p>
+
 ## 核心功能
 
 - 输入日语文本，并按所选 JLPT 等级提取词汇和语法点
@@ -25,18 +50,6 @@ JP Reading Assistant 是一个围绕真实阅读流程构建的全栈 Web 应用
 - 将当前结果导出为 PDF
 - 在英文和中文之间切换解释/输出语言
 - 支持浅色与深色模式
-
-## Demo
-
-- [Demo Video Link Here]
-
-[Screenshot 1 - Main Interface]
-
-[Screenshot 2 - Analysis Results]
-
-[Screenshot 3 - Context Explain Modal]
-
-[Screenshot 4 - History / Export / Generator]
 
 ## 工作流程
 
