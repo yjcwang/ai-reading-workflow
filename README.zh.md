@@ -15,12 +15,12 @@ JP Reading Assistant 是一个围绕真实阅读流程构建的全栈 Web 应用
 
 ## Demo
 
-- [Demo Video Link Here](https://your-demo-link-here)
+- [Demo视频链接](https://your-demo-link-here)
 
 <p align="center">
-  <img src="./docs/assets/main-interface.png" alt="Main Interface" width="880"/>
+  <img src="./docs/assets/ai-generator.png" alt="Main Interface and AI Text Generator" width="880"/>
   <br/>
-  <em>主界面</em>
+  <em>主界面和AI文本生成</em>
 </p>
 <p align="center">
   <img src="./docs/assets/analysis-result.png" alt="Analysis Results" width="880"/>

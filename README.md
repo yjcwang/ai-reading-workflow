@@ -18,9 +18,9 @@ JP Reading Assistant is a full-stack web application built around a practical re
 - [Demo Video Link Here](https://your-demo-link-here)
 
 <p align="center">
-  <img src="./docs/assets/main-interface.png" alt="Main Interface" width="880"/>
+  <img src="./docs/assets/ai-generator.png" alt="Main Interface and AI Text Generator" width="880"/>
   <br/>
-  <em>Main Interface</em>
+  <em>Main Interface and AI Text Generator</em>
 </p>
 <p align="center">
   <img src="./docs/assets/analysis-result.png" alt="Analysis Results" width="880"/>
