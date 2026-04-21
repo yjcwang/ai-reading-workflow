@@ -11,7 +11,7 @@ from app.models import Grammar, Result, Vocab  # noqa: F401
 
 logger = logging.getLogger(__name__)
 
-app = FastAPI(title="JP Reading Assistant API", version="0.1.0")
+app = FastAPI(title="AI Reading Workflow API", version="0.1.0")
 
 
 def _get_allowed_origins() -> list[str]:

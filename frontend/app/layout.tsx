@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "jp-reading-assistant",
-  description: "Japanese Reading Assistant with AI",
+  title: "ai-reading-workflow",
+  description: "Japanese Reading Workflow System with AI",
 };
 
 export default function RootLayout({

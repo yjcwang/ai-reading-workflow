@@ -4,7 +4,7 @@
 
 [English](README.md) | [简体中文](README.zh.md)
 
-JP Reading Assistant 是一个围绕真实阅读流程构建的全栈 Web 应用：输入或实时生成日语文本，提取词汇与语法，针对难点做上下文解释，整理结果列表，并将学习记录保存下来以便后续复习。
+AI-Powered Japanese Reading Workflow 是一个围绕真实阅读流程构建的全栈 Web 应用：输入或实时生成日语文本，提取词汇与语法，针对难点做上下文解释，整理结果列表，并将学习记录保存下来以便后续复习。
 
 ## 项目亮点
 
@@ -15,7 +15,7 @@ JP Reading Assistant 是一个围绕真实阅读流程构建的全栈 Web 应用
 
 ## Demo
 
-- [Demo视频链接](https://your-demo-link-here)
+- [Demo视频链接](https://youtu.be/NV0gn7CtJrc)
 
 <p align="center">
   <img src="./docs/assets/ai-generator.png" alt="Main Interface and AI Text Generator" width="880"/>
@@ -102,7 +102,7 @@ JP Reading Assistant 是一个围绕真实阅读流程构建的全栈 Web 应用
 ## 项目结构
 
 ```text
-jp-reading-assistant/
+ai-reading-workflow/
 ├─ backend/
 │  ├─ app/
 │  │  ├─ api/            # FastAPI 路由

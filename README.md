@@ -1,10 +1,10 @@
 # AI-Powered Japanese Reading Workflow
 
-AI-powered Japanese reading assistant for turning real text into structured study material.
+AI-powered workflow for turning real Japanese text into structured study material.
 
 [English](README.md) | [简体中文](README.zh.md)
 
-JP Reading Assistant is a full-stack web application built around a practical reading workflow: bring in or generate apanese text, analyze it into vocabulary and grammar, inspect difficult parts in context, refine the result list, and save the session for later review.
+AI-Powered Japanese Reading Workflow is a full-stack web application built around a practical reading workflow: bring in or generate Japanese text, analyze it into vocabulary and grammar, inspect difficult parts in context, refine the result list, and save the session for later review.
 
 ## Why This Project Stands Out
 
@@ -102,7 +102,7 @@ JP Reading Assistant is a full-stack web application built around a practical re
 ## Project Structure
 
 ```text
-jp-reading-assistant/
+ai-reading-workflow/
 ├─ backend/
 │  ├─ app/
 │  │  ├─ api/            # FastAPI routes
