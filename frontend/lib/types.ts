@@ -22,6 +22,11 @@ export type AnalyzeResponse = {
   grammar: GrammarItem[];
 };
 
+export type ExportPdfRequest = {
+  text: string;
+  data: AnalyzeResponse;
+};
+
 export type ExplainType = "vocab" | "grammar";
 
 export type ExplainWordResponse = {

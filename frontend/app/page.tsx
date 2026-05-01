@@ -177,7 +177,19 @@ export default function Page() {
   }
 
   async function handleExportPdf() {
-    await exportFeature.handleExportPdf(analyzeFeature.data, targetLang);
+    const currentText = analyzeFeature.lockedText?.trim() || text.trim();
+    const hasResult =
+      analyzeFeature.data.vocab.length > 0 || analyzeFeature.data.grammar.length > 0;
+
+    if (!currentText || !hasResult) return;
+
+    await exportFeature.handleExportPdf(
+      {
+        text: currentText,
+        data: analyzeFeature.data,
+      },
+      targetLang,
+    );
   }
 
   return (

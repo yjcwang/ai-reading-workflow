@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { exportPdf } from "@/lib/api";
 import { downloadBlob } from "@/lib/utils";
-import type { AnalyzeResponse, TargetLang } from "@/lib/types";
+import type { ExportPdfRequest, TargetLang } from "@/lib/types";
 
 type UseExportPdfOptions = {
   filename?: string;
@@ -15,15 +15,17 @@ export function useExportPdf(options?: UseExportPdfOptions) {
   const [exporting, setExporting] = useState(false);
   const [exportError, setExportError] = useState<string | null>(null);
 
-  async function handleExportPdf(data: AnalyzeResponse, targetLang: TargetLang) {
+  async function handleExportPdf(payload: ExportPdfRequest, targetLang: TargetLang) {
     try {
       setExporting(true);
       setExportError(null);
 
-      const blob = await exportPdf(data, targetLang);
+      const blob = await exportPdf(payload, targetLang);
       downloadBlob(blob, filename);
-    } catch (e: any) {
-      setExportError(e?.message ?? "Export failed");
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error ? error.message : "Export failed";
+      setExportError(message);
     } finally {
       setExporting(false);
     }

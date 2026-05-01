@@ -65,6 +65,7 @@ ExplainResponse = Union[ExplainWordResponse, ExplainSentenceResponse]
 
 # PDF exporter ------------  
 class ExportPDFRequest(BaseModel):
+    text: str = Field(..., min_length=1)
     data: AnalyzeResponse
     target_lang: str = "en" 
 

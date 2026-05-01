@@ -41,7 +41,7 @@ def explain_endpoint(req: ExplainRequest):
 
 @router.post("/export_pdf")
 def export_pdf_endpoint(req: ExportPDFRequest):
-    pdf_bytes = build_pdf_bytes(req.data, req.target_lang)
+    pdf_bytes = build_pdf_bytes(req.text, req.data, req.target_lang)
     return Response(
         content=pdf_bytes,
         media_type="application/pdf",

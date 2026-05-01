@@ -1,5 +1,6 @@
 import type { 
   AnalyzeResponse, 
+  ExportPdfRequest,
   Level,
   ExplainResponse, 
   GenerateTextRequest,
@@ -45,7 +46,7 @@ export async function explain(mode: "word" | "sentence", selected_text: string, 
   return (await resp.json()) as ExplainResponse;
 }
 
-export async function exportPdf(data: AnalyzeResponse, targetLang: TargetLang): Promise<Blob> {
+export async function exportPdf(payload: ExportPdfRequest, targetLang: TargetLang): Promise<Blob> {
   const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
   if (!BASE_URL) {
@@ -55,7 +56,7 @@ export async function exportPdf(data: AnalyzeResponse, targetLang: TargetLang): 
   const resp = await fetch(BASE_URL + "/api/export_pdf", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({data, target_lang: targetLang}),
+    body: JSON.stringify({ ...payload, target_lang: targetLang }),
   });
 
   if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
