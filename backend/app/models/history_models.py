@@ -1,4 +1,4 @@
-"""Result SQLModel table definitions."""
+"""History SQLModel table definitions."""
 
 from datetime import datetime, timezone
 from typing import List, Optional
@@ -11,8 +11,8 @@ def generate_uuid() -> str:
     return str(uuid4())
 
 
-class Result(SQLModel, table=True):
-    # Parent table: one saved reading result.
+class ArticleHistory(SQLModel, table=True):
+    # Parent table: one saved article-level history record.
     __tablename__ = "results"
 
     id: str = Field(default_factory=generate_uuid, primary_key=True, index=True)
@@ -22,12 +22,12 @@ class Result(SQLModel, table=True):
     title: Optional[str] = None
 
     # Relationship fields make it possible to navigate related rows in Python.
-    vocab_items: List["Vocab"] = Relationship(back_populates="result")
-    grammar_items: List["Grammar"] = Relationship(back_populates="result")
+    vocab_items: List["VocabHistory"] = Relationship(back_populates="article")
+    grammar_items: List["GrammarHistory"] = Relationship(back_populates="article")
 
 
-class Vocab(SQLModel, table=True):
-    # Child table: each row belongs to one Result through result_id.
+class VocabHistory(SQLModel, table=True):
+    # Child table: each row belongs to one article history record through result_id.
     __tablename__ = "vocab_items"
 
     id: str = Field(default_factory=generate_uuid, primary_key=True, index=True)
@@ -38,11 +38,11 @@ class Vocab(SQLModel, table=True):
     definition: str
     example: Optional[str] = None
 
-    result: Optional["Result"] = Relationship(back_populates="vocab_items")
+    article: Optional["ArticleHistory"] = Relationship(back_populates="vocab_items")
 
 
-class Grammar(SQLModel, table=True):
-    # Child table: each row belongs to one Result through result_id.
+class GrammarHistory(SQLModel, table=True):
+    # Child table: each row belongs to one article history record through result_id.
     __tablename__ = "grammar_items"
 
     id: str = Field(default_factory=generate_uuid, primary_key=True, index=True)
@@ -52,4 +52,4 @@ class Grammar(SQLModel, table=True):
     definition: str
     example: Optional[str] = None
 
-    result: Optional["Result"] = Relationship(back_populates="grammar_items")
+    article: Optional["ArticleHistory"] = Relationship(back_populates="grammar_items")

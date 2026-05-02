@@ -1,14 +1,16 @@
 import type { 
   AnalyzeResponse, 
+  ArticleHistoryDetailResponse,
+  ArticleHistoryItemResponse,
   ExportPdfRequest,
   Level,
   ExplainResponse, 
+  GrammarHistoryItemResponse,
   GenerateTextRequest,
   GenerateTextResponse, 
-  ResultSummaryResponse,
-  SaveResultRequest,
-  SavedResultResponse,
-  TargetLang} from "./types";
+  SaveArticleHistoryRequest,
+  TargetLang,
+  VocabHistoryItemResponse} from "./types";
 
 
 // service layer, handle operations
@@ -83,45 +85,63 @@ export async function generateText(
   return (await resp.json()) as GenerateTextResponse;
 }
 
-export async function saveResult(
-  payload: SaveResultRequest,
-): Promise<SavedResultResponse> {
+export async function saveArticleHistory(
+  payload: SaveArticleHistoryRequest,
+): Promise<ArticleHistoryDetailResponse> {
   const BASE_URL = getBackendBaseUrl();
 
-  const resp = await fetch(BASE_URL + "/api/results", {
+  const resp = await fetch(BASE_URL + "/api/history/articles", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   });
 
   if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-  return (await resp.json()) as SavedResultResponse;
+  return (await resp.json()) as ArticleHistoryDetailResponse;
 }
 
-export async function getSavedResults(): Promise<ResultSummaryResponse[]> {
+export async function getArticleHistory(): Promise<ArticleHistoryItemResponse[]> {
   const BASE_URL = getBackendBaseUrl();
 
-  const resp = await fetch(BASE_URL + "/api/results");
+  const resp = await fetch(BASE_URL + "/api/history/articles");
 
   if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-  return (await resp.json()) as ResultSummaryResponse[];
+  return (await resp.json()) as ArticleHistoryItemResponse[];
 }
 
-export async function getSavedResultDetail(
-  resultId: string,
-): Promise<SavedResultResponse> {
+export async function getVocabHistoryItems(): Promise<VocabHistoryItemResponse[]> {
   const BASE_URL = getBackendBaseUrl();
 
-  const resp = await fetch(BASE_URL + `/api/results/${resultId}`);
+  const resp = await fetch(BASE_URL + "/api/history/vocab");
 
   if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-  return (await resp.json()) as SavedResultResponse;
+  return (await resp.json()) as VocabHistoryItemResponse[];
 }
 
-export async function deleteSavedResult(resultId: string): Promise<{ status: string }> {
+export async function getGrammarHistoryItems(): Promise<GrammarHistoryItemResponse[]> {
   const BASE_URL = getBackendBaseUrl();
 
-  const resp = await fetch(BASE_URL + `/api/results/${resultId}`, {
+  const resp = await fetch(BASE_URL + "/api/history/grammar");
+
+  if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+  return (await resp.json()) as GrammarHistoryItemResponse[];
+}
+
+export async function getArticleHistoryDetail(
+  articleId: string,
+): Promise<ArticleHistoryDetailResponse> {
+  const BASE_URL = getBackendBaseUrl();
+
+  const resp = await fetch(BASE_URL + `/api/history/articles/${articleId}`);
+
+  if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+  return (await resp.json()) as ArticleHistoryDetailResponse;
+}
+
+export async function deleteArticleHistory(articleId: string): Promise<{ status: string }> {
+  const BASE_URL = getBackendBaseUrl();
+
+  const resp = await fetch(BASE_URL + `/api/history/articles/${articleId}`, {
     method: "DELETE",
   });
 

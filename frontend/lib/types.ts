@@ -70,7 +70,7 @@ export type GenerateTextResponse = {
   text: string;
 };
 
-export type SavedVocabItem = {
+export type ArticleHistoryVocabItem = {
   expression: string;
   reading?: string | null;
   definition: string;
@@ -78,35 +78,64 @@ export type SavedVocabItem = {
   notes?: string | null;
 };
 
-export type SavedGrammarItem = {
+export type ArticleHistoryGrammarItem = {
   expression: string;
   definition: string;
   example: string;
   notes?: string | null;
 };
 
-export type SaveResultRequest = {
+export type SaveArticleHistoryRequest = {
   text: string;
   level: Level;
-  vocab: SavedVocabItem[];
-  grammar: SavedGrammarItem[];
+  vocab: ArticleHistoryVocabItem[];
+  grammar: ArticleHistoryGrammarItem[];
 };
 
-export type SavedResultResponse = {
+export type ArticleHistoryDetailResponse = {
   id: string;
   text: string;
   level: string;
   created_at: string;
   title?: string | null;
-  vocab: SavedVocabItem[];
-  grammar: SavedGrammarItem[];
+  vocab: ArticleHistoryVocabItem[];
+  grammar: ArticleHistoryGrammarItem[];
 };
 
-export type ResultSummaryResponse = {
+export type ArticleHistoryItemResponse = {
   id: string;
   text: string;
   level: string;
   created_at: string;
   title?: string | null;
+};
+
+export type HistoryView = "articles" | "vocab" | "grammar";
+
+export type HistorySortOrder = "desc" | "asc";
+
+export type VocabHistoryItemResponse = {
+  id: string;
+  result_id: string;
+  expression: string;
+  reading?: string | null;
+  definition: string;
+  example?: string | null;
+  source_title?: string | null;
+  source_text_preview: string;
+  source_level: string;
+  source_created_at: string;
+};
+
+export type GrammarHistoryItemResponse = {
+  id: string;
+  result_id: string;
+  expression: string;
+  definition: string;
+  example?: string | null;
+  source_title?: string | null;
+  source_text_preview: string;
+  source_level: string;
+  source_created_at: string;
 };
 

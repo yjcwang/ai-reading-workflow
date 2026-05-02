@@ -85,41 +85,41 @@ class GenerateTitleResponse(BaseModel):
     title: str
 
 # database ------------
-class SavedVocabItem(BaseModel):
+class ArticleHistoryVocabItem(BaseModel):
     expression: str
     reading: Optional[str] = None
     definition: str
     example: str
     notes: Optional[str] = None
 
-class SavedGrammarItem(BaseModel):
+class ArticleHistoryGrammarItem(BaseModel):
     expression: str
     definition: str
     example: str
     notes: Optional[str] = None
 
-class SaveResultRequest(BaseModel):
+class SaveArticleHistoryRequest(BaseModel):
     text: str = Field(..., min_length=1)
     level: str = Field(..., min_length=1)
-    vocab: list[SavedVocabItem]
-    grammar: list[SavedGrammarItem]
+    vocab: list[ArticleHistoryVocabItem]
+    grammar: list[ArticleHistoryGrammarItem]
 
 
-class SavedResultResponse(BaseModel):
+class ArticleHistoryDetailResponse(BaseModel):
     id: str
     text: str
     level: str
     created_at: datetime
     title: Optional[str] = None
-    vocab: list[SavedVocabItem]
-    grammar: list[SavedGrammarItem]
+    vocab: list[ArticleHistoryVocabItem]
+    grammar: list[ArticleHistoryGrammarItem]
 
     @field_serializer("created_at")
     def serialize_created_at(self, value: datetime) -> str:
         return serialize_utc_datetime(value)
 
 
-class ResultSummaryResponse(BaseModel):
+class ArticleHistoryItemResponse(BaseModel):
     id: str
     text: str
     level: str
@@ -128,4 +128,37 @@ class ResultSummaryResponse(BaseModel):
 
     @field_serializer("created_at")
     def serialize_created_at(self, value: datetime) -> str:
+        return serialize_utc_datetime(value)
+
+
+class VocabHistoryItemResponse(BaseModel):
+    id: str
+    result_id: str
+    expression: str
+    reading: Optional[str] = None
+    definition: str
+    example: Optional[str] = None
+    source_title: Optional[str] = None
+    source_text_preview: str
+    source_level: str
+    source_created_at: datetime
+
+    @field_serializer("source_created_at")
+    def serialize_source_created_at(self, value: datetime) -> str:
+        return serialize_utc_datetime(value)
+
+
+class GrammarHistoryItemResponse(BaseModel):
+    id: str
+    result_id: str
+    expression: str
+    definition: str
+    example: Optional[str] = None
+    source_title: Optional[str] = None
+    source_text_preview: str
+    source_level: str
+    source_created_at: datetime
+
+    @field_serializer("source_created_at")
+    def serialize_source_created_at(self, value: datetime) -> str:
         return serialize_utc_datetime(value)

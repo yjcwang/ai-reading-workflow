@@ -154,6 +154,19 @@ Recent frontend updates focused on making the interface clearer and easier to us
 - Add loading animations to improve async feedback
 - Refine the overall interaction design to be more user-friendly
 
+## 2026-05-02 Add Three Saved History Views
+
+### Context
+Saved history was only shown as article-level records, while the database already stores related vocabulary and grammar rows. Users also need to browse saved vocabulary and grammar directly without changing the persistence model.
+
+### Decision
+- Keep the existing database tables and `result_id` field unchanged
+- Rename code-level concepts to `ArticleHistory`, `VocabHistory`, and `GrammarHistory`
+- Use history-oriented API paths: `/history/articles`, `/history/vocab`, and `/history/grammar`
+- Add frontend history tabs: Articles, Vocabulary, and Grammar
+- Keep each vocab/grammar item linked back to its source article through `result_id`
+- Defer search, deduplication, semantic search, and vector database work to later iterations
+
 
 
 

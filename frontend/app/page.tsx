@@ -4,25 +4,25 @@ import React, { useState } from "react";
 import styles from "./page.module.css";
 import { InputPanel } from "@/components/InputPanel";
 import { ResultPanel } from "@/components/ResultPanel";
-import { SavedResultsPanel } from "@/components/SavedResultsPanel";
+import { HistoryPanel } from "@/components/HistoryPanel";
 import { useTheme } from "@/hooks/useTheme";
 import { useTargetLang } from "@/hooks/useTargetLang";
 import { useExplainFeature, inferExplainMode } from "@/hooks/useExplainFeature";
 import { useAnalyzeFeature } from "@/hooks/useAnalyzeFeature";
 import { useExportPdf } from "@/hooks/useExportPdf";
 import { useGenerateTextFeature } from "@/hooks/useGenerateTextFeature";
-import { useSavedResultsFeature } from "@/hooks/useSavedResultsFeature";
+import { useHistoryFeature } from "@/hooks/useHistoryFeature";
 import {
   addItemFromExplain,
   deleteGrammarByExpression,
   deleteVocabByExpression,
 } from "@/lib/item-helpers";
 import type {
+  ArticleHistoryDetailResponse,
   ExplainWordResponse,
   GenerateTextRequest,
   Level,
-  SaveResultRequest,
-  SavedResultResponse,
+  SaveArticleHistoryRequest,
 } from "@/lib/types";
 import { DEFAULT_GENERATE_REQUEST } from "@/lib/types";
 
@@ -47,7 +47,7 @@ export default function Page() {
     level,
     targetLang,
   });
-  const savedResultsFeature = useSavedResultsFeature(targetLang);
+  const historyFeature = useHistoryFeature(targetLang);
   const exportFeature = useExportPdf({
     filename: "my-list.pdf",
   });
@@ -89,28 +89,28 @@ export default function Page() {
 
   async function handleOpenHistory() {
     setHistoryOpen(true);
-    await savedResultsFeature.refreshHistory();
+    await historyFeature.refreshCurrentHistory();
   }
 
-  async function handleLoadSavedResult(resultId: string) {
-    const saved = await savedResultsFeature.fetchSavedResultDetail(resultId);
-    if (!saved) return;
+  async function handleLoadArticleHistory(resultId: string) {
+    const articleHistory = await historyFeature.fetchArticleHistoryDetail(resultId);
+    if (!articleHistory) return;
 
-    applySavedResult(saved);
+    applyArticleHistoryDetail(articleHistory);
     setHistoryOpen(false);
   }
 
-  async function handleDeleteSavedResult(resultId: string) {
-    await savedResultsFeature.removeSavedResult(resultId);
+  async function handleDeleteArticleHistory(resultId: string) {
+    await historyFeature.removeArticleHistory(resultId);
   }
 
-  async function handleSaveCurrentResult() {
+  async function handleSaveCurrentArticleHistory() {
     const currentText = analyzeFeature.lockedText?.trim() || text.trim();
     const hasResult = analyzeFeature.data.vocab.length > 0 || analyzeFeature.data.grammar.length > 0;
 
     if (!currentText || !hasResult) return;
 
-    const payload: SaveResultRequest = {
+    const payload: SaveArticleHistoryRequest = {
       text: currentText,
       level,
       vocab: analyzeFeature.data.vocab.map((item) => ({
@@ -128,20 +128,20 @@ export default function Page() {
       })),
     };
 
-    await savedResultsFeature.saveCurrentResult(payload);
+    await historyFeature.saveCurrentArticleHistory(payload);
   }
 
-  function applySavedResult(saved: SavedResultResponse) {
-    setText(saved.text);
-    analyzeFeature.loadSavedResult(saved.text, {
-      vocab: saved.vocab.map((item) => ({
+  function applyArticleHistoryDetail(articleHistory: ArticleHistoryDetailResponse) {
+    setText(articleHistory.text);
+    analyzeFeature.loadHistoryResult(articleHistory.text, {
+      vocab: articleHistory.vocab.map((item) => ({
         expression: item.expression,
         reading: item.reading ?? undefined,
         definition: item.definition,
         example: item.example,
         notes: item.notes ?? undefined,
       })),
-      grammar: saved.grammar.map((item) => ({
+      grammar: articleHistory.grammar.map((item) => ({
         expression: item.expression,
         definition: item.definition,
         example: item.example,
@@ -229,28 +229,34 @@ export default function Page() {
           analyzeLoading={analyzeFeature.analyzeLoading}
           onDeleteVocab={handleDeleteVocab}
           onDeleteGrammar={handleDeleteGrammar}
-          onSaveResult={handleSaveCurrentResult}
+          onSaveArticleHistory={handleSaveCurrentArticleHistory}
           onExportPdf={handleExportPdf}
-          saving={savedResultsFeature.saveLoading}
-          saveError={savedResultsFeature.saveError}
-          saveSuccess={savedResultsFeature.saveSuccess}
-          saveSuccessLeaving={savedResultsFeature.saveSuccessLeaving}
+          saving={historyFeature.saveLoading}
+          saveError={historyFeature.saveError}
+          saveSuccess={historyFeature.saveSuccess}
+          saveSuccessLeaving={historyFeature.saveSuccessLeaving}
           exporting={exportFeature.exporting}
           exportError={exportFeature.exportError}
           targetLang={targetLang}
         />
-        <SavedResultsPanel
+        <HistoryPanel
           open={historyOpen}
           targetLang={targetLang}
-          results={savedResultsFeature.historyList}
-          loading={savedResultsFeature.historyLoading}
-          error={savedResultsFeature.historyError}
-          loadingResultId={savedResultsFeature.historyLoadingResultId}
-          deletingResultId={savedResultsFeature.historyDeletingResultId}
+          historyView={historyFeature.historyView}
+          historySortOrder={historyFeature.historySortOrder}
+          articleHistory={historyFeature.articleHistoryList}
+          vocabHistory={historyFeature.vocabHistoryList}
+          grammarHistory={historyFeature.grammarHistoryList}
+          loading={historyFeature.historyLoading}
+          error={historyFeature.historyError}
+          loadingResultId={historyFeature.historyLoadingResultId}
+          deletingResultId={historyFeature.historyDeletingResultId}
           onClose={() => setHistoryOpen(false)}
-          onLoad={handleLoadSavedResult}
-          onDelete={handleDeleteSavedResult}
-          onRefresh={savedResultsFeature.refreshHistory}
+          onLoad={handleLoadArticleHistory}
+          onDelete={handleDeleteArticleHistory}
+          onRefresh={historyFeature.refreshCurrentHistory}
+          onViewChange={historyFeature.changeHistoryView}
+          onSortOrderChange={historyFeature.setHistorySortOrder}
         />
       </div>
     </main>

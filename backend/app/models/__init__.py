@@ -1,4 +1,4 @@
 """SQLModel models package."""
-from app.models.result_models import Grammar, Result, Vocab
+from app.models.history_models import ArticleHistory, GrammarHistory, VocabHistory
 
-__all__ = ["Result", "Vocab", "Grammar"]
+__all__ = ["ArticleHistory", "VocabHistory", "GrammarHistory"]

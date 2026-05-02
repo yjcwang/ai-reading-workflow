@@ -4,6 +4,8 @@ from sqlmodel import Session
 
 from app.db.session import get_session
 from app.schemas import (
+    ArticleHistoryDetailResponse,
+    ArticleHistoryItemResponse,
     AnalyzeRequest,
     AnalyzeResponse,
     ExplainRequest,
@@ -11,19 +13,19 @@ from app.schemas import (
     ExportPDFRequest,
     GenerateTextRequest,
     GenerateTextResponse,
-    ResultSummaryResponse,
-    SaveResultRequest,
-    SavedResultResponse,
+    GrammarHistoryItemResponse,
+    SaveArticleHistoryRequest,
+    VocabHistoryItemResponse,
 )
 from app.services.analyzer import analyze_text
 from app.services.explainer import explain_word, explain_sentence
 from app.services.pdf_exporter import build_pdf_bytes
-from app.services.result_service import ResultService
+from app.services.history_service import HistoryService
 from app.services.text_generator import generate_text
 
 # Controller layer: receives HTTP requests and delegates actual work to services.
 router = APIRouter()
-result_service = ResultService()
+history_service = HistoryService()
 
 
 @router.post("/analyze", response_model=AnalyzeResponse)
@@ -54,32 +56,46 @@ def generate_text_endpoint(req: GenerateTextRequest):
     return generate_text(req)
 
 
-@router.post("/results", response_model=SavedResultResponse)
-def save_result_endpoint(
-    req: SaveResultRequest,
+@router.post("/history/articles", response_model=ArticleHistoryDetailResponse)
+def save_article_history_endpoint(
+    req: SaveArticleHistoryRequest,
     session: Session = Depends(get_session),
 ):
-    return result_service.save_result(session, req)
+    return history_service.save_article_history(session, req)
 
 
-@router.get("/results", response_model=list[ResultSummaryResponse])
-def list_results_endpoint(
+@router.get("/history/articles", response_model=list[ArticleHistoryItemResponse])
+def list_article_history_endpoint(
     session: Session = Depends(get_session),
 ):
-    return result_service.list_results(session)
+    return history_service.list_article_history(session)
 
 
-@router.get("/results/{result_id}", response_model=SavedResultResponse)
-def get_result_detail_endpoint(
-    result_id: str,
+@router.get("/history/vocab", response_model=list[VocabHistoryItemResponse])
+def list_vocab_history_endpoint(
     session: Session = Depends(get_session),
 ):
-    return result_service.get_result_detail(session, result_id)
+    return history_service.list_vocab_history(session)
 
 
-@router.delete("/results/{result_id}")
-def delete_result_endpoint(
-    result_id: str,
+@router.get("/history/grammar", response_model=list[GrammarHistoryItemResponse])
+def list_grammar_history_endpoint(
     session: Session = Depends(get_session),
 ):
-    return result_service.delete_result(session, result_id)
+    return history_service.list_grammar_history(session)
+
+
+@router.get("/history/articles/{article_id}", response_model=ArticleHistoryDetailResponse)
+def get_article_history_detail_endpoint(
+    article_id: str,
+    session: Session = Depends(get_session),
+):
+    return history_service.get_article_history_detail(session, article_id)
+
+
+@router.delete("/history/articles/{article_id}")
+def delete_article_history_endpoint(
+    article_id: str,
+    session: Session = Depends(get_session),
+):
+    return history_service.delete_article_history(session, article_id)

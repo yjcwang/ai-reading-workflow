@@ -5,7 +5,7 @@ import Image from "next/image";
 import loadingIcon from "@/icons/loading.svg";
 import deleteIcon from "@/icons/delete.svg";
 import downloadIcon from "@/icons/download.svg";
-import saveResultIcon from "@/icons/save_result.svg";
+import saveToHistoryIcon from "@/icons/save_result.svg";
 import styles from "./InputPanel.module.css";
 import {
   buttonMd,
@@ -24,7 +24,7 @@ type Props = {
   analyzeLoading: boolean;
   onDeleteVocab: (expression: string) => void;
   onDeleteGrammar: (expression: string) => void;
-  onSaveResult: () => void;
+  onSaveArticleHistory: () => void;
   onExportPdf: () => void;
   saving: boolean;
   saveError: string | null;
@@ -41,7 +41,7 @@ export function ResultPanel({
   analyzeLoading: loading,
   onDeleteVocab,
   onDeleteGrammar,
-  onSaveResult,
+  onSaveArticleHistory,
   onExportPdf,
   saving,
   saveError,
@@ -68,9 +68,9 @@ export function ResultPanel({
           <button
             className="btn-interactive"
             style={saveBtn}
-            onClick={onSaveResult}
+            onClick={onSaveArticleHistory}
             disabled={loading || saving || !hasResult}
-            title={tUI.resultPanel.saveResult}
+            title={tUI.resultPanel.saveToHistory}
           >
             {saving ? (
               <Image
@@ -83,8 +83,8 @@ export function ResultPanel({
               />
             ) : (
               <>
-                <span style={maskedIconStyle(saveResultIcon.src, 18)} aria-hidden="true" />
-                {tUI.resultPanel.saveResult}
+                <span style={maskedIconStyle(saveToHistoryIcon.src, 18)} aria-hidden="true" />
+                {tUI.resultPanel.saveToHistory}
               </>
             )}
           </button>

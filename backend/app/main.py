@@ -7,7 +7,7 @@ from app.config import settings
 from app.api.routes import router
 from app.db.init_db import init_db
 from app.db.session import DATABASE_URL
-from app.models import Grammar, Result, Vocab  # noqa: F401
+from app.models import ArticleHistory, GrammarHistory, VocabHistory  # noqa: F401
 
 logger = logging.getLogger(__name__)
 
