@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from fastapi.responses import Response
 from sqlmodel import Session
 
@@ -71,6 +71,14 @@ def list_article_history_endpoint(
     return history_service.list_article_history(session)
 
 
+@router.get("/history/articles/search", response_model=list[ArticleHistoryItemResponse])
+def search_article_history_endpoint(
+    q: str = Query(..., min_length=1),
+    session: Session = Depends(get_session),
+):
+    return history_service.search_article_history(session, q)
+
+
 @router.get("/history/vocab", response_model=list[VocabHistoryItemResponse])
 def list_vocab_history_endpoint(
     session: Session = Depends(get_session),
@@ -78,11 +86,27 @@ def list_vocab_history_endpoint(
     return history_service.list_vocab_history(session)
 
 
+@router.get("/history/vocab/search", response_model=list[VocabHistoryItemResponse])
+def search_vocab_history_endpoint(
+    q: str = Query(..., min_length=1),
+    session: Session = Depends(get_session),
+):
+    return history_service.search_vocab_history(session, q)
+
+
 @router.get("/history/grammar", response_model=list[GrammarHistoryItemResponse])
 def list_grammar_history_endpoint(
     session: Session = Depends(get_session),
 ):
     return history_service.list_grammar_history(session)
+
+
+@router.get("/history/grammar/search", response_model=list[GrammarHistoryItemResponse])
+def search_grammar_history_endpoint(
+    q: str = Query(..., min_length=1),
+    session: Session = Depends(get_session),
+):
+    return history_service.search_grammar_history(session, q)
 
 
 @router.get("/history/articles/{article_id}", response_model=ArticleHistoryDetailResponse)

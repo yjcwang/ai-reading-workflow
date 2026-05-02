@@ -5,6 +5,7 @@ import logging
 from fastapi import HTTPException
 from sqlmodel import Session
 
+from app.models.history_models import ArticleHistory, GrammarHistory, VocabHistory
 from app.repositories.history_repository import HistoryRepository
 from app.schemas import (
     ArticleHistoryDetailResponse,
@@ -72,6 +73,20 @@ class HistoryService:
     def list_article_history(self, session: Session) -> list[ArticleHistoryItemResponse]:
         articles = self.repository.list_article_history(session)
 
+        return self._map_article_history_items(articles)
+
+    def search_article_history(
+        self,
+        session: Session,
+        query: str,
+    ) -> list[ArticleHistoryItemResponse]:
+        articles = self.repository.search_article_history(session, query)
+        return self._map_article_history_items(articles)
+
+    def _map_article_history_items(
+        self,
+        articles: list[ArticleHistory],
+    ) -> list[ArticleHistoryItemResponse]:
         return [
             ArticleHistoryItemResponse(
                 id=item.id,
@@ -86,6 +101,20 @@ class HistoryService:
     def list_vocab_history(self, session: Session) -> list[VocabHistoryItemResponse]:
         rows = self.repository.list_vocab_history(session)
 
+        return self._map_vocab_history_items(rows)
+
+    def search_vocab_history(
+        self,
+        session: Session,
+        query: str,
+    ) -> list[VocabHistoryItemResponse]:
+        rows = self.repository.search_vocab_history(session, query)
+        return self._map_vocab_history_items(rows)
+
+    def _map_vocab_history_items(
+        self,
+        rows: list[tuple[VocabHistory, ArticleHistory]],
+    ) -> list[VocabHistoryItemResponse]:
         return [
             VocabHistoryItemResponse(
                 id=vocab.id,
@@ -105,6 +134,20 @@ class HistoryService:
     def list_grammar_history(self, session: Session) -> list[GrammarHistoryItemResponse]:
         rows = self.repository.list_grammar_history(session)
 
+        return self._map_grammar_history_items(rows)
+
+    def search_grammar_history(
+        self,
+        session: Session,
+        query: str,
+    ) -> list[GrammarHistoryItemResponse]:
+        rows = self.repository.search_grammar_history(session, query)
+        return self._map_grammar_history_items(rows)
+
+    def _map_grammar_history_items(
+        self,
+        rows: list[tuple[GrammarHistory, ArticleHistory]],
+    ) -> list[GrammarHistoryItemResponse]:
         return [
             GrammarHistoryItemResponse(
                 id=grammar.id,

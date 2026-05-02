@@ -8,6 +8,9 @@ import {
   getGrammarHistoryItems,
   getVocabHistoryItems,
   saveArticleHistory,
+  searchArticleHistory,
+  searchGrammarHistoryItems,
+  searchVocabHistoryItems,
 } from "@/lib/api";
 import { UI_STRINGS } from "@/lib/i18n";
 import type {
@@ -25,6 +28,7 @@ export function useHistoryFeature(targetLang: TargetLang) {
   const tUI = UI_STRINGS[targetLang];
   const [historyView, setHistoryView] = useState<HistoryView>("articles");
   const [historySortOrder, setHistorySortOrder] = useState<HistorySortOrder>("desc");
+  const [historySearchQuery, setHistorySearchQuery] = useState("");
   const [articleHistoryList, setArticleHistoryList] = useState<ArticleHistoryItemResponse[]>([]);
   const [vocabHistoryList, setVocabHistoryList] = useState<VocabHistoryItemResponse[]>([]);
   const [grammarHistoryList, setGrammarHistoryList] = useState<GrammarHistoryItemResponse[]>([]);
@@ -100,6 +104,12 @@ export function useHistoryFeature(targetLang: TargetLang) {
   }
 
   async function refreshCurrentHistory(view: HistoryView = historyView) {
+    const query = historySearchQuery.trim();
+    if (query) {
+      await searchCurrentHistory(query, view);
+      return;
+    }
+
     if (view === "vocab") {
       await refreshVocabHistory();
       return;
@@ -115,7 +125,66 @@ export function useHistoryFeature(targetLang: TargetLang) {
 
   async function changeHistoryView(view: HistoryView) {
     setHistoryView(view);
+    const query = historySearchQuery.trim();
+    if (query) {
+      await searchCurrentHistory(query, view);
+      return;
+    }
+
     await refreshCurrentHistory(view);
+  }
+
+  async function searchCurrentHistory(query: string, view: HistoryView = historyView) {
+    const trimmedQuery = query.trim();
+    setHistorySearchQuery(query);
+
+    if (!trimmedQuery) {
+      await refreshCurrentHistoryWithoutSearch(view);
+      return;
+    }
+
+    setHistoryLoading(true);
+    setHistoryError(null);
+
+    try {
+      if (view === "vocab") {
+        const results = await searchVocabHistoryItems(trimmedQuery);
+        setVocabHistoryList(results);
+        return;
+      }
+
+      if (view === "grammar") {
+        const results = await searchGrammarHistoryItems(trimmedQuery);
+        setGrammarHistoryList(results);
+        return;
+      }
+
+      const articles = await searchArticleHistory(trimmedQuery);
+      setArticleHistoryList(articles);
+    } catch (e: unknown) {
+      setHistoryError(getErrorMessage(e));
+    } finally {
+      setHistoryLoading(false);
+    }
+  }
+
+  async function clearHistorySearch() {
+    setHistorySearchQuery("");
+    await refreshCurrentHistoryWithoutSearch(historyView);
+  }
+
+  async function refreshCurrentHistoryWithoutSearch(view: HistoryView) {
+    if (view === "vocab") {
+      await refreshVocabHistory();
+      return;
+    }
+
+    if (view === "grammar") {
+      await refreshGrammarHistory();
+      return;
+    }
+
+    await refreshArticleHistory();
   }
 
   async function saveCurrentArticleHistory(
@@ -175,6 +244,7 @@ export function useHistoryFeature(targetLang: TargetLang) {
   return {
     historyView,
     historySortOrder,
+    historySearchQuery,
     articleHistoryList: sortByCreatedAt(articleHistoryList, historySortOrder, (item) => item.created_at),
     vocabHistoryList: sortByCreatedAt(vocabHistoryList, historySortOrder, (item) => item.source_created_at),
     grammarHistoryList: sortByCreatedAt(grammarHistoryList, historySortOrder, (item) => item.source_created_at),
@@ -192,6 +262,9 @@ export function useHistoryFeature(targetLang: TargetLang) {
     refreshCurrentHistory,
     changeHistoryView,
     setHistorySortOrder,
+    setHistorySearchQuery,
+    searchCurrentHistory,
+    clearHistorySearch,
     saveCurrentArticleHistory,
     fetchArticleHistoryDetail,
     removeArticleHistory,

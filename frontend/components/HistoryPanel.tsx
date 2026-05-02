@@ -4,6 +4,7 @@ import React from "react";
 import historyIcon from "@/icons/history.svg";
 import deleteIcon from "@/icons/delete.svg";
 import closeIcon from "@/icons/close.svg";
+import clearIcon from "@/icons/clear.svg";
 import refreshIcon from "@/icons/refresh.svg";
 import loadResultIcon from "@/icons/load_result.svg";
 import {
@@ -30,6 +31,7 @@ type Props = {
   targetLang: TargetLang;
   historyView: HistoryView;
   historySortOrder: HistorySortOrder;
+  historySearchQuery: string;
   articleHistory: ArticleHistoryItemResponse[];
   vocabHistory: VocabHistoryItemResponse[];
   grammarHistory: GrammarHistoryItemResponse[];
@@ -43,6 +45,9 @@ type Props = {
   onRefresh: () => void;
   onViewChange: (view: HistoryView) => void;
   onSortOrderChange: (order: HistorySortOrder) => void;
+  onSearchQueryChange: (query: string) => void;
+  onSearch: (query: string) => void;
+  onClearSearch: () => void;
 };
 
 export function HistoryPanel({
@@ -50,6 +55,7 @@ export function HistoryPanel({
   targetLang,
   historyView,
   historySortOrder,
+  historySearchQuery,
   articleHistory,
   vocabHistory,
   grammarHistory,
@@ -63,9 +69,13 @@ export function HistoryPanel({
   onRefresh,
   onViewChange,
   onSortOrderChange,
+  onSearchQueryChange,
+  onSearch,
+  onClearSearch,
 }: Props) {
   const tUI = UI_STRINGS[targetLang];
   const visibleCount = getVisibleCount(historyView, articleHistory, vocabHistory, grammarHistory);
+  const hasSearchQuery = historySearchQuery.trim().length > 0;
 
   return (
     <div
@@ -140,6 +150,47 @@ export function HistoryPanel({
               onClick={() => onViewChange("grammar")}
             />
           </div>
+          <form
+            style={searchRow}
+            onSubmit={(e) => {
+              e.preventDefault();
+              onSearch(historySearchQuery);
+            }}
+          >
+            <input
+              style={searchInput}
+              value={historySearchQuery}
+              onChange={(e) => {
+                const nextQuery = e.target.value;
+                onSearchQueryChange(nextQuery);
+                if (!nextQuery.trim()) {
+                  onClearSearch();
+                }
+              }}
+              placeholder={tUI.historyPanel.searchPlaceholder}
+              aria-label={tUI.historyPanel.searchPlaceholder}
+            />
+            {hasSearchQuery ? (
+              <button
+                className="btn-interactive"
+                style={clearSearchBtn}
+                onClick={onClearSearch}
+                type="button"
+                title={tUI.historyPanel.clearSearch}
+                aria-label={tUI.historyPanel.clearSearch}
+              >
+                <span style={maskedIconStyle(clearIcon.src)} aria-hidden="true" />
+              </button>
+            ) : null}
+            <button
+              className="btn-interactive"
+              style={searchBtn}
+              type="submit"
+              disabled={loading || !hasSearchQuery}
+            >
+              {tUI.historyPanel.search}
+            </button>
+          </form>
           <div style={sortControls}>
             <span style={toolbarLabel}>{tUI.historyPanel.sortByTime}</span>
             <button
@@ -495,12 +546,13 @@ const header: React.CSSProperties = {
 const titleBlock: React.CSSProperties = {
   display: "flex",
   flexDirection: "column",
+  maxWidth: 180,
 };
 
 const titleRow: React.CSSProperties = {
   display: "flex",
   alignItems: "center",
-  gap: 10,
+  gap: 8,
 };
 
 const headerActions: React.CSSProperties = {
@@ -509,8 +561,8 @@ const headerActions: React.CSSProperties = {
 };
 
 const headerIcon: React.CSSProperties = {
-  width: 24,
-  height: 24,
+  width: 18,
+  height: 18,
   display: "inline-block",
   backgroundColor: "var(--text)",
   WebkitMaskRepeat: "no-repeat",
@@ -524,12 +576,15 @@ const headerIcon: React.CSSProperties = {
 
 const title: React.CSSProperties = {
   fontWeight: 700,
-  fontSize: 24,
+  fontSize: 18,
+  lineHeight: 1.2,
 };
 
 const subtitle: React.CSSProperties = {
   opacity: 0.7,
-  marginTop: 4,
+  marginTop: 2,
+  fontSize: 12,
+  lineHeight: 1.25,
 };
 
 const controlsRow: React.CSSProperties = {
@@ -559,6 +614,27 @@ const sortControls: React.CSSProperties = {
   gap: 8,
 };
 
+const searchRow: React.CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  gap: 8,
+  flex: "1 1 280px",
+  maxWidth: 420,
+  minWidth: 240,
+};
+
+const searchInput: React.CSSProperties = {
+  flex: 1,
+  minWidth: 0,
+  height: 38,
+  border: "1px solid var(--border)",
+  borderRadius: 8,
+  background: "var(--surface)",
+  color: "var(--text)",
+  padding: "0 12px",
+  font: "inherit",
+};
+
 const tab: React.CSSProperties = {
   ...buttonSm,
   ...buttonSecondary,
@@ -567,6 +643,17 @@ const tab: React.CSSProperties = {
 const activeTab: React.CSSProperties = {
   ...buttonSm,
   ...buttonPrimary,
+};
+
+const searchBtn: React.CSSProperties = {
+  ...buttonSm,
+  ...buttonPrimary,
+};
+
+const clearSearchBtn: React.CSSProperties = {
+  ...iconButtonSm,
+  ...buttonSecondary,
+  flexShrink: 0,
 };
 
 const content: React.CSSProperties = {

@@ -109,6 +109,16 @@ export async function getArticleHistory(): Promise<ArticleHistoryItemResponse[]>
   return (await resp.json()) as ArticleHistoryItemResponse[];
 }
 
+export async function searchArticleHistory(query: string): Promise<ArticleHistoryItemResponse[]> {
+  const BASE_URL = getBackendBaseUrl();
+  const params = new URLSearchParams({ q: query });
+
+  const resp = await fetch(BASE_URL + `/api/history/articles/search?${params.toString()}`);
+
+  if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+  return (await resp.json()) as ArticleHistoryItemResponse[];
+}
+
 export async function getVocabHistoryItems(): Promise<VocabHistoryItemResponse[]> {
   const BASE_URL = getBackendBaseUrl();
 
@@ -118,10 +128,30 @@ export async function getVocabHistoryItems(): Promise<VocabHistoryItemResponse[]
   return (await resp.json()) as VocabHistoryItemResponse[];
 }
 
+export async function searchVocabHistoryItems(query: string): Promise<VocabHistoryItemResponse[]> {
+  const BASE_URL = getBackendBaseUrl();
+  const params = new URLSearchParams({ q: query });
+
+  const resp = await fetch(BASE_URL + `/api/history/vocab/search?${params.toString()}`);
+
+  if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+  return (await resp.json()) as VocabHistoryItemResponse[];
+}
+
 export async function getGrammarHistoryItems(): Promise<GrammarHistoryItemResponse[]> {
   const BASE_URL = getBackendBaseUrl();
 
   const resp = await fetch(BASE_URL + "/api/history/grammar");
+
+  if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+  return (await resp.json()) as GrammarHistoryItemResponse[];
+}
+
+export async function searchGrammarHistoryItems(query: string): Promise<GrammarHistoryItemResponse[]> {
+  const BASE_URL = getBackendBaseUrl();
+  const params = new URLSearchParams({ q: query });
+
+  const resp = await fetch(BASE_URL + `/api/history/grammar/search?${params.toString()}`);
 
   if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
   return (await resp.json()) as GrammarHistoryItemResponse[];

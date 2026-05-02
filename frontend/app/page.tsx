@@ -244,6 +244,7 @@ export default function Page() {
           targetLang={targetLang}
           historyView={historyFeature.historyView}
           historySortOrder={historyFeature.historySortOrder}
+          historySearchQuery={historyFeature.historySearchQuery}
           articleHistory={historyFeature.articleHistoryList}
           vocabHistory={historyFeature.vocabHistoryList}
           grammarHistory={historyFeature.grammarHistoryList}
@@ -257,6 +258,9 @@ export default function Page() {
           onRefresh={historyFeature.refreshCurrentHistory}
           onViewChange={historyFeature.changeHistoryView}
           onSortOrderChange={historyFeature.setHistorySortOrder}
+          onSearchQueryChange={historyFeature.setHistorySearchQuery}
+          onSearch={historyFeature.searchCurrentHistory}
+          onClearSearch={historyFeature.clearHistorySearch}
         />
       </div>
     </main>
