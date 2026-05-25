@@ -30,4 +30,5 @@ def translate_sentence(sentence: str, target_lang: str) -> TranslateSentenceResp
         system_prompt=system_prompt,
         user_prompt=user_prompt,
         response_model=TranslateSentenceResponse,
+        service_name="translate",
     )

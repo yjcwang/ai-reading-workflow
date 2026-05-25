@@ -38,6 +38,7 @@ def generate_title_from_text(*, text: str, level: str) -> str:
         system_prompt=system_prompt,
         user_prompt=user_prompt,
         response_model=GenerateTitleResponse,
+        service_name="title_generator",
     )
 
     return response.title.strip()

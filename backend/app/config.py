@@ -20,6 +20,11 @@ class Settings(BaseSettings):
     DEEPSEEK_API_KEY: str | None = None
     DEEPSEEK_MODEL: str = "deepseek-chat"
 
+    LANGFUSE_PUBLIC_KEY: str | None = None
+    LANGFUSE_SECRET_KEY: str | None = None
+    LANGFUSE_HOST: str | None = None
+    LANGFUSE_BASE_URL: str | None = None
+
     DATABASE_URL: str | None = None
     SQLITE_DB_PATH: str = "app/app.db"
     ALLOWED_ORIGINS: str = "http://localhost:3000,http://127.0.0.1:3000"

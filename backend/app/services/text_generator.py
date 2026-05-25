@@ -53,6 +53,7 @@ def generate_text(req: GenerateTextRequest) -> GenerateTextResponse:
         system_prompt=system_prompt,
         user_prompt=user_prompt,
         response_model=GenerateTextResponse,
+        service_name="generate_text",
     )
 
 

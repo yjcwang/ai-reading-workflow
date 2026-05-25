@@ -41,4 +41,5 @@ def analyze_text(req: AnalyzeRequest) -> AnalyzeResponse:
         system_prompt=system_prompt,
         user_prompt=user_prompt,
         response_model=AnalyzeResponse,
+        service_name="analyze",
     )

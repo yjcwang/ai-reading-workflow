@@ -8,6 +8,7 @@ from app.api.routes import router
 from app.db.init_db import init_db
 from app.db.session import DATABASE_URL
 from app.models import ArticleHistory, GrammarHistory, VocabHistory  # noqa: F401
+from app.observability.langfuse_client import flush_langfuse
 
 logger = logging.getLogger(__name__)
 
@@ -24,6 +25,11 @@ def on_startup() -> None:
     logger.warning("Database URL: %s", DATABASE_URL)
     init_db()
     logger.warning("Startup complete")
+
+
+@app.on_event("shutdown")
+def on_shutdown() -> None:
+    flush_langfuse()
 
 
 app.add_middleware(

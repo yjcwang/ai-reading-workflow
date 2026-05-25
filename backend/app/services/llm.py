@@ -5,6 +5,7 @@ import httpx
 from typing import Any
 from google import genai
 from google.genai import types
+import time
 from typing import Type, TypeVar, Any, Callable, Dict
 from pydantic import BaseModel, ValidationError
 import logging
@@ -16,6 +17,7 @@ from tenacity import (
     before_sleep_log
 )
 from app.services.utils import extract_json
+from app.observability.langfuse_client import record_llm_call
 
 def _mock_json_output(prompt: str) -> str:
 
@@ -167,7 +169,6 @@ def _call_openai(
 
     return content
 
-# TODO: this is not yet tested
 def _call_gemini(
     *,
     system_prompt: str,
@@ -253,6 +254,21 @@ LLM_STRATEGY_MAP: Dict[str, Callable] = {
     "deepseek": _call_deepseek,
 }
 
+
+def _model_name_for_provider(provider: str) -> str:
+    """Return the configured model name used for observability records."""
+    if provider == "mock":
+        return "mock"
+    if provider == "ollama":
+        return settings.OLLAMA_MODEL
+    if provider == "openai":
+        return settings.OPENAI_MODEL
+    if provider == "gemini":
+        return settings.GEMINI_MODEL
+    if provider == "deepseek":
+        return settings.DEEPSEEK_MODEL
+    return provider
+
 @retry(
     # Case1: Network error
     # Case2: Pydantic Validation error
@@ -269,6 +285,7 @@ def call_llm_with_retry(
     system_prompt: str,
     user_prompt: str,
     response_model: Type[T],
+    service_name: str | None = None,
 ) -> T:
     
     schema = None
@@ -287,34 +304,77 @@ def call_llm_with_retry(
             f"Supported providers are: [{valid_providers}]"
         )
 
-    # Engage llm caller function
-    if provider == "mock":
-        raw_content = handler(system_prompt)
-    
-    else: raw_content = handler(
-        system_prompt=system_prompt,
-        user_prompt=user_prompt,
-        response_schema=schema,
-    )
+    model_name = _model_name_for_provider(provider)
+    input_chars = len((system_prompt or "") + (user_prompt or ""))
+    input_tokens_est = max(1, input_chars // 4)
+    raw_content = None
+    llm_duration_ms = None
+    success = False
+    error_type = None
+    error_message = None
 
-    print("=== RAW FROM LLM START ===")
-    print(raw_content)
-    print("=== RAW FROM LLM END ===")
-
-    # Try extract JSON
+    # Engage llm caller function and measure only the provider request duration.
+    start = time.monotonic()
     try:
-        data = extract_json(raw_content)
-    except Exception as e:
-        logger.error(f"Failed to extract JSON from LLM response: {raw_content}")
-        raise ValueError("Invalid JSON format") from e
+        if provider == "mock":
+            raw_content = handler(system_prompt)
+        else:
+            raw_content = handler(
+                system_prompt=system_prompt,
+                user_prompt=user_prompt,
+                response_schema=schema,
+            )
+        llm_duration_ms = int((time.monotonic() - start) * 1000)
 
-    # Pydantic Validation
-    try:
-        validated_data = response_model(**data)
+        print("=== RAW FROM LLM START ===")
+        print(raw_content)
+        print("=== RAW FROM LLM END ===")
+
+        # Parse and validate after timing so llm_duration_ms stays provider-specific.
+        try:
+            data = extract_json(raw_content)
+        except Exception as e:
+            logger.error(f"Failed to extract JSON from LLM response: {raw_content}")
+            raise ValueError("Invalid JSON format") from e
+
+        try:
+            validated_data = response_model(**data)
+        except ValidationError as e:
+            logger.error(
+                f"LLM output schema mismatch. Provider: {provider}, Error: {e}"
+            )
+            raise
+
+        success = True
         return validated_data
-    except ValidationError as e:
-        logger.error(f"LLM output schema mismatch. Provider: {provider}, Error: {e}")
-        raise e
+    except Exception as e:
+        if llm_duration_ms is None:
+            llm_duration_ms = int((time.monotonic() - start) * 1000)
+        error_type = type(e).__name__
+        error_message = str(e)
+        raise
+    finally:
+        output_chars = len(str(raw_content or ""))
+        output_tokens_est = max(1, output_chars // 4) if output_chars else 0
+        try:
+            record_llm_call(
+                service_name,
+                provider,
+                model_name,
+                system_prompt,
+                user_prompt,
+                raw_content if success else None,
+                input_tokens=input_tokens_est,
+                output_tokens=output_tokens_est,
+                cost=None,
+                llm_duration_ms=llm_duration_ms,
+                success=success,
+                error_type=error_type,
+                error_message=error_message,
+                raw_content=raw_content,
+            )
+        except Exception:
+            pass
 
 
 def call_llm_json(
@@ -323,10 +383,12 @@ def call_llm_json(
     system_prompt: str,
     user_prompt: str,
     response_model: Type[T],
+    service_name: str | None = None,
 ) -> T:
     return call_llm_with_retry(
         provider=provider,
         system_prompt=system_prompt,
         user_prompt=user_prompt,
-        response_model=response_model
+        response_model=response_model,
+        service_name=service_name,
     )

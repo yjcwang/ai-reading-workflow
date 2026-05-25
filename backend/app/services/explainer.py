@@ -46,6 +46,7 @@ def explain_word(req: ExplainRequest) -> ExplainWordResponse:
         system_prompt=system_prompt,
         user_prompt=user_prompt,
         response_model=ExplainWordResponse,
+        service_name="explain",
     )
 
 # explain with scentence mode is not strictly explainer, it is composition of translator and analyzer
