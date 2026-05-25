@@ -167,8 +167,17 @@ Saved history was only shown as article-level records, while the database alread
 - Keep each vocab/grammar item linked back to its source article through `result_id`
 - Defer search, deduplication, semantic search, and vector database work to later iterations
 
+## 2026-05-25 Add Langfuse Observability for LLM Calls
 
+### Context
+The backend needed Langfuse visibility for LLM provider calls, latency, outputs, token estimates, and provider failures.
 
+### Decision
+- Add a Langfuse client helper using `get_client()` and SDK env vars, with local `.env` support.
+- Wrap only the real LLM provider call in a Langfuse generation.
+- Record output, token estimates, provider/model metadata, duration, and provider success/failure.
+- Keep JSON extraction and Pydantic validation outside the generation.
 
-
+### Consequences
+- Langfuse latency now reflects actual provider time, and generation traces stay focused on provider calls.
 
