@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import historyIcon from "@/icons/history.svg";
 import deleteIcon from "@/icons/delete.svg";
 import closeIcon from "@/icons/close.svg";
@@ -353,6 +353,7 @@ function VocabList({
   onLoad: (resultId: string) => void;
 }) {
   const tUI = UI_STRINGS[targetLang];
+  const [activeLoadKey, setActiveLoadKey] = useState<string | null>(null);
 
   if (vocabHistory.length === 0) {
     return (
@@ -364,31 +365,37 @@ function VocabList({
   }
 
   return (
-    <ul style={list}>
+    <ul style={compactList}>
       {vocabHistory.map((item) => (
-        <li key={item.id} style={card}>
-          <div style={cardTop}>
-            <div style={cardTitle}>{item.expression}</div>
-            {item.reading ? <div style={reading}>{item.reading}</div> : null}
-            <div style={preview}>{item.definition}</div>
+        <li
+          key={item.id}
+          style={compactItem}
+          onMouseEnter={() => setActiveLoadKey(item.id)}
+          onMouseLeave={() => setActiveLoadKey((current) => (current === item.id ? null : current))}
+        >
+          <div style={compactTitle}>
+            {item.expression} {item.reading ? <span style={compactMuted}>({item.reading})</span> : null}
           </div>
+          <div style={compactDefinition}>{item.definition}</div>
           {item.example ? (
-            <div style={example}>{tUI.historyPanel.exampleLabel}: {item.example}</div>
+            <div style={compactExample}>{item.example}</div>
           ) : null}
-          <SourceBlock item={item} targetLang={targetLang} />
-          <div style={cardActions}>
-            <button
-              className="btn-interactive"
-              style={loadResultBtn}
-              onClick={() => onLoad(item.result_id)}
-              disabled={loadingResultId === item.result_id}
-            >
-              <span style={maskedIconStyle(loadResultIcon.src, 18)} aria-hidden="true" />
-              {loadingResultId === item.result_id
-                ? tUI.historyPanel.loadLoading
-                : tUI.historyPanel.loadArticle}
-            </button>
-          </div>
+          <CompactSourceLine item={item} targetLang={targetLang} />
+          <button
+            className="btn-interactive"
+            style={{
+              ...compactLoadBtn,
+              ...(activeLoadKey === item.id ? compactLoadBtnVisible : compactLoadBtnHidden),
+            }}
+            onClick={() => onLoad(item.result_id)}
+            disabled={loadingResultId === item.result_id}
+            title={tUI.historyPanel.loadArticle}
+            aria-label={tUI.historyPanel.loadArticle}
+            onFocus={() => setActiveLoadKey(item.id)}
+            onBlur={() => setActiveLoadKey((current) => (current === item.id ? null : current))}
+          >
+            <span style={maskedIconStyle(loadResultIcon.src, 15)} aria-hidden="true" />
+          </button>
         </li>
       ))}
     </ul>
@@ -407,6 +414,7 @@ function GrammarList({
   onLoad: (resultId: string) => void;
 }) {
   const tUI = UI_STRINGS[targetLang];
+  const [activeLoadKey, setActiveLoadKey] = useState<string | null>(null);
 
   if (grammarHistory.length === 0) {
     return (
@@ -418,37 +426,42 @@ function GrammarList({
   }
 
   return (
-    <ul style={list}>
+    <ul style={compactList}>
       {grammarHistory.map((item) => (
-        <li key={item.id} style={card}>
-          <div style={cardTop}>
-            <div style={cardTitle}>{item.expression}</div>
-            <div style={preview}>{item.definition}</div>
-          </div>
+        <li
+          key={item.id}
+          style={compactItem}
+          onMouseEnter={() => setActiveLoadKey(item.id)}
+          onMouseLeave={() => setActiveLoadKey((current) => (current === item.id ? null : current))}
+        >
+          <div style={compactTitle}>{item.expression}</div>
+          <div style={compactDefinition}>{item.definition}</div>
           {item.example ? (
-            <div style={example}>{tUI.historyPanel.exampleLabel}: {item.example}</div>
+            <div style={compactExample}>{item.example}</div>
           ) : null}
-          <SourceBlock item={item} targetLang={targetLang} />
-          <div style={cardActions}>
-            <button
-              className="btn-interactive"
-              style={loadResultBtn}
-              onClick={() => onLoad(item.result_id)}
-              disabled={loadingResultId === item.result_id}
-            >
-              <span style={maskedIconStyle(loadResultIcon.src, 18)} aria-hidden="true" />
-              {loadingResultId === item.result_id
-                ? tUI.historyPanel.loadLoading
-                : tUI.historyPanel.loadArticle}
-            </button>
-          </div>
+          <CompactSourceLine item={item} targetLang={targetLang} />
+          <button
+            className="btn-interactive"
+            style={{
+              ...compactLoadBtn,
+              ...(activeLoadKey === item.id ? compactLoadBtnVisible : compactLoadBtnHidden),
+            }}
+            onClick={() => onLoad(item.result_id)}
+            disabled={loadingResultId === item.result_id}
+            title={tUI.historyPanel.loadArticle}
+            aria-label={tUI.historyPanel.loadArticle}
+            onFocus={() => setActiveLoadKey(item.id)}
+            onBlur={() => setActiveLoadKey((current) => (current === item.id ? null : current))}
+          >
+            <span style={maskedIconStyle(loadResultIcon.src, 15)} aria-hidden="true" />
+          </button>
         </li>
       ))}
     </ul>
   );
 }
 
-function SourceBlock({
+function CompactSourceLine({
   item,
   targetLang,
 }: {
@@ -458,11 +471,9 @@ function SourceBlock({
   const tUI = UI_STRINGS[targetLang];
 
   return (
-    <div style={source}>
-      <div style={sourceTitle}>
-        {tUI.historyPanel.sourceLabel}: {item.source_title?.trim() || item.source_text_preview}
-      </div>
-      <div style={meta}>{item.source_level} · {formatDate(item.source_created_at)}</div>
+    <div style={compactSource}>
+      {tUI.historyPanel.sourceLabel}: {item.source_title?.trim() || item.source_text_preview} ·{" "}
+      {item.source_level} · {formatShortDate(item.source_created_at)}
     </div>
   );
 }
@@ -488,6 +499,12 @@ function formatDate(value: string): string {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;
   return date.toLocaleString();
+}
+
+function formatShortDate(value: string): string {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return date.toLocaleDateString();
 }
 
 const overlay: React.CSSProperties = {
@@ -670,6 +687,87 @@ const list: React.CSSProperties = {
   gap: 14,
 };
 
+const compactList: React.CSSProperties = {
+  listStyle: "none",
+  margin: 0,
+  padding: 0,
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fill, minmax(360px, 1fr))",
+  gap: 10,
+};
+
+const compactItem: React.CSSProperties = {
+  border: "1px solid var(--border)",
+  background: "var(--surface)",
+  borderRadius: 14,
+  padding: 10,
+  paddingRight: 48,
+  position: "relative",
+  minHeight: 112,
+  display: "flex",
+  flexDirection: "column",
+  gap: 5,
+};
+
+const compactTitle: React.CSSProperties = {
+  fontWeight: 700,
+  fontSize: 15,
+  lineHeight: 1.4,
+};
+
+const compactMuted: React.CSSProperties = { opacity: 0.8, fontSize: 13 };
+
+const compactDefinition: React.CSSProperties = {
+  fontSize: 13,
+  lineHeight: 1.5,
+  opacity: 0.8,
+};
+
+const compactLine: React.CSSProperties = {
+  fontSize: 12,
+  lineHeight: 1.5,
+  opacity: 0.65,
+  overflow: "hidden",
+  textOverflow: "ellipsis",
+  whiteSpace: "nowrap",
+};
+
+const compactExample: React.CSSProperties = {
+  fontSize: 13,
+  lineHeight: 1.5,
+  opacity: 0.85,
+  fontStyle: "italic",
+  overflow: "hidden",
+  textOverflow: "ellipsis",
+  whiteSpace: "nowrap",
+};
+
+const compactSource: React.CSSProperties = {
+  ...compactLine,
+  marginTop: "auto",
+  paddingTop: 5,
+  borderTop: "1px solid var(--border)",
+};
+
+const compactLoadBtn: React.CSSProperties = {
+  ...iconButtonSm,
+  ...buttonGhost,
+  position: "absolute",
+  top: 10,
+  right: 10,
+  transition: "opacity 160ms ease",
+};
+
+const compactLoadBtnHidden: React.CSSProperties = {
+  opacity: 0,
+  pointerEvents: "none",
+};
+
+const compactLoadBtnVisible: React.CSSProperties = {
+  opacity: 1,
+  pointerEvents: "auto",
+};
+
 const card: React.CSSProperties = {
   border: "1px solid var(--border)",
   background: "var(--surface)",
@@ -692,11 +790,6 @@ const cardTitle: React.CSSProperties = {
   lineHeight: 1.35,
 };
 
-const reading: React.CSSProperties = {
-  fontSize: 13,
-  opacity: 0.68,
-};
-
 const meta: React.CSSProperties = {
   fontSize: 13,
   opacity: 0.7,
@@ -707,25 +800,6 @@ const preview: React.CSSProperties = {
   lineHeight: 1.5,
   opacity: 0.85,
   flex: 1,
-};
-
-const example: React.CSSProperties = {
-  fontSize: 13,
-  lineHeight: 1.45,
-  opacity: 0.78,
-};
-
-const source: React.CSSProperties = {
-  borderTop: "1px solid var(--border)",
-  paddingTop: 10,
-  display: "flex",
-  flexDirection: "column",
-  gap: 4,
-};
-
-const sourceTitle: React.CSSProperties = {
-  fontSize: 13,
-  lineHeight: 1.4,
 };
 
 const cardActions: React.CSSProperties = {
