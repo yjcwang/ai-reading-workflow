@@ -23,6 +23,7 @@ $backendEnvPath = Join-Path $backendDir ".env"
 $backendEnvExamplePath = Join-Path $backendDir ".env.example"
 $frontendEnvPath = Join-Path $frontendDir ".env"
 $frontendEnvLocalPath = Join-Path $frontendDir ".env.local"
+$useCondaJpread = $env:CONDA_DEFAULT_ENV -eq 'jpread'
 
 function Write-Step([string]$Message) {
     Write-Host "==> $Message" -ForegroundColor Cyan
@@ -71,6 +72,11 @@ function Ensure-FrontendEnv() {
 }
 
 function Ensure-BackendVenv() {
+    if ($useCondaJpread) {
+        Write-Step "Using conda env jpread for backend; skipping .venv creation"
+        return
+    }
+
     if (Test-Path $backendVenvPython) {
         return
     }
@@ -81,7 +87,12 @@ function Ensure-BackendVenv() {
 
 function Install-BackendDeps() {
     Write-Step "Installing backend dependencies"
-    & $backendVenvPython -m pip install -r (Join-Path $projectRoot "requirements.txt")
+    if ($useCondaJpread) {
+        & python -m pip install -r (Join-Path $projectRoot "requirements.txt")
+    }
+    else {
+        & $backendVenvPython -m pip install -r (Join-Path $projectRoot "requirements.txt")
+    }
 }
 
 function Install-FrontendDeps() {
@@ -91,7 +102,13 @@ function Install-FrontendDeps() {
 
 function Start-Backend() {
     Write-Step "Starting backend at http://127.0.0.1:8000"
-    $command = "Set-Location '$backendDir'; & '.\.venv\Scripts\Activate.ps1'; uvicorn app.main:app --reload"
+    if ($useCondaJpread) {
+        $command = "Set-Location '$backendDir'; python -m uvicorn app.main:app --reload"
+    }
+    else {
+        $command = "Set-Location '$backendDir'; & '.\.venv\Scripts\Activate.ps1'; uvicorn app.main:app --reload"
+    }
+
     Start-Process powershell -WorkingDirectory $backendDir -ArgumentList @(
         "-NoExit",
         "-ExecutionPolicy", "Bypass",

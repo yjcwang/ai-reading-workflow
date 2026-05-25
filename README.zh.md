@@ -139,6 +139,17 @@ ai-reading-workflow/
 
 ### Backend
 
+如果你想使用 `jpread` conda 环境：
+
+```bash
+conda activate jpread
+cd backend
+pip install -r ../requirements.txt
+uvicorn app.main:app --reload
+```
+
+如果你想使用本地虚拟环境：
+
 ```bash
 cd backend
 python -m venv .venv
