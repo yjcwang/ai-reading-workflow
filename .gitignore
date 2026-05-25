@@ -18,3 +18,6 @@ conda-meta/
 
 # OS
 .DS_Store
+
+# Demo video assets
+demo-video/
