@@ -1,5 +1,7 @@
 import logging
 import os
+from contextlib import nullcontext
+from contextlib import AbstractContextManager
 from typing import Any
 
 from langfuse import get_client
@@ -26,64 +28,37 @@ _configure_langfuse_environment()
 langfuse = get_client()
 
 
-def record_llm_call(
+def start_llm_generation(
+    *,
     service_name: str | None,
     provider: str | None,
     model: str | None,
     system_prompt: str | None,
     user_prompt: str | None,
-    response: Any | None,
-    *,
-    input_tokens: int | None = None,
-    output_tokens: int | None = None,
-    cost: float | None = None,
-    llm_duration_ms: int | None = None,
-    success: bool = True,
-    error_type: str | None = None,
-    error_message: str | None = None,
-    raw_content: Any | None = None,
-) -> None:
-    """Record an LLM call to Langfuse with basic metadata."""
-
+) -> AbstractContextManager[Any | None]:
+    """Create a Langfuse generation that wraps the provider request."""
     if not settings.LANGFUSE_PUBLIC_KEY:
-        return
+        return nullcontext(None)
 
-    metadata = {
-        "service": service_name or "unknown",
-        "provider": provider or "unknown",
-        "success": success,
-        "error_type": error_type,
-        "error_message": error_message,
-        "llm_duration_ms": llm_duration_ms,
-        "input_tokens_estimated": True,
-    }
-
-    try:
-        with langfuse.start_as_current_observation(
-            name=f"llm.{service_name or 'unknown'}",
-            as_type="generation",
-            input={
-                "service": service_name,
-                "provider": provider,
-                "model": model,
-                "system_prompt": (system_prompt or "")[:2000],
-                "user_prompt": (user_prompt or "")[:2000],
-            },
-            output=(str(response) if response is not None else "")[:4000],
-            metadata=metadata,
-            model=model or provider,
-            usage_details={
-                "input": int(input_tokens or 0),
-                "output": int(output_tokens or 0),
-            },
-            cost_details={"total_cost": float(cost)} if cost is not None else None,
-        ) as generation:
-            if raw_content is not None and response is None:
-                generation.update(output=str(raw_content)[:4000])
-    except Exception as exc:
-        logger.warning(
-            "[Langfuse] failed to record LLM call: %s", exc, exc_info=True
-        )
+    return langfuse.start_as_current_observation(
+        name=f"llm.{service_name or 'unknown'}",
+        as_type="generation",
+        input={
+            "service": service_name,
+            "provider": provider,
+            "model": model,
+            "system_prompt": (system_prompt or "")[:2000],
+            "user_prompt": (user_prompt or "")[:2000],
+        },
+        metadata={
+            "service": service_name or "unknown",
+            "provider": provider or "unknown",
+            "model": model or provider or "unknown",
+            "success": None,
+            "input_tokens_estimated": True,
+        },
+        model=model or provider,
+    )
 
 
 def flush_langfuse() -> None:
@@ -91,5 +66,5 @@ def flush_langfuse() -> None:
         if not settings.LANGFUSE_PUBLIC_KEY:
             return
         langfuse.flush()
-    except Exception:
-        pass
+    except Exception as exc:
+        logger.warning("[Langfuse] failed to flush: %s", exc, exc_info=True)

@@ -17,7 +17,7 @@ from tenacity import (
     before_sleep_log
 )
 from app.services.utils import extract_json
-from app.observability.langfuse_client import record_llm_call
+from app.observability.langfuse_client import start_llm_generation
 
 def _mock_json_output(prompt: str) -> str:
 
@@ -269,6 +269,17 @@ def _model_name_for_provider(provider: str) -> str:
         return settings.DEEPSEEK_MODEL
     return provider
 
+
+def _update_generation(generation: Any | None, **kwargs: Any) -> None:
+    """Update Langfuse without letting observability failures break LLM calls."""
+    if generation is None:
+        return
+    try:
+        generation.update(**kwargs)
+    except Exception as exc:
+        logger.warning("[Langfuse] failed to update generation: %s", exc, exc_info=True)
+
+
 @retry(
     # Case1: Network error
     # Case2: Pydantic Validation error
@@ -308,73 +319,85 @@ def call_llm_with_retry(
     input_chars = len((system_prompt or "") + (user_prompt or ""))
     input_tokens_est = max(1, input_chars // 4)
     raw_content = None
-    llm_duration_ms = None
-    success = False
-    error_type = None
-    error_message = None
 
-    # Engage llm caller function and measure only the provider request duration.
+    # The Langfuse generation wraps only the provider request and response wait.
     start = time.monotonic()
-    try:
-        if provider == "mock":
-            raw_content = handler(system_prompt)
-        else:
-            raw_content = handler(
-                system_prompt=system_prompt,
-                user_prompt=user_prompt,
-                response_schema=schema,
-            )
-        llm_duration_ms = int((time.monotonic() - start) * 1000)
-
-        print("=== RAW FROM LLM START ===")
-        print(raw_content)
-        print("=== RAW FROM LLM END ===")
-
-        # Parse and validate after timing so llm_duration_ms stays provider-specific.
+    with start_llm_generation(
+        service_name=service_name,
+        provider=provider,
+        model=model_name,
+        system_prompt=system_prompt,
+        user_prompt=user_prompt,
+    ) as generation:
         try:
-            data = extract_json(raw_content)
+            if provider == "mock":
+                raw_content = handler(system_prompt)
+            else:
+                raw_content = handler(
+                    system_prompt=system_prompt,
+                    user_prompt=user_prompt,
+                    response_schema=schema,
+                )
         except Exception as e:
-            logger.error(f"Failed to extract JSON from LLM response: {raw_content}")
-            raise ValueError("Invalid JSON format") from e
-
-        try:
-            validated_data = response_model(**data)
-        except ValidationError as e:
-            logger.error(
-                f"LLM output schema mismatch. Provider: {provider}, Error: {e}"
+            duration_ms = int((time.monotonic() - start) * 1000)
+            _update_generation(
+                generation,
+                usage_details={
+                    "input": int(input_tokens_est),
+                    "output": 0,
+                },
+                metadata={
+                    "service": service_name or "unknown",
+                    "provider": provider,
+                    "model": model_name,
+                    "duration_ms": duration_ms,
+                    "success": False,
+                    "error_message": str(e),
+                    "input_tokens_estimated": True,
+                },
             )
             raise
 
-        success = True
-        return validated_data
-    except Exception as e:
-        if llm_duration_ms is None:
-            llm_duration_ms = int((time.monotonic() - start) * 1000)
-        error_type = type(e).__name__
-        error_message = str(e)
-        raise
-    finally:
+        duration_ms = int((time.monotonic() - start) * 1000)
         output_chars = len(str(raw_content or ""))
         output_tokens_est = max(1, output_chars // 4) if output_chars else 0
-        try:
-            record_llm_call(
-                service_name,
-                provider,
-                model_name,
-                system_prompt,
-                user_prompt,
-                raw_content if success else None,
-                input_tokens=input_tokens_est,
-                output_tokens=output_tokens_est,
-                cost=None,
-                llm_duration_ms=llm_duration_ms,
-                success=success,
-                error_type=error_type,
-                error_message=error_message,
-                raw_content=raw_content,
-            )
-        except Exception:
-            pass
+
+        _update_generation(
+            generation,
+            output=str(raw_content)[:4000],
+            usage_details={
+                "input": int(input_tokens_est),
+                "output": int(output_tokens_est),
+            },
+            metadata={
+                "service": service_name or "unknown",
+                "provider": provider,
+                "model": model_name,
+                "duration_ms": duration_ms,
+                "success": True,
+                "input_tokens_estimated": True,
+            },
+        )
+
+    print("=== RAW FROM LLM START ===")
+    print(raw_content)
+    print("=== RAW FROM LLM END ===")
+
+    try:
+        data = extract_json(raw_content)
+    except Exception as e:
+        logger.error(f"Failed to extract JSON from LLM response: {raw_content}")
+        raise ValueError("Invalid JSON format") from e
+
+    try:
+        validated_data = response_model(**data)
+    except ValidationError as e:
+        logger.error(
+            f"LLM output schema mismatch. Provider: {provider}, Error: {e}"
+        )
+        raise
+
+    return validated_data
 
 
 def call_llm_json(
