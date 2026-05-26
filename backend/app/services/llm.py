@@ -228,7 +228,7 @@ def _call_deepseek(
         full_system_prompt += f"\n\nReturn a JSON object that strictly follows this schema:\n{schema_str}"
 
     request_kwargs: dict[str, Any] = {
-        "model": "deepseek-chat",
+        "model": settings.DEEPSEEK_MODEL,
         "messages": [
             {"role": "system", "content": full_system_prompt},
             {"role": "user", "content": user_prompt},
