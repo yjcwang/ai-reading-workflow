@@ -167,7 +167,7 @@ Saved history was only shown as article-level records, while the database alread
 - Keep each vocab/grammar item linked back to its source article through `result_id`
 - Defer search, deduplication, semantic search, and vector database work to later iterations
 
-## 2026-05-25 Add Langfuse Observability for LLM Calls
+## 2026-05-25 Add Langfuse Observability for LLM Calls (Issue #25)
 
 ### Context
 The backend needed Langfuse visibility for LLM provider calls, latency, outputs, token estimates, and provider failures.
