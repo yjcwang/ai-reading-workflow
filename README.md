@@ -241,4 +241,4 @@ The codebase currently includes provider support for:
 
 - The project currently stores history locally in SQLite
 - A lightweight health endpoint and environment-based CORS configuration are included for deployment
-- Related implementation notes are available in [docs/architecture.md](docs/architecture.md) and [docs/decision_log.md](docs/decision_log.md)
+- Related implementation notes are available in [docs/decision_log.md](docs/decision_log.md)
