@@ -170,16 +170,18 @@ Saved history was only shown as article-level records, while the database alread
 ## 2026-05-25 Add Langfuse Observability for LLM Calls (Issue #25)
 
 ### Context
-The backend needed Langfuse visibility for LLM provider calls, latency, outputs, token estimates, and provider failures.
+The backend needed provider-level visibility for LLM calls without mixing observability with JSON extraction, schema validation, or API-level evaluation metrics.
 
 ### Decision
-- Add a Langfuse client helper using `get_client()` and SDK env vars, with local `.env` support.
-- Wrap only the real LLM provider call in a Langfuse generation.
-- Record output, token estimates, provider/model metadata, duration, and provider success/failure.
-- Keep JSON extraction and Pydantic validation outside the generation.
+- Wrap each LLM provider request in a Langfuse `generation` named by service, such as `llm.analyze`.
+- Record service name, provider, configured model, truncated system/user prompts, and truncated raw provider output.
+- Record provider-call duration in milliseconds.
+- Record estimated input/output token counts based on character length, marked with `input_tokens_estimated`.
+- Record success/failure state and provider error message when the provider call fails.
+- Flush Langfuse on FastAPI shutdown.
 
 ### Consequences
-- Langfuse latency now reflects actual provider time, and generation traces stay focused on provider calls.
+- Langfuse is used for LLM-call observability, while eval precision, recall, F1, and API-level latency stay in the local evaluation runner.
 
 ## 2026-05-27 Add Analyze API Evaluation Pipeline (Issue #24)
 

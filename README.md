@@ -78,24 +78,16 @@ AI-Powered Japanese Reading Workflow is a full-stack web application built aroun
 - LLM responses go through centralized extraction, validation, and retry handling in `backend/app/services/llm.py`
 - Provider switching is handled through a strategy map instead of feature-specific branching throughout the codebase
 
-### Analyze Evaluation
+### LLM Observability and Evaluation
 
-- The backend includes a lightweight evaluation runner for the analyze API using a custom N2 Japanese grammar and vocabulary benchmark dataset
-- The evaluation compares Gemini 3.5 Flash, Gemini 3.1 Flash Lite, DeepSeek V4 Pro, DeepSeek V4 Flash, and Ollama Qwen3 8B using precision, recall, F1, and latency
+- Langfuse records provider-call traces with service, provider, model, prompt/output previews, duration, estimated token usage, and success/failure metadata
+- A lightweight analyze evaluation runner compares multi models on a custom N2 grammar/vocabulary dataset using precision, recall, F1, and latency (report in backend\evals\reports)
 
 ### Modular Frontend and Backend Design
 
 - Frontend page orchestration stays in `frontend/app/page.tsx`
 - Async product flows are split into feature hooks such as `useAnalyzeFeature`, `useExplainFeature`, `useGenerateTextFeature`, `useExportPdf`, and `useSavedResultsFeature`
 - Backend responsibilities are split across API routes, services, repositories, models, and schemas
-
-### Explain Flow vs. Analysis Flow
-
-- `POST /api/analyze` focuses on extracting learnable vocabulary and grammar from a passage
-- `POST /api/explain` supports two different paths:
-- Word mode returns a focused explanation for the selected text
-- Sentence mode composes translation and full analysis for the selected sentence
-- This separation keeps the UX clearer and avoids overloading one endpoint with mixed responsibilities
 
 ### Persistence, History, and Export
 
@@ -113,10 +105,14 @@ ai-reading-workflow/
 │  │  ├─ api/            # FastAPI routes
 │  │  ├─ db/             # DB setup and session management
 │  │  ├─ models/         # SQLModel tables
+│  │  ├─ observability/  # Langfuse client and LLM tracing helpers
 │  │  ├─ repositories/   # Data access layer
 │  │  ├─ services/       # LLM, analysis, explanation, PDF, persistence
 │  │  ├─ schemas.py      # Request / response contracts
 │  │  └─ main.py         # FastAPI entry point
+│  ├─ evals/
+│  │  ├─ datasets/       # Analyze API evaluation datasets
+│  │  └─ runners/        # Local evaluation runners
 │  └─ tests/
 ├─ frontend/
 │  ├─ app/               # Next.js App Router
@@ -124,7 +120,6 @@ ai-reading-workflow/
 │  ├─ hooks/             # Feature hooks
 │  └─ lib/               # API client, i18n, helpers, types
 └─ docs/
-   ├─ architecture.md
    └─ decision_log.md
 ```
 
