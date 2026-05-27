@@ -1,6 +1,8 @@
 import argparse
 import json
+import os
 import sys
+from time import perf_counter
 from pathlib import Path
 from typing import Any
 from urllib.error import HTTPError, URLError
@@ -9,6 +11,17 @@ from urllib.request import Request, urlopen
 
 DEFAULT_API_URL = "http://127.0.0.1:8000/api/analyze"
 DEFAULT_DATASET = Path(__file__).resolve().parents[1] / "datasets" / "n2_eval_dataset.json"
+BACKEND_DIR = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(BACKEND_DIR))
+
+_cwd = Path.cwd()
+try:
+    os.chdir(BACKEND_DIR)
+    from app.config import settings  # noqa: E402
+finally:
+    os.chdir(_cwd)
+
+
 GRAMMAR_PREFIXES = (chr(0xFF5E), chr(0x301C), "~")
 
 
@@ -21,6 +34,19 @@ def load_dataset(dataset_path: Path) -> list[dict[str, Any]]:
         raise ValueError("Dataset must be a JSON array.")
 
     return data
+
+
+def get_analyzer_model() -> str:
+    provider = settings.LLM_PROVIDER_ANALYZER
+    if provider == "gemini":
+        return settings.GEMINI_MODEL
+    if provider == "openai":
+        return settings.OPENAI_MODEL
+    if provider == "ollama":
+        return settings.OLLAMA_MODEL
+    if provider == "deepseek":
+        return settings.DEEPSEEK_MODEL
+    return "mock"
 
 
 def post_analyze(api_url: str, text: str, level: str, target_lang: str, timeout: float) -> dict[str, Any]:
@@ -55,20 +81,20 @@ def unique_sorted(items: list[str]) -> list[str]:
     return sorted({item.strip() for item in items if item and item.strip()})
 
 
-def normalize_expressions(items: list[str]) -> list[str]:
+def normalize_grammar(items: list[str]) -> list[str]:
     return unique_sorted([normalize_grammar_expression(item) for item in items])
 
 
-def extract_grammar_expressions(response: dict[str, Any]) -> list[str]:
-    grammar_items = response.get("grammar", [])
-    if not isinstance(grammar_items, list):
+def extract_expressions(response: dict[str, Any], key: str) -> list[str]:
+    items = response.get(key, [])
+    if not isinstance(items, list):
         return []
 
-    expressions = []
-    for item in grammar_items:
+    values = []
+    for item in items:
         if isinstance(item, dict) and isinstance(item.get("expression"), str):
-            expressions.append(item["expression"])
-    return unique_sorted(expressions)
+            values.append(item["expression"])
+    return unique_sorted(values)
 
 
 def calculate_metrics(expected: list[str], actual: list[str]) -> dict[str, float | int]:
@@ -87,9 +113,20 @@ def calculate_metrics(expected: list[str], actual: list[str]) -> dict[str, float
     }
 
 
+def eval_list(expected: list[str], actual: list[str]) -> dict[str, Any]:
+    expected = unique_sorted(expected)
+    actual = unique_sorted(actual)
+    metrics = calculate_metrics(expected, actual)
+    return {
+        "expected": expected,
+        "actual_norm": actual,
+        "missing": sorted(set(expected) - set(actual)),
+        "extra": sorted(set(actual) - set(expected)),
+        **metrics,
+    }
+
+
 def evaluate_case(case: dict[str, Any], api_url: str, target_lang: str, timeout: float) -> dict[str, Any]:
-    expected_raw = unique_sorted(case.get("expected_grammar", []))
-    expected_normalized = normalize_expressions(expected_raw)
     response = post_analyze(
         api_url=api_url,
         text=case["text"],
@@ -97,43 +134,44 @@ def evaluate_case(case: dict[str, Any], api_url: str, target_lang: str, timeout:
         target_lang=target_lang,
         timeout=timeout,
     )
-    actual_raw = extract_grammar_expressions(response)
-    actual_normalized = normalize_expressions(actual_raw)
-    metrics = calculate_metrics(expected_normalized, actual_normalized)
 
     return {
         "id": case["id"],
-        "expected_grammar": expected_raw,
-        "actual_grammar": actual_raw,
-        "expected_normalized": expected_normalized,
-        "actual_normalized": actual_normalized,
-        "match": expected_normalized == actual_normalized,
-        "missing": sorted(set(expected_normalized) - set(actual_normalized)),
-        "extra": sorted(set(actual_normalized) - set(expected_normalized)),
-        **metrics,
+        "grammar": eval_list(
+            case.get("expected_grammar", []),
+            normalize_grammar(extract_expressions(response, "grammar")),
+        ),
+        "vocab": eval_list(
+            case.get("expected_vocab", []),
+            extract_expressions(response, "vocab"),
+        ),
     }
 
 
-def print_result(result: dict[str, Any]) -> None:
-    status = "PASS" if result["match"] else "FAIL"
-    print(f"\n[{status}] {result['id']}")
-    print(f"  expected grammar: {result['expected_grammar']}")
-    print(f"  actual grammar:   {result['actual_grammar']}")
-    print(f"  expected norm:    {result['expected_normalized']}")
-    print(f"  actual norm:      {result['actual_normalized']}")
-    print(f"  missing:          {result['missing']}")
-    print(f"  extra:            {result['extra']}")
+def print_section(name: str, data: dict[str, Any]) -> None:
+    print(f"  {name}")
+    print(f"    expected:    {data['expected']}")
+    print(f"    actual norm: {data['actual_norm']}")
+    print(f"    missing:     {data['missing']}")
+    print(f"    extra:       {data['extra']}")
     print(
-        "  metrics:          "
-        f"matched={result['matched']}, "
-        f"precision={result['precision']:.2f}, "
-        f"recall={result['recall']:.2f}, "
-        f"f1={result['f1']:.2f}"
+        "    metrics:     "
+        f"matched={data['matched']}, "
+        f"precision={data['precision']:.2f}, "
+        f"recall={data['recall']:.2f}, "
+        f"f1={data['f1']:.2f}"
     )
 
 
+def print_result(result: dict[str, Any]) -> None:
+    print(f"\n[CASE] {result['id']}")
+    print(f"  latency: {result['latency_seconds']:.2f}s")
+    print_section("Grammar", result["grammar"])
+    print_section("Vocab", result["vocab"])
+
+
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Run the minimal analyze API grammar evaluation.")
+    parser = argparse.ArgumentParser(description="Run the minimal analyze API extraction evaluation.")
     parser.add_argument("--dataset", type=Path, default=DEFAULT_DATASET)
     parser.add_argument("--api-url", default=DEFAULT_API_URL)
     parser.add_argument("--target-lang", default="en")
@@ -147,39 +185,38 @@ def main() -> int:
     results = []
 
     for case in cases:
+        start = perf_counter()
         try:
             result = evaluate_case(case, args.api_url, args.target_lang, args.timeout)
         except (HTTPError, URLError, TimeoutError, KeyError, json.JSONDecodeError, ValueError) as exc:
             result = {
                 "id": case.get("id", "<unknown>"),
-                "expected_grammar": unique_sorted(case.get("expected_grammar", [])),
-                "actual_grammar": [],
-                "expected_normalized": normalize_expressions(case.get("expected_grammar", [])),
-                "actual_normalized": [],
-                "match": False,
-                "missing": normalize_expressions(case.get("expected_grammar", [])),
-                "extra": [],
-                "matched": 0,
-                "precision": 0.0,
-                "recall": 0.0,
-                "f1": 0.0,
+                "latency_seconds": perf_counter() - start,
+                "grammar": eval_list(case.get("expected_grammar", []), []),
+                "vocab": eval_list(case.get("expected_vocab", []), []),
             }
             print_result(result)
             print(f"  error:            {exc}")
             results.append(result)
             continue
 
+        result["latency_seconds"] = perf_counter() - start
         print_result(result)
         results.append(result)
 
     print("\nSummary")
+    print(f"Analyzer provider: {settings.LLM_PROVIDER_ANALYZER}")
+    print(f"Analyzer model:    {get_analyzer_model()}")
     if results:
-        avg_precision = sum(result["precision"] for result in results) / len(results)
-        avg_recall = sum(result["recall"] for result in results) / len(results)
-        avg_f1 = sum(result["f1"] for result in results) / len(results)
-        print(f"Average precision: {avg_precision:.2f}")
-        print(f"Average recall:    {avg_recall:.2f}")
-        print(f"Average f1:        {avg_f1:.2f}")
+        avg_latency = sum(result["latency_seconds"] for result in results) / len(results)
+        print(f"Average latency:   {avg_latency:.2f}s")
+        for key, label in [("grammar", "Grammar"), ("vocab", "Vocab")]:
+            avg_precision = sum(result[key]["precision"] for result in results) / len(results)
+            avg_recall = sum(result[key]["recall"] for result in results) / len(results)
+            avg_f1 = sum(result[key]["f1"] for result in results) / len(results)
+            print(f"{label} average precision: {avg_precision:.2f}")
+            print(f"{label} average recall:    {avg_recall:.2f}")
+            print(f"{label} average f1:        {avg_f1:.2f}")
     return 0
 
 
