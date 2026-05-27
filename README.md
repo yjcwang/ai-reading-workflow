@@ -110,10 +110,9 @@ ai-reading-workflow/
 │  │  ├─ services/       # LLM, analysis, explanation, PDF, persistence
 │  │  ├─ schemas.py      # Request / response contracts
 │  │  └─ main.py         # FastAPI entry point
-│  ├─ evals/
-│  │  ├─ datasets/       # Analyze API evaluation datasets
-│  │  └─ runners/        # Local evaluation runners
-│  └─ tests/
+│  └─evals/
+│    ├─ datasets/       # Analyze API evaluation datasets
+│    └─ runners/        # Local evaluation runners
 ├─ frontend/
 │  ├─ app/               # Next.js App Router
 │  ├─ components/        # UI panels and modals
