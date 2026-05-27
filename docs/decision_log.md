@@ -181,3 +181,14 @@ The backend needed Langfuse visibility for LLM provider calls, latency, outputs,
 ### Consequences
 - Langfuse latency now reflects actual provider time, and generation traces stay focused on provider calls.
 
+## 2026-05-27 Add Analyze API Evaluation Pipeline (Issue #24)
+
+### Context
+Need to compare grammar and vocabulary extraction quality across LLM providers and models.
+
+### Decision
+- Add a custom N2 evaluation dataset for expected grammar and vocabulary.
+- Add a local runner that calls the real analyze API and reports precision, recall, F1, and latency.
+- Use the runner to compare and generate report for Gemini 3.5 Flash, Gemini 3.1 Flash Lite, DeepSeek V4 Pro, DeepSeek V4 Flash, and Ollama Qwen3 8B.
+
+

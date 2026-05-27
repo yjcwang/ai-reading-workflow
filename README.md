@@ -78,6 +78,11 @@ AI-Powered Japanese Reading Workflow is a full-stack web application built aroun
 - LLM responses go through centralized extraction, validation, and retry handling in `backend/app/services/llm.py`
 - Provider switching is handled through a strategy map instead of feature-specific branching throughout the codebase
 
+### Analyze Evaluation
+
+- The backend includes a lightweight evaluation runner for the analyze API using a custom N2 Japanese grammar and vocabulary benchmark dataset
+- The evaluation compares Gemini 3.5 Flash, Gemini 3.1 Flash Lite, DeepSeek V4 Pro, DeepSeek V4 Flash, and Ollama Qwen3 8B using precision, recall, F1, and latency
+
 ### Modular Frontend and Backend Design
 
 - Frontend page orchestration stays in `frontend/app/page.tsx`
