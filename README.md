@@ -37,6 +37,11 @@ AI-Powered Japanese Reading Workflow is a full-stack web application built aroun
   <br/>
   <em>History</em>
 </p>
+<p align="center">
+  <img src="./docs/assets/docker-compose.png" alt="Docker" width="880"/>
+  <br/>
+  <em>Run with Docker Compose</em>
+</p>
 
 ## Core Features
 
