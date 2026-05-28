@@ -193,4 +193,19 @@ Need to compare grammar and vocabulary extraction quality across LLM providers a
 - Add a local runner that calls the real analyze API and reports precision, recall, F1, and latency.
 - Use the runner to compare and generate report for Gemini 3.5 Flash, Gemini 3.1 Flash Lite, DeepSeek V4 Pro, DeepSeek V4 Flash, and Ollama Qwen3 8B.
 
+## 2026-05-28 Add Minimal Docker Compose Setup
+
+### Context
+The project needed a simple way to run the full stack locally with Docker.
+
+### Decision
+- Add separate Dockerfiles for FastAPI backend and Next.js frontend.
+- Add root `docker-compose.yml` for one-command startup.
+- Use root `.env` / `.env.example` for Docker-only configuration.
+- Default providers to `mock` and persist SQLite with a Docker volume.
+
+### Consequences
+- First run: `cp .env.example .env` then `docker compose up --build`.
+- Daily run: `docker compose up`.
+- Code changes require rebuild; env-only backend changes usually require restart.
 

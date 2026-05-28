@@ -128,13 +128,41 @@ ai-reading-workflow/
 - `POST /api/explain`
 - `POST /api/generate-text`
 - `POST /api/export_pdf`
-- `POST /api/results`
-- `GET /api/results`
-- `GET /api/results/{result_id}`
-- `DELETE /api/results/{result_id}`
+- `POST /api/history/articles`
+- `GET /api/history/articles`
+- `GET /api/history/articles/search`
+- `GET /api/history/articles/{article_id}`
+- `DELETE /api/history/articles/{article_id}`
+- `GET /api/history/vocab`
+- `GET /api/history/vocab/search`
+- `GET /api/history/grammar`
+- `GET /api/history/grammar/search`
 - `GET /health`
 
 ## Local Setup
+
+### Docker Quick Start
+
+First-time Docker setup:
+
+```bash
+git clone https://github.com/yjcwang/ai-reading-workflow.git
+cd ai-reading-workflow
+cp .env.example .env
+docker compose up --build
+```
+
+Open the app at `http://localhost:3000`. The backend is exposed at `http://localhost:8000`
+
+After the first build, daily startup can use:
+
+```bash
+docker compose up
+```
+
+The root `.env` file is for Docker Compose only. The default values use `mock` providers so the app can start without API keys. To use a real provider, edit `.env`
+
+SQLite data is stored in the Docker volume `backend_data`.
 
 ### Backend
 
@@ -207,27 +235,6 @@ First-time dependency install:
 ```powershell
 .\start-dev.ps1 -Install
 ```
-
-### Docker Quick Start
-
-First-time Docker setup:
-
-```bash
-cp .env.example .env
-docker compose up --build
-```
-
-Open the app at `http://localhost:3000`. The backend is exposed at `http://localhost:8000`
-
-After the first build, daily startup can use:
-
-```bash
-docker compose up
-```
-
-The root `.env` file is for Docker Compose only. The default values use `mock` providers so the app can start without API keys. To use a real provider, edit `.env`
-
-SQLite data is stored in the Docker volume `backend_data`.
 
 ## Environment Notes
 

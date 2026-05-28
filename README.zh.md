@@ -143,6 +143,29 @@ ai-reading-workflow/
 
 ## 本地运行
 
+### Docker 快速启动
+
+第一次使用 Docker：
+
+```bash
+git clone https://github.com/yjcwang/ai-reading-workflow.git
+cd ai-reading-workflow
+cp .env.example .env
+docker compose up --build
+```
+
+打开 `http://localhost:3000` 访问前端。后端会暴露在 `http://localhost:8000`
+
+第一次构建完成后，日常启动可以直接运行：
+
+```bash
+docker compose up
+```
+
+根目录 `.env` 只给 Docker Compose 使用。默认配置会将所有 LLM provider 设置为 `mock`，因此没有 API key 也可以启动应用。如果要使用真实 provider，编辑 `.env`
+
+SQLite 数据会保存在 Docker volume `backend_data` 中。
+
 ### Backend
 
 如果使用 `jpread` conda 环境：
@@ -214,27 +237,6 @@ npm run dev
 ```powershell
 .\start-dev.ps1 -Install
 ```
-
-### Docker 快速启动
-
-第一次使用 Docker 时，先从示例文件创建根目录 `.env`，再构建并启动：
-
-```bash
-cp .env.example .env
-docker compose up --build
-```
-
-打开 `http://localhost:3000` 访问前端。后端会暴露在 `http://localhost:8000`
-
-第一次构建完成后，日常启动可以直接运行：
-
-```bash
-docker compose up
-```
-
-根目录 `.env` 只给 Docker Compose 使用。默认配置会将所有 LLM provider 设置为 `mock`，因此没有 API key 也可以启动应用。如果要使用真实 provider，编辑 `.env`
-
-SQLite 数据会保存在 Docker volume `backend_data` 中。
 
 ## 环境配置说明
 
