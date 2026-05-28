@@ -1,17 +1,33 @@
 # AI-Powered Japanese Reading Workflow
 
-AI-powered workflow for turning real Japanese text into structured study material.
-
 [English](README.md) | [简体中文](README.zh.md)
 
-AI-Powered Japanese Reading Workflow is a full-stack web application built around a practical reading workflow: bring in or generate Japanese text, analyze it into vocabulary and grammar, inspect difficult parts in context, refine the result list, and save the session for later review.
+Full-stack AI application for transforming Japanese text into structured learning material using LLM-powered analysis pipelines.
 
-## Why This Project Stands Out
+Built with FastAPI, Next.js, Docker, and multi-provider LLM integration.
 
-- Structured output pipeline for vocabulary, grammar, translation, and title generation
-- Clear service boundaries between text analysis, explanation, translation, text generation, PDF export, and persistence
-- Real product UX considerations: editable results, history reload, language switching, dark mode, and loading/error states
-- Multi-provider LLM integration behind one backend abstraction layer
+## Tech Stack
+
+* Frontend: Next.js, React, TypeScript
+* Backend: FastAPI, Pydantic, SQLModel
+* AI: OpenAI, Gemini, DeepSeek, Ollama
+* Infrastructure: Docker Compose, Langfuse
+* Evaluation: Custom dataset & LLM benchmarking
+* Database: SQLite
+
+## Highlights
+
+* Structured LLM output pipeline with Pydantic validation
+* Multi-provider support (OpenAI, Gemini, DeepSeek, Ollama)
+* Langfuse observability integration for tracing and monitoring
+* Evaluation dataset and LLM-based output benchmarking
+* Docker Compose setup for reproducible multi-service deployment
+
+## Engineering Design
+
+* Clear service boundaries between analysis, explanation, translation, text generation, PDF export, and persistence
+* Real product UX considerations: editable results, history reload, language switching, dark mode, and loading/error handling
+* Modular frontend/backend architecture focused on maintainability and extensibility
 
 ## Demo
 
@@ -43,6 +59,37 @@ AI-Powered Japanese Reading Workflow is a full-stack web application built aroun
   <em>Run with Docker Compose</em>
 </p>
 
+## Project Structure
+
+```text
+ai-reading-workflow/
+├─ .env.example         # Docker Compose environment template
+├─ .dockerignore        # Docker build exclusions
+├─ docker-compose.yml   # Local full-stack Docker orchestration
+├─ backend/
+│  ├─ Dockerfile        # FastAPI production container
+│  ├─ app/
+│  │  ├─ api/            # FastAPI routes
+│  │  ├─ db/             # DB setup and session management
+│  │  ├─ models/         # SQLModel tables
+│  │  ├─ observability/  # Langfuse client and LLM tracing helpers
+│  │  ├─ repositories/   # Data access layer
+│  │  ├─ services/       # LLM, analysis, explanation, PDF, persistence
+│  │  ├─ schemas.py      # Request / response contracts
+│  │  └─ main.py         # FastAPI entry point
+│  └─ evals/
+│    ├─ datasets/       # Analyze API evaluation datasets
+│    └─ runners/        # Local evaluation runners
+├─ frontend/
+│  ├─ Dockerfile        # Next.js production container
+│  ├─ app/               # Next.js App Router
+│  ├─ components/        # UI panels and modals
+│  ├─ hooks/             # Feature hooks
+│  └─ lib/               # API client, i18n, helpers, types
+└─ docs/
+   └─ decision_log.md
+```
+
 ## Core Features
 
 - Paste Japanese text and analyze it into vocabulary and grammar lists aligned with a selected JLPT level
@@ -65,15 +112,6 @@ AI-Powered Japanese Reading Workflow is a full-stack web application built aroun
 5. For sentence explanations, the app runs translation and analysis as separate steps.
 6. Edit the final study list in the UI.
 7. Save the session to SQLite or export it as PDF.
-
-## Tech Stack
-
-- Frontend: Next.js 16, React 19, TypeScript
-- Backend: Python FastAPI, Pydantic v2, SQLModel, Uvicorn
-- Database: SQLite
-- LLM integration: Ollama, OpenAI, Gemini, DeepSeek, Mock provider
-- Reliability: Tenacity-based retry handling for LLM calls
-- PDF export: ReportLab with Noto Sans JP / SC fonts
 
 ## Technical Highlights
 
@@ -101,33 +139,7 @@ AI-Powered Japanese Reading Workflow is a full-stack web application built aroun
 - Save titles are generated on the backend, with a fallback preview title if title generation fails
 - Current results can be exported to PDF for offline review
 
-## Project Structure
-
-```text
-ai-reading-workflow/
-├─ backend/
-│  ├─ app/
-│  │  ├─ api/            # FastAPI routes
-│  │  ├─ db/             # DB setup and session management
-│  │  ├─ models/         # SQLModel tables
-│  │  ├─ observability/  # Langfuse client and LLM tracing helpers
-│  │  ├─ repositories/   # Data access layer
-│  │  ├─ services/       # LLM, analysis, explanation, PDF, persistence
-│  │  ├─ schemas.py      # Request / response contracts
-│  │  └─ main.py         # FastAPI entry point
-│  └─evals/
-│    ├─ datasets/       # Analyze API evaluation datasets
-│    └─ runners/        # Local evaluation runners
-├─ frontend/
-│  ├─ app/               # Next.js App Router
-│  ├─ components/        # UI panels and modals
-│  ├─ hooks/             # Feature hooks
-│  └─ lib/               # API client, i18n, helpers, types
-└─ docs/
-   └─ decision_log.md
-```
-
-## API Surface
+### API Surface
 
 - `POST /api/analyze`
 - `POST /api/explain`
@@ -241,37 +253,3 @@ First-time dependency install:
 .\start-dev.ps1 -Install
 ```
 
-## Environment Notes
-
-Current backend configuration supports separate providers for:
-
-- analyzer
-- explainer
-- translator
-- text generator
-
-The codebase currently includes provider support for:
-
-- `ollama`
-- `openai`
-- `gemini`
-- `deepseek`
-- `mock`
-
-## Realistic Next Improvements
-
-- Improve provider configuration ergonomics and document all supported environment variables more fully
-- Add richer history capabilities such as search, filter, or tagging for saved study sessions
-
-## Engineering Challenges and Lessons
-
-- LLM integration became more reliable after moving JSON extraction, schema validation, and retry logic into one shared backend layer instead of repeating it in each service
-- Separating page orchestration from feature hooks reduced coupling in the frontend and made the product workflow easier to extend
-- Treating sentence explanation as translation plus analysis produced a cleaner UX and clearer backend responsibilities than forcing one large prompt to do everything
-- One practical engineering challenge was deciding which work belonged to which endpoint and layer; clarifying boundaries between title generation, persistence, analysis, and explanation made the system easier to maintain and extend
-
-## Additional Notes
-
-- The project currently stores history locally in SQLite
-- A lightweight health endpoint and environment-based CORS configuration are included for deployment
-- Related implementation notes are available in [docs/decision_log.md](docs/decision_log.md)
