@@ -1,5 +1,7 @@
 # Project Structure
 
+![Architecture overview](architecture-overview.png)
+
 ```text
 ai-reading-workflow/
 +-- .env.example         # Docker Compose environment template
