@@ -34,61 +34,22 @@
 - [Demo 视频链接](https://youtu.be/NV0gn7CtJrc)
 
 <p align="center">
-  <img src="./docs/assets/ai-generator.png" alt="Main Interface and AI Text Generator" width="880"/>
+  <img src="./docs/screenshot/ai-generator.png" alt="Main Interface and AI Text Generator" width="880"/>
   <br/>
   <em>主界面和 AI 文本生成</em>
 </p>
 <p align="center">
-  <img src="./docs/assets/analysis-result.png" alt="Analysis Results" width="880"/>
+  <img src="./docs/screenshot/analysis-result.png" alt="Analysis Results" width="880"/>
   <br/>
   <em>分析结果</em>
 </p>
-<p align="center">
-  <img src="./docs/assets/explain-modal.png" alt="Context Explain Modal" width="880"/>
-  <br/>
-  <em>上下文解释面板</em>
-</p>
-<p align="center">
-  <img src="./docs/assets/save-history.png" alt="History" width="880"/>
-  <br/>
-  <em>历史记录</em>
-</p>
-<p align="center">
-  <img src="./docs/assets/docker-compose.png" alt="Docker" width="880"/>
-  <br/>
-  <em>使用 Docker Compose 运行</em>
-</p>
+
+更多截图见 [`docs/screenshot/screenshots.md`](docs/screenshot/screenshots.md)。
 
 ## 项目结构
 
-```text
-ai-reading-workflow/
-├─ .env.example         # Docker Compose 环境变量模板
-├─ .dockerignore        # Docker 构建排除规则
-├─ docker-compose.yml   # 本地全栈 Docker 编排
-├─ backend/
-│  ├─ Dockerfile        # FastAPI 生产容器
-│  ├─ app/
-│  │  ├─ api/            # FastAPI routes
-│  │  ├─ db/             # 数据库初始化和 session 管理
-│  │  ├─ models/         # SQLModel 表模型
-│  │  ├─ observability/  # Langfuse client 和 LLM tracing helpers
-│  │  ├─ repositories/   # 数据访问层
-│  │  ├─ services/       # LLM、分析、解释、PDF、持久化
-│  │  ├─ schemas.py      # 请求/响应契约
-│  │  └─ main.py         # FastAPI 入口
-│  └─ evals/
-│    ├─ datasets/       # Analyze API evaluation datasets
-│    └─ runners/        # 本地 evaluation runner
-├─ frontend/
-│  ├─ Dockerfile        # Next.js 生产容器
-│  ├─ app/               # Next.js App Router
-│  ├─ components/        # UI 面板和弹窗
-│  ├─ hooks/             # Feature hooks
-│  └─ lib/               # API client, i18n, helpers, types
-└─ docs/
-   └─ decision_log.md
-```
+仓库结构见
+[`docs/reference/architecture/project-structure.md`](docs/reference/architecture/project-structure.md)。
 
 ## 核心功能
 
@@ -102,16 +63,6 @@ ai-reading-workflow/
 - 将当前结果列表导出为 PDF
 - 在英文和中文之间切换解释/输出语言
 - 支持浅色和深色模式
-
-## 工作流程
-
-1. 手动输入日语文本，或通过 AI 生成阅读材料。
-2. 锁定文本，并发送到分析管线。
-3. 后端返回结构化的词汇和语法条目。
-4. 选中单词或句子，请求上下文解释。
-5. 对于句子解释，应用会把翻译和分析拆成两个步骤。
-6. 在前端编辑最终学习列表。
-7. 将会话保存到 SQLite，或导出为 PDF。
 
 ## 技术实现重点
 
@@ -139,22 +90,10 @@ ai-reading-workflow/
 - 保存标题由后端生成；标题生成失败时会回退到文本预览标题
 - 当前结果可以导出为 PDF，方便离线复习
 
-### API 概览
+### API 参考
 
-- `POST /api/analyze`
-- `POST /api/explain`
-- `POST /api/generate-text`
-- `POST /api/export_pdf`
-- `POST /api/history/articles`
-- `GET /api/history/articles`
-- `GET /api/history/articles/search`
-- `GET /api/history/articles/{article_id}`
-- `DELETE /api/history/articles/{article_id}`
-- `GET /api/history/vocab`
-- `GET /api/history/vocab/search`
-- `GET /api/history/grammar`
-- `GET /api/history/grammar/search`
-- `GET /health`
+后端 API 摘要和接口清单见
+[`docs/reference/api/index.md`](docs/reference/api/index.md)。
 
 ## 本地运行
 

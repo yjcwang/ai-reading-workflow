@@ -34,61 +34,22 @@ Built with FastAPI, Next.js, Docker, and multi-provider LLM integration.
 - [Demo Video Link Here](https://youtu.be/NV0gn7CtJrc)
 
 <p align="center">
-  <img src="./docs/assets/ai-generator.png" alt="Main Interface and AI Text Generator" width="880"/>
+  <img src="./docs/screenshot/ai-generator.png" alt="Main Interface and AI Text Generator" width="880"/>
   <br/>
   <em>Main Interface and AI Text Generator</em>
 </p>
 <p align="center">
-  <img src="./docs/assets/analysis-result.png" alt="Analysis Results" width="880"/>
+  <img src="./docs/screenshot/analysis-result.png" alt="Analysis Results" width="880"/>
   <br/>
   <em>Analysis Results</em>
 </p>
-<p align="center">
-  <img src="./docs/assets/explain-modal.png" alt="Context Explain Modal" width="880"/>
-  <br/>
-  <em>Context Explain Modal</em>
-</p>
-<p align="center">
-  <img src="./docs/assets/save-history.png" alt="History" width="880"/>
-  <br/>
-  <em>History</em>
-</p>
-<p align="center">
-  <img src="./docs/assets/docker-compose.png" alt="Docker" width="880"/>
-  <br/>
-  <em>Run with Docker Compose</em>
-</p>
+
+More screenshots: [`docs/screenshot/screenshots.md`](docs/screenshot/screenshots.md)
 
 ## Project Structure
 
-```text
-ai-reading-workflow/
-├─ .env.example         # Docker Compose environment template
-├─ .dockerignore        # Docker build exclusions
-├─ docker-compose.yml   # Local full-stack Docker orchestration
-├─ backend/
-│  ├─ Dockerfile        # FastAPI production container
-│  ├─ app/
-│  │  ├─ api/            # FastAPI routes
-│  │  ├─ db/             # DB setup and session management
-│  │  ├─ models/         # SQLModel tables
-│  │  ├─ observability/  # Langfuse client and LLM tracing helpers
-│  │  ├─ repositories/   # Data access layer
-│  │  ├─ services/       # LLM, analysis, explanation, PDF, persistence
-│  │  ├─ schemas.py      # Request / response contracts
-│  │  └─ main.py         # FastAPI entry point
-│  └─ evals/
-│    ├─ datasets/       # Analyze API evaluation datasets
-│    └─ runners/        # Local evaluation runners
-├─ frontend/
-│  ├─ Dockerfile        # Next.js production container
-│  ├─ app/               # Next.js App Router
-│  ├─ components/        # UI panels and modals
-│  ├─ hooks/             # Feature hooks
-│  └─ lib/               # API client, i18n, helpers, types
-└─ docs/
-   └─ decision_log.md
-```
+See [`docs/reference/architecture/project-structure.md`](docs/reference/architecture/project-structure.md)
+for the repository structure.
 
 ## Core Features
 
@@ -102,16 +63,6 @@ ai-reading-workflow/
 - Export the current result list as PDF
 - Switch explanation/output language between English and Chinese
 - Toggle between light and dark mode
-
-## How It Works
-
-1. Input Japanese text manually or generate a passage with AI.
-2. Lock the text and send it to the analysis pipeline.
-3. The backend returns structured vocabulary and grammar items.
-4. Select a word or sentence to request a contextual explanation.
-5. For sentence explanations, the app runs translation and analysis as separate steps.
-6. Edit the final study list in the UI.
-7. Save the session to SQLite or export it as PDF.
 
 ## Technical Highlights
 
@@ -139,22 +90,10 @@ ai-reading-workflow/
 - Save titles are generated on the backend, with a fallback preview title if title generation fails
 - Current results can be exported to PDF for offline review
 
-### API Surface
+### API Reference
 
-- `POST /api/analyze`
-- `POST /api/explain`
-- `POST /api/generate-text`
-- `POST /api/export_pdf`
-- `POST /api/history/articles`
-- `GET /api/history/articles`
-- `GET /api/history/articles/search`
-- `GET /api/history/articles/{article_id}`
-- `DELETE /api/history/articles/{article_id}`
-- `GET /api/history/vocab`
-- `GET /api/history/vocab/search`
-- `GET /api/history/grammar`
-- `GET /api/history/grammar/search`
-- `GET /health`
+See [`docs/reference/api/index.md`](docs/reference/api/index.md) for the backend
+API summary and endpoint list.
 
 ## Local Setup
 
