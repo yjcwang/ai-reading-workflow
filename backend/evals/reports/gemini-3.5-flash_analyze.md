@@ -128,3 +128,7 @@ Grammar average f1:        0.71
 Vocab average precision: 0.69
 Vocab average recall:    0.65
 Vocab average f1:        0.66
+
+Obersevation through Langfuse:
+Average total token per run: 566.625
+Average cost per run: $0.003703

@@ -193,7 +193,7 @@ Need to compare grammar and vocabulary extraction quality across LLM providers a
 - Add a local runner that calls the real analyze API and reports precision, recall, F1, and latency.
 - Use the runner to compare and generate report for Gemini 3.5 Flash, Gemini 3.1 Flash Lite, DeepSeek V4 Pro, DeepSeek V4 Flash, and Ollama Qwen3 8B.
 
-## 2026-05-28 Add Minimal Docker Compose Setup
+## 2026-05-28 Add Minimal Docker Compose Setup (Issue #26)
 
 ### Context
 The project needed a simple way to run the full stack locally with Docker.

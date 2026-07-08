@@ -1,5 +1,5 @@
 [CASE] n2_001
-  latency: 3.29s
+  latency: 3.62s
   Grammar
     expected:    ['おかげで', 'からといって', 'ものの']
     actual norm: ['おかげで', 'からといって', 'ものの']
@@ -14,13 +14,13 @@
     metrics:     matched=3, precision=0.75, recall=0.75, f1=0.75
 
 [CASE] n2_002
-  latency: 2.97s
+  latency: 3.28s
   Grammar
     expected:    ['ざるを得ない', 'とたん', 'とは思ってもみなかった']
-    actual norm: ['ざるを得ない', 'たとたん', 'とは思ってもみなかった']
-    missing:     ['とたん']
-    extra:       ['たとたん']
-    metrics:     matched=2, precision=0.67, recall=0.67, f1=0.67
+    actual norm: ['ざるを得ない', 'とたん', 'とは思ってもみなかった']
+    missing:     []
+    extra:       []
+    metrics:     matched=3, precision=1.00, recall=1.00, f1=1.00
   Vocab
     expected:    ['ざるを得ない', '降り出す']
     actual norm: ['思いもよらない', '急に', '降り出す']
@@ -29,7 +29,7 @@
     metrics:     matched=1, precision=0.33, recall=0.50, f1=0.40
 
 [CASE] n2_003
-  latency: 4.27s
+  latency: 3.24s
   Grammar
     expected:    ['だけでなく', 'に関して', 'べき', '一方で']
     actual norm: ['が求められている', 'に関して', 'べき', '一方で']
@@ -44,7 +44,7 @@
     metrics:     matched=3, precision=0.75, recall=0.60, f1=0.67
 
 [CASE] n2_004
-  latency: 3.70s
+  latency: 2.75s
   Grammar
     expected:    ['にもかかわらず', 'ようだ', 'ようになってきた']
     actual norm: ['にもかかわらず', 'ようになってきた']
@@ -59,7 +59,7 @@
     metrics:     matched=2, precision=1.00, recall=0.67, f1=0.80
 
 [CASE] n2_005
-  latency: 3.06s
+  latency: 3.03s
   Grammar
     expected:    ['たほうがよい', 'ためには', 'だけに', 'とともに']
     actual norm: ['たほうがよい', 'だけに', 'とともに']
@@ -74,7 +74,7 @@
     metrics:     matched=3, precision=1.00, recall=0.50, f1=0.67
 
 [CASE] n2_006
-  latency: 3.48s
+  latency: 3.01s
   Grammar
     expected:    ['ことがある', 'ことになっている', 'なしに', 'までに']
     actual norm: ['ことがある', 'ことになっている', '場合']
@@ -89,7 +89,7 @@
     metrics:     matched=2, precision=0.50, recall=1.00, f1=0.67
 
 [CASE] n2_007
-  latency: 3.74s
+  latency: 2.73s
   Grammar
     expected:    ['ことなく', '恐れがある', '際に']
     actual norm: ['ことなく', '際に']
@@ -104,7 +104,7 @@
     metrics:     matched=1, precision=0.33, recall=0.25, f1=0.29
 
 [CASE] n2_008
-  latency: 11.97s
+  latency: 2.74s
   Grammar
     expected:    ['ことになりかねない', 'だけでなく', 'にあたって', 'まま']
     actual norm: ['かねない', 'にあたって']
@@ -113,18 +113,22 @@
     metrics:     matched=1, precision=0.50, recall=0.25, f1=0.33
   Vocab
     expected:    ['なりかねない', '不十分', '住まい', '現地', '生活費']
-    actual norm: ['出発', '現地', '生活費', '留学']
-    missing:     ['なりかねない', '不十分', '住まい']
-    extra:       ['出発', '留学']
-    metrics:     matched=2, precision=0.50, recall=0.40, f1=0.44
+    actual norm: ['不十分', '現地', '生活費', '留学']
+    missing:     ['なりかねない', '住まい']
+    extra:       ['留学']
+    metrics:     matched=3, precision=0.75, recall=0.60, f1=0.67
 
 Summary
 Analyzer provider: gemini
 Analyzer model:    gemini-3.1-flash-lite
-Average latency:   4.56s
-Grammar average precision: 0.82
-Grammar average recall:    0.66
-Grammar average f1:        0.72
-Vocab average precision: 0.65
-Vocab average recall:    0.58
-Vocab average f1:        0.59
+Average latency:   3.05s
+Grammar average precision: 0.86
+Grammar average recall:    0.70
+Grammar average f1:        0.76
+Vocab average precision: 0.68
+Vocab average recall:    0.61
+Vocab average f1:        0.61
+
+Obersevation through Langfuse:
+Average total token per run: 507.875
+Average cost per run: $0.00052900
