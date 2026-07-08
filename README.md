@@ -10,24 +10,10 @@ Built with FastAPI, Next.js, Docker, and multi-provider LLM integration.
 
 * Frontend: Next.js, React, TypeScript
 * Backend: FastAPI, Pydantic, SQLModel
-* AI: OpenAI, Gemini, DeepSeek, Ollama
+* LLM APIs: Gemini, DeepSeek, Ollama
 * Infrastructure: Docker Compose, Langfuse
 * Evaluation: Custom dataset & LLM benchmarking
 * Database: SQLite
-
-## Highlights
-
-* Structured LLM output pipeline with Pydantic validation
-* Multi-provider support (OpenAI, Gemini, DeepSeek, Ollama)
-* Langfuse observability integration for tracing and monitoring
-* Evaluation dataset and LLM-based output benchmarking
-* Docker Compose setup for reproducible multi-service deployment
-
-## Engineering Design
-
-* Clear service boundaries between analysis, explanation, translation, text generation, PDF export, and persistence
-* Real product UX considerations: editable results, history reload, language switching, dark mode, and loading/error handling
-* Modular frontend/backend architecture focused on maintainability and extensibility
 
 ## Demo
 
@@ -46,60 +32,33 @@ Built with FastAPI, Next.js, Docker, and multi-provider LLM integration.
 
 More screenshots: [`docs/screenshot/screenshots.md`](docs/screenshot/screenshots.md)
 
+## Features
+
+* Analyze Japanese text into vocabulary and grammar lists for a selected JLPT level
+* Generate Japanese reading passages by topic, level, length, and style
+* Explain selected words or sentences in context
+* Edit, save, reload, search, and delete reading history
+* Export study results as PDF
+* Switch output language between English and Chinese
+* Use light and dark mode
+
+## Technical Highlights
+
+* FastAPI and Next.js full-stack architecture with clear service boundaries
+* Structured LLM output pipeline with Pydantic validation and retry handling
+* Multi-provider LLM support for Gemini, DeepSeek, and Ollama
+* Langfuse tracing for provider calls, latency, previews, token estimates, and failures
+* SQLite persistence for reading sessions, vocabulary, and grammar history
+* Evaluation dataset and runner for analyze quality benchmarking
+* Docker Compose setup for reproducible local deployment
+* API summary: [`docs/reference/api/index.md`](docs/reference/api/index.md)
+
 ## Project Structure
 
 See [`docs/reference/architecture/project-structure.md`](docs/reference/architecture/project-structure.md)
 for the repository structure.
 
-## Core Features
-
-- Paste Japanese text and analyze it into vocabulary and grammar lists aligned with a selected JLPT level
-- Generate Japanese reading passages by topic, level, length, and style
-- Explain selected text in context
-- Use separate explain modes for short selections and sentence-length selections
-- Edit the result set by adding explained items or removing analysis items
-- Save analyzed sessions into a local SQLite database
-- Reload, browse, refresh, and delete saved results from the history panel
-- Export the current result list as PDF
-- Switch explanation/output language between English and Chinese
-- Toggle between light and dark mode
-
-## Technical Highlights
-
-### Structured LLM Output
-
-- Backend services request JSON-shaped outputs and validate them with Pydantic models
-- LLM responses go through centralized extraction, validation, and retry handling in `backend/app/services/llm.py`
-- Provider switching is handled through a strategy map instead of feature-specific branching throughout the codebase
-
-### LLM Observability and Evaluation
-
-- Langfuse records provider-call traces with service, provider, model, prompt/output previews, duration, estimated token usage, and success/failure metadata
-- A lightweight analyze evaluation runner compares multi models on a custom N2 grammar/vocabulary dataset using precision, recall, F1, and latency (report in backend\evals\reports)
-
-### Modular Frontend and Backend Design
-
-- Frontend page orchestration stays in `frontend/app/page.tsx`
-- Async product flows are split into feature hooks such as `useAnalyzeFeature`, `useExplainFeature`, `useGenerateTextFeature`, `useExportPdf`, and `useSavedResultsFeature`
-- Backend responsibilities are split across API routes, services, repositories, models, and schemas
-
-### Persistence, History, and Export
-
-- Saved reading sessions are stored in SQLite using `Result`, `Vocab`, and `Grammar` tables
-- The history panel supports list, detail reload, refresh, and delete flows
-- Save titles are generated on the backend, with a fallback preview title if title generation fails
-- Current results can be exported to PDF for offline review
-
-### API Reference
-
-See [`docs/reference/api/index.md`](docs/reference/api/index.md) for the backend
-API summary and endpoint list.
-
-## Local Setup
-
-### Docker Quick Start
-
-First-time Docker setup:
+## Quick Start
 
 ```bash
 git clone https://github.com/yjcwang/ai-reading-workflow.git
@@ -108,87 +67,5 @@ cp .env.example .env
 docker compose up --build
 ```
 
-Open the app at `http://localhost:3000`. The backend is exposed at `http://localhost:8000`
-
-After the first build, daily startup can use:
-
-```bash
-docker compose up
-```
-
-The root `.env` file is for Docker Compose only. The default values use `mock` providers so the app can start without API keys. To use a real provider, edit `.env`
-
-SQLite data is stored in the Docker volume `backend_data`.
-
-### Backend
-
-If you want to use the `jpread` conda environment:
-
-```bash
-conda activate jpread
-cd backend
-pip install -r ../requirements.txt
-uvicorn app.main:app --reload
-```
-
-If you prefer the local virtual environment:
-
-```bash
-cd backend
-python -m venv .venv
-```
-
-Windows:
-
-```bash
-.\.venv\Scripts\Activate.ps1
-```
-
-macOS / Linux:
-
-```bash
-source .venv/bin/activate
-```
-
-Install dependencies:
-
-```bash
-pip install -r ../requirements.txt
-```
-
-Create `backend/.env` from `backend/.env.example`, then start the server:
-
-```bash
-uvicorn app.main:app --reload
-```
-
-### Frontend
-
-Create `frontend/.env` or `frontend/.env.local`:
-
-```env
-NEXT_PUBLIC_BACKEND_URL=http://127.0.0.1:8000
-```
-
-Then run:
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-### Windows Quick Start
-
-The repository includes a helper script that can bootstrap local development:
-
-```powershell
-.\start-dev.ps1
-```
-
-First-time dependency install:
-
-```powershell
-.\start-dev.ps1 -Install
-```
+More setup: [`docs/reference/developement.md`](docs/reference/developement.md)
 
