@@ -30,6 +30,17 @@
 
 更多截图见 [`docs/screenshot/screenshots.md`](docs/screenshot/screenshots.md)。
 
+## 项目结构
+
+<p align="center">
+  <img src="./docs/reference/architecture/architecture-overview.png" alt="Architecture Overview" width="880"/>
+  <br/>
+  <em>架构概览</em>
+</p>
+
+仓库结构见
+[`docs/reference/architecture/project-structure.md`](docs/reference/architecture/project-structure.md)。
+
 ## 功能
 
 * 按所选 JLPT 等级分析日语文本，生成词汇和语法列表
@@ -50,22 +61,11 @@
 * 使用 Docker Compose 支持可复现的本地部署
 * API 摘要：[`docs/reference/api/index.md`](docs/reference/api/index.md)
 
-## Evaluation
+## 测评
 
 结合Langfuse，项目包含一个面向 analyze 流程的轻量评测方案。
 
-架构总览图：[`docs/reference/architecture/architecture-overview.png`](docs/reference/architecture/architecture-overview.png)
-
-## 项目结构
-
-<p align="center">
-  <img src="./docs/reference/architecture/architecture-overview.png" alt="Architecture Overview" width="880"/>
-  <br/>
-  <em>架构概览</em>
-</p>
-
-仓库结构见
-[`docs/reference/architecture/project-structure.md`](docs/reference/architecture/project-structure.md)。
+测评流程和结果: [`docs\reference\evaluation\evaluation-pipeline-table.png`](docs\reference\evaluation\evaluation-pipeline-table.png)
 
 ## Quick Start
 

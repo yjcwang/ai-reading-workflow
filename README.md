@@ -40,6 +40,17 @@ More screenshots: [`docs/screenshot/screenshots.md`](docs/screenshot/screenshots
 * Switch output language between English and Chinese
 * Use light and dark mode
 
+## Project Structure
+
+<p align="center">
+  <img src="./docs/reference/architecture/architecture-overview.png" alt="Architecture Overview" width="880"/>
+  <br/>
+  <em>Architecture Overview</em>
+</p>
+
+See [`docs/reference/architecture/project-structure.md`](docs/reference/architecture/project-structure.md)
+for the repository structure.
+
 ## Technical Highlights
 
 * FastAPI and Next.js full-stack architecture with clear service boundaries
@@ -54,18 +65,7 @@ More screenshots: [`docs/screenshot/screenshots.md`](docs/screenshot/screenshots
 
 The project includes a lightweight evaluation workflow for the analyze pipeline combining with Langfuse.
 
-Architecture overview: [`docs/reference/architecture/architecture-overview.png`](docs/reference/architecture/architecture-overview.png)
-
-## Project Structure
-
-<p align="center">
-  <img src="./docs/reference/architecture/architecture-overview.png" alt="Architecture Overview" width="880"/>
-  <br/>
-  <em>Architecture Overview</em>
-</p>
-
-See [`docs/reference/architecture/project-structure.md`](docs/reference/architecture/project-structure.md)
-for the repository structure.
+Evaluation pipeline and result: [`docs\reference\evaluation\evaluation-pipeline-table.png`](docs\reference\evaluation\evaluation-pipeline-table.png)
 
 ## Quick Start
 
