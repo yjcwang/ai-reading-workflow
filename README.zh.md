@@ -1,7 +1,5 @@
 # AI-Powered Japanese Reading Workflow
 
-[English](README.md) | [简体中文](README.zh.md)
-
 一个全栈 AI 应用，用 LLM 驱动的分析管线把日语文本转化为结构化学习材料。
 
 使用 FastAPI、Next.js、Docker 和多 provider LLM 集成构建。
@@ -49,11 +47,18 @@
 * 支持 Gemini、DeepSeek 和 Ollama 等多个 LLM provider
 * 使用 Langfuse 记录 provider 调用、延迟、预览、token 估算和失败信息
 * 使用 SQLite 持久化阅读会话、词汇和语法历史
-* 包含 analyze 质量 benchmark 的 evaluation dataset 和 runner
 * 使用 Docker Compose 支持可复现的本地部署
 * API 摘要：[`docs/reference/api/index.md`](docs/reference/api/index.md)
 
+## Evaluation
+
+结合Langfuse，项目包含一个面向 analyze 流程的轻量评测方案。
+
+架构总览图：[`docs/reference/architecture/architecture-overview.png`](docs/reference/architecture/architecture-overview.png)
+
 ## 项目结构
+
+![Architecture overview](./docs/reference/architecture/architecture-overview.png)
 
 仓库结构见
 [`docs/reference/architecture/project-structure.md`](docs/reference/architecture/project-structure.md)。
@@ -68,3 +73,5 @@ docker compose up --build
 ```
 
 More setup: [`docs/reference/developement.md`](docs/reference/developement.md)
+
+[English](README.md) | [简体中文](README.zh.md)

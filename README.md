@@ -1,7 +1,5 @@
 # AI-Powered Japanese Reading Workflow
 
-[English](README.md) | [简体中文](README.zh.md)
-
 Full-stack AI application for transforming Japanese text into structured learning material using LLM-powered analysis pipelines.
 
 Built with FastAPI, Next.js, Docker, and multi-provider LLM integration.
@@ -49,11 +47,18 @@ More screenshots: [`docs/screenshot/screenshots.md`](docs/screenshot/screenshots
 * Multi-provider LLM support for Gemini, DeepSeek, and Ollama
 * Langfuse tracing for provider calls, latency, previews, token estimates, and failures
 * SQLite persistence for reading sessions, vocabulary, and grammar history
-* Evaluation dataset and runner for analyze quality benchmarking
 * Docker Compose setup for reproducible local deployment
 * API summary: [`docs/reference/api/index.md`](docs/reference/api/index.md)
 
+## Evaluation
+
+The project includes a lightweight evaluation workflow for the analyze pipeline combining with Langfuse.
+
+Architecture overview: [`docs/reference/architecture/architecture-overview.png`](docs/reference/architecture/architecture-overview.png)
+
 ## Project Structure
+
+![Architecture overview](./docs/reference/architecture/architecture-overview.png)
 
 See [`docs/reference/architecture/project-structure.md`](docs/reference/architecture/project-structure.md)
 for the repository structure.
@@ -69,3 +74,4 @@ docker compose up --build
 
 More setup: [`docs/reference/developement.md`](docs/reference/developement.md)
 
+[English](README.md) | [简体中文](README.zh.md)
