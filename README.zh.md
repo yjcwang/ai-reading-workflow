@@ -58,7 +58,11 @@
 
 ## 项目结构
 
-![Architecture overview](./docs/reference/architecture/architecture-overview.png)
+<p align="center">
+  <img src="./docs/architecture/architecture-overview.png" alt="Architecture Overview" width="880"/>
+  <br/>
+  <em>架构概览</em>
+</p>
 
 仓库结构见
 [`docs/reference/architecture/project-structure.md`](docs/reference/architecture/project-structure.md)。

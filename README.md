@@ -58,7 +58,11 @@ Architecture overview: [`docs/reference/architecture/architecture-overview.png`]
 
 ## Project Structure
 
-![Architecture overview](./docs/reference/architecture/architecture-overview.png)
+<p align="center">
+  <img src="./docs/architecture/architecture-overview.png" alt="Architecture Overview" width="880"/>
+  <br/>
+  <em>Architecture Overview</em>
+</p>
 
 See [`docs/reference/architecture/project-structure.md`](docs/reference/architecture/project-structure.md)
 for the repository structure.
