@@ -59,7 +59,7 @@
 ## 项目结构
 
 <p align="center">
-  <img src="./docs/architecture/architecture-overview.png" alt="Architecture Overview" width="880"/>
+  <img src="./docs/reference/architecture/architecture-overview.png" alt="Architecture Overview" width="880"/>
   <br/>
   <em>架构概览</em>
 </p>

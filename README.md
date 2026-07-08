@@ -59,7 +59,7 @@ Architecture overview: [`docs/reference/architecture/architecture-overview.png`]
 ## Project Structure
 
 <p align="center">
-  <img src="./docs/architecture/architecture-overview.png" alt="Architecture Overview" width="880"/>
+  <img src="./docs/reference/architecture/architecture-overview.png" alt="Architecture Overview" width="880"/>
   <br/>
   <em>Architecture Overview</em>
 </p>
