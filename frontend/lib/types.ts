@@ -22,6 +22,11 @@ export type AnalyzeResponse = {
   grammar: GrammarItem[];
 };
 
+export type TextHighlight = {
+  type: "vocab" | "grammar";
+  expression: string;
+};
+
 export type ExportPdfRequest = {
   text: string;
   data: AnalyzeResponse;

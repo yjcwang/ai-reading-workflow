@@ -23,6 +23,7 @@ import type {
   ExplainResponse,
   ExplainWordResponse,
   TargetLang,
+  TextHighlight,
 } from "@/lib/types";
 import { LockedTextViewer } from "@/components/LockedTextViewer";
 import { LanguageConfirmModal } from "@/components/LanguageConfirmModal";
@@ -70,6 +71,7 @@ type Props = {
   targetLang: TargetLang;
   onLanguageChange: (lang: TargetLang) => void;
   onOpenHistory: () => void;
+  activeTextHighlight: TextHighlight | null;
 };
 
 export function InputPanel({
@@ -94,6 +96,7 @@ export function InputPanel({
   targetLang, 
   onLanguageChange,
   onOpenHistory,
+  activeTextHighlight,
   generateRequest: generateRequest,
   onGenerateRequestChange: onGenerateRequestChange,
   onGenerateRequest,
@@ -307,6 +310,7 @@ export function InputPanel({
             explainLoading={explainLoading}
             getMode={getMode}
             targetLang={targetLang}
+            activeHighlight={activeTextHighlight}
           />
 
           <div className={styles.lockedActions}>

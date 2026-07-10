@@ -1,13 +1,14 @@
 "use client";
 
-import React, { useEffect, useEffectEvent, useRef, useState } from "react";
+import React, { useEffect, useEffectEvent, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import loadingIcon from "@/icons/loading.svg";
 import aiIcon from "@/icons/ai.svg";
 import styles from "./InputPanel.module.css";
 import { buttonSm, buttonMd, maskedIconStyle} from "@/components/buttonStyles";
+import { findHighlightQuery as findTextHighlightQuery } from "@/lib/text-highlight-helpers";
 import { UI_STRINGS } from "@/lib/i18n";
-import { TargetLang } from "@/lib/types";
+import { TargetLang, TextHighlight } from "@/lib/types";
 
 type ExplainRequestPayload = {
   selectedText: string;
@@ -22,6 +23,7 @@ type Props = {
   explainLoading?: boolean;
   getMode?: (selectedText: string) => "word" | "sentence";
   targetLang: TargetLang;
+  activeHighlight?: TextHighlight | null;
 };
 
 export function LockedTextViewer({
@@ -32,6 +34,7 @@ export function LockedTextViewer({
   explainLoading,
   getMode,
   targetLang,
+  activeHighlight,
 }: Props) {
   const tUI = UI_STRINGS[targetLang];
   const boxRef = useRef<HTMLDivElement | null>(null);
@@ -58,6 +61,20 @@ export function LockedTextViewer({
 
   explainBusyRef.current = explainBusy;
   btnPosRef.current = btnPos;
+
+  const highlightQuery = useMemo(
+    () => findTextHighlightQuery(text, activeHighlight),
+    [text, activeHighlight],
+  );
+
+  useEffect(() => {
+    if (!highlightQuery) return;
+
+    const highlighted = boxRef.current?.querySelector<HTMLElement>(
+      "[data-active-text-highlight='true']",
+    );
+    highlighted?.scrollIntoView({ block: "nearest", inline: "nearest" });
+  }, [highlightQuery]);
 
   useEffect(() => {
     if (typeof window === "undefined" || !window.matchMedia) return;
@@ -224,7 +241,7 @@ export function LockedTextViewer({
           userSelect: explainBusy ? "none" : style?.userSelect,
         }}
       >
-        {text}
+        {renderHighlightedText(text, highlightQuery)}
       </div>
 
       {btnPos && (
@@ -264,6 +281,44 @@ export function LockedTextViewer({
       )}
     </>
   );
+}
+
+function renderHighlightedText(
+  text: string,
+  query: string,
+): React.ReactNode {
+  if (!query) return text;
+
+  const nodes: React.ReactNode[] = [];
+  let cursor = 0;
+  let matchIndex = text.indexOf(query);
+  let key = 0;
+
+  while (matchIndex !== -1) {
+    if (matchIndex > cursor) {
+      nodes.push(text.slice(cursor, matchIndex));
+    }
+
+    nodes.push(
+      <mark
+        key={`highlight-${key}`}
+        data-active-text-highlight={key === 0 ? "true" : undefined}
+        style={highlightMark}
+      >
+        {text.slice(matchIndex, matchIndex + query.length)}
+      </mark>,
+    );
+
+    cursor = matchIndex + query.length;
+    matchIndex = text.indexOf(query, cursor);
+    key += 1;
+  }
+
+  if (cursor < text.length) {
+    nodes.push(text.slice(cursor));
+  }
+
+  return nodes;
 }
 
 const explainBtn: React.CSSProperties = {
@@ -306,4 +361,11 @@ const explainBtnBusy: React.CSSProperties = {
 
 const explainLoadingIcon: React.CSSProperties = {
   filter: "brightness(0) saturate(100%)",
+};
+
+const highlightMark: React.CSSProperties = {
+  background: "rgba(var(--accent-rgb), 0.53)",
+  borderRadius: 4,
+  boxShadow: "0 0 0 1px rgba(var(--accent-rgb), 0.4) inset",
+  color: "inherit",
 };

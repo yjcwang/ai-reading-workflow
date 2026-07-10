@@ -23,6 +23,7 @@ import type {
   GenerateTextRequest,
   Level,
   SaveArticleHistoryRequest,
+  TextHighlight,
 } from "@/lib/types";
 import { DEFAULT_GENERATE_REQUEST } from "@/lib/types";
 
@@ -33,6 +34,7 @@ export default function Page() {
     DEFAULT_GENERATE_REQUEST,
   );
   const [historyOpen, setHistoryOpen] = useState(false);
+  const [activeTextHighlight, setActiveTextHighlight] = useState<TextHighlight | null>(null);
 
   const { theme, toggleTheme } = useTheme();
   const { targetLang, handleLanguageChange } = useTargetLang();
@@ -159,6 +161,7 @@ export default function Page() {
 
   function onClear() {
     setText("");
+    setActiveTextHighlight(null);
     setGenerateRequest(DEFAULT_GENERATE_REQUEST);
     analyzeFeature.resetAnalyze();
     explainFeature.resetExplain();
@@ -225,6 +228,7 @@ export default function Page() {
           targetLang={targetLang}
           onLanguageChange={handleLanguageChangeWithReset}
           onOpenHistory={handleOpenHistory}
+          activeTextHighlight={activeTextHighlight}
           generateRequest={generateRequest}
           onGenerateRequestChange={handleGenerateRequestChange}
           onGenerateRequest={handleGenerateRequest}
@@ -247,6 +251,7 @@ export default function Page() {
           exporting={exportFeature.exporting}
           exportError={exportFeature.exportError}
           targetLang={targetLang}
+          onActiveTextHighlightChange={setActiveTextHighlight}
         />
         <HistoryPanel
           open={historyOpen}

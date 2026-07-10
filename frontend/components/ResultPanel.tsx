@@ -15,7 +15,12 @@ import {
   buttonGhost,
   maskedIconStyle,
 } from "@/components/buttonStyles";
-import type { AnalyzeResponse, TargetLang, TranslateSentenceResponse } from "@/lib/types";
+import type {
+  AnalyzeResponse,
+  TargetLang,
+  TextHighlight,
+  TranslateSentenceResponse,
+} from "@/lib/types";
 import { UI_STRINGS } from "@/lib/i18n";
 
 type Props = {
@@ -34,6 +39,7 @@ type Props = {
   exporting: boolean;
   exportError: string | null;
   targetLang: TargetLang;
+  onActiveTextHighlightChange?: (highlight: TextHighlight | null) => void;
 };
 
 export function ResultPanel({
@@ -52,6 +58,7 @@ export function ResultPanel({
   exporting,
   exportError,
   targetLang,
+  onActiveTextHighlightChange,
 }: Props) {
   const tUI = UI_STRINGS[targetLang];
   const hasResult = data.vocab.length > 0 || data.grammar.length > 0;
@@ -149,8 +156,14 @@ export function ResultPanel({
                 <li
                   key={v.expression}
                   style={item}
-                  onMouseEnter={() => setActiveDeleteKey(`vocab:${v.expression}`)}
-                  onMouseLeave={() => setActiveDeleteKey((current) => (current === `vocab:${v.expression}` ? null : current))}
+                  onMouseEnter={() => {
+                    setActiveDeleteKey(`vocab:${v.expression}`);
+                    onActiveTextHighlightChange?.({ type: "vocab", expression: v.expression });
+                  }}
+                  onMouseLeave={() => {
+                    setActiveDeleteKey((current) => (current === `vocab:${v.expression}` ? null : current));
+                    onActiveTextHighlightChange?.(null);
+                  }}
                 >
                   <div style={itemTitle}>
                     {v.expression} {v.reading ? <span style={muted}>({v.reading})</span> : null}
@@ -164,8 +177,14 @@ export function ResultPanel({
                     onClick={() => onDeleteVocab(v.expression)}
                     title={tUI.resultPanel.deleteItem}
                     aria-label={tUI.resultPanel.deleteItem}
-                    onFocus={() => setActiveDeleteKey(`vocab:${v.expression}`)}
-                    onBlur={() => setActiveDeleteKey((current) => (current === `vocab:${v.expression}` ? null : current))}
+                    onFocus={() => {
+                      setActiveDeleteKey(`vocab:${v.expression}`);
+                      onActiveTextHighlightChange?.({ type: "vocab", expression: v.expression });
+                    }}
+                    onBlur={() => {
+                      setActiveDeleteKey((current) => (current === `vocab:${v.expression}` ? null : current));
+                      onActiveTextHighlightChange?.(null);
+                    }}
                   >
                     <span style={maskedIconStyle(deleteIcon.src, 14)} aria-hidden="true" />
                   </button>
@@ -190,8 +209,14 @@ export function ResultPanel({
                 <li
                   key={g.expression}
                   style={item}
-                  onMouseEnter={() => setActiveDeleteKey(`grammar:${g.expression}`)}
-                  onMouseLeave={() => setActiveDeleteKey((current) => (current === `grammar:${g.expression}` ? null : current))}
+                  onMouseEnter={() => {
+                    setActiveDeleteKey(`grammar:${g.expression}`);
+                    onActiveTextHighlightChange?.({ type: "grammar", expression: g.expression });
+                  }}
+                  onMouseLeave={() => {
+                    setActiveDeleteKey((current) => (current === `grammar:${g.expression}` ? null : current));
+                    onActiveTextHighlightChange?.(null);
+                  }}
                 >
                   <div style={itemTitle}>{g.expression}</div>
                   <button
@@ -203,8 +228,14 @@ export function ResultPanel({
                     onClick={() => onDeleteGrammar(g.expression)}
                     title={tUI.resultPanel.deleteItem}
                     aria-label={tUI.resultPanel.deleteItem}
-                    onFocus={() => setActiveDeleteKey(`grammar:${g.expression}`)}
-                    onBlur={() => setActiveDeleteKey((current) => (current === `grammar:${g.expression}` ? null : current))}
+                    onFocus={() => {
+                      setActiveDeleteKey(`grammar:${g.expression}`);
+                      onActiveTextHighlightChange?.({ type: "grammar", expression: g.expression });
+                    }}
+                    onBlur={() => {
+                      setActiveDeleteKey((current) => (current === `grammar:${g.expression}` ? null : current));
+                      onActiveTextHighlightChange?.(null);
+                    }}
                   >
                     <span style={maskedIconStyle(deleteIcon.src, 14)} aria-hidden="true" />
                   </button>

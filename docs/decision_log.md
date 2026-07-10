@@ -219,3 +219,12 @@ Translation is useful during reading because it helps users understand the full 
 - Save article-level `translation` with history records; existing rows keep `NULL`.
 - Include translation when loading history and exporting PDF.
 
+## 2026-07-10 Add Result-to-Text Highlight Linking (Issue #1)
+
+### Context
+Learners need a quick way to connect vocabulary and grammar cards in the result panel back to their occurrences in the locked reading text. 
+
+### Decision
+- Highlight matching text inside `LockedTextViewer` when hovering or focusing vocabulary and grammar cards in `ResultPanel`.
+
+
