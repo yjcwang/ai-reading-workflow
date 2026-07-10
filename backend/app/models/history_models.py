@@ -20,6 +20,7 @@ class ArticleHistory(SQLModel, table=True):
     level: str = Field(index=True)
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc), index=True)
     title: Optional[str] = None
+    translation: Optional[str] = None
 
     # Relationship fields make it possible to navigate related rows in Python.
     vocab_items: List["VocabHistory"] = Relationship(back_populates="article")

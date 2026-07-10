@@ -97,11 +97,13 @@ class PDFExporter:
         text: str,
         data: AnalyzeResponse,
         target_lang: str = "en",
+        translation: str | None = None,
     ) -> bytes:
         i18n = {
             "en": {
                 "main_title": "Summary List",
                 "text_title": "Text",
+                "translation_title": "Translation",
                 "vocab_title": "Vocabulary",
                 "grammar_title": "Grammar",
                 "definition": "Definition",
@@ -139,6 +141,15 @@ class PDFExporter:
         elements.append(Spacer(1, 0.2 * cm))
         elements.append(Paragraph(self._fmt_mix(text, "JP"), self.styles["JP_Content"]))
         elements.append(Spacer(1, 0.5 * cm))
+
+        if translation:
+            translation_title = t.get("translation_title", "Translation")
+            elements.append(
+                Paragraph(self._fmt_mix(translation_title, "SC"), self.styles["Heading"])
+            )
+            elements.append(Spacer(1, 0.2 * cm))
+            elements.append(Paragraph(self._fmt_mix(translation, "SC"), self.styles["CN_Body"]))
+            elements.append(Spacer(1, 0.5 * cm))
 
         elements.append(Paragraph(self._fmt_mix(t["vocab_title"], "SC"), self.styles["Heading"]))
         elements.append(Spacer(1, 0.3 * cm))
@@ -215,5 +226,10 @@ class PDFExporter:
         return buffer.getvalue()
 
 
-def build_pdf_bytes(text: str, data: AnalyzeResponse, target_lang: str = "en") -> bytes:
-    return PDFExporter().build_pdf_bytes(text, data, target_lang)
+def build_pdf_bytes(
+    text: str,
+    data: AnalyzeResponse,
+    target_lang: str = "en",
+    translation: str | None = None,
+) -> bytes:
+    return PDFExporter().build_pdf_bytes(text, data, target_lang, translation)

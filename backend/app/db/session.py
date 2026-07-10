@@ -2,6 +2,7 @@
 
 from pathlib import Path
 
+from sqlalchemy import text
 from sqlmodel import Session, SQLModel, create_engine
 from app.config import settings
 
@@ -26,3 +27,16 @@ def get_session():
 def create_db_and_tables() -> None:
     # create_all() creates missing tables from imported SQLModel table classes.
     SQLModel.metadata.create_all(engine)
+    _ensure_history_translation_column()
+
+
+def _ensure_history_translation_column() -> None:
+    """Backfill the nullable translation column for existing SQLite databases."""
+    if not DATABASE_URL.startswith("sqlite"):
+        return
+
+    with engine.begin() as connection:
+        columns = connection.execute(text("PRAGMA table_info(results)")).fetchall()
+        column_names = {column[1] for column in columns}
+        if "translation" not in column_names:
+            connection.execute(text("ALTER TABLE results ADD COLUMN translation TEXT"))

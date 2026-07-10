@@ -113,6 +113,7 @@ export default function Page() {
     const payload: SaveArticleHistoryRequest = {
       text: currentText,
       level,
+      translation: analyzeFeature.translation?.translation ?? null,
       vocab: analyzeFeature.data.vocab.map((item) => ({
         expression: item.expression,
         reading: item.reading,
@@ -133,21 +134,27 @@ export default function Page() {
 
   function applyArticleHistoryDetail(articleHistory: ArticleHistoryDetailResponse) {
     setText(articleHistory.text);
-    analyzeFeature.loadHistoryResult(articleHistory.text, {
-      vocab: articleHistory.vocab.map((item) => ({
-        expression: item.expression,
-        reading: item.reading ?? undefined,
-        definition: item.definition,
-        example: item.example,
-        notes: item.notes ?? undefined,
-      })),
-      grammar: articleHistory.grammar.map((item) => ({
-        expression: item.expression,
-        definition: item.definition,
-        example: item.example,
-        notes: item.notes ?? undefined,
-      })),
-    });
+    analyzeFeature.loadHistoryResult(
+      articleHistory.text,
+      {
+        vocab: articleHistory.vocab.map((item) => ({
+          expression: item.expression,
+          reading: item.reading ?? undefined,
+          definition: item.definition,
+          example: item.example,
+          notes: item.notes ?? undefined,
+        })),
+        grammar: articleHistory.grammar.map((item) => ({
+          expression: item.expression,
+          definition: item.definition,
+          example: item.example,
+          notes: item.notes ?? undefined,
+        })),
+      },
+      articleHistory.translation
+        ? { translation: articleHistory.translation }
+        : null,
+    );
   }
 
   function onClear() {
@@ -187,6 +194,7 @@ export default function Page() {
       {
         text: currentText,
         data: analyzeFeature.data,
+        translation: analyzeFeature.translation?.translation ?? null,
       },
       targetLang,
     );
@@ -225,6 +233,7 @@ export default function Page() {
         />
         <ResultPanel
           data={analyzeFeature.data}
+          translation={analyzeFeature.translation}
           error={analyzeFeature.error}
           analyzeLoading={analyzeFeature.analyzeLoading}
           onDeleteVocab={handleDeleteVocab}

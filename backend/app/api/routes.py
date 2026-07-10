@@ -15,6 +15,8 @@ from app.schemas import (
     GenerateTextResponse,
     GrammarHistoryItemResponse,
     SaveArticleHistoryRequest,
+    TranslateRequest,
+    TranslateSentenceResponse,
     VocabHistoryItemResponse,
 )
 from app.services.analyzer import analyze_text
@@ -22,6 +24,7 @@ from app.services.explainer import explain_word, explain_sentence
 from app.services.pdf_exporter import build_pdf_bytes
 from app.services.history_service import HistoryService
 from app.services.text_generator import generate_text
+from app.services.translator import translate_sentence
 
 # Controller layer: receives HTTP requests and delegates actual work to services.
 router = APIRouter()
@@ -31,6 +34,11 @@ history_service = HistoryService()
 @router.post("/analyze", response_model=AnalyzeResponse)
 def analyze_endpoint(req: AnalyzeRequest):
     return analyze_text(req)
+
+
+@router.post("/translate", response_model=TranslateSentenceResponse)
+def translate_endpoint(req: TranslateRequest):
+    return translate_sentence(req.text, req.target_lang)
 
 
 @router.post("/explain", response_model=ExplainResponse)
@@ -43,7 +51,7 @@ def explain_endpoint(req: ExplainRequest):
 
 @router.post("/export_pdf")
 def export_pdf_endpoint(req: ExportPDFRequest):
-    pdf_bytes = build_pdf_bytes(req.text, req.data, req.target_lang)
+    pdf_bytes = build_pdf_bytes(req.text, req.data, req.target_lang, req.translation)
     return Response(
         content=pdf_bytes,
         media_type="application/pdf",

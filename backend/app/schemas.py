@@ -55,6 +55,10 @@ class ExplainWordResponse(BaseModel):
 class TranslateSentenceResponse(BaseModel):
     translation: str        
 
+class TranslateRequest(BaseModel):
+    text: str = Field(..., min_length=1, description="Japanese text to translate")
+    target_lang: str = "en"
+
 class ExplainSentenceResponse(BaseModel):
     kind: Literal["sentence"] = "sentence"
     translation: TranslateSentenceResponse
@@ -67,6 +71,7 @@ ExplainResponse = Union[ExplainWordResponse, ExplainSentenceResponse]
 class ExportPDFRequest(BaseModel):
     text: str = Field(..., min_length=1)
     data: AnalyzeResponse
+    translation: Optional[str] = None
     target_lang: str = "en" 
 
 # text generator ------------    
@@ -101,6 +106,7 @@ class ArticleHistoryGrammarItem(BaseModel):
 class SaveArticleHistoryRequest(BaseModel):
     text: str = Field(..., min_length=1)
     level: str = Field(..., min_length=1)
+    translation: Optional[str] = None
     vocab: list[ArticleHistoryVocabItem]
     grammar: list[ArticleHistoryGrammarItem]
 
@@ -111,6 +117,7 @@ class ArticleHistoryDetailResponse(BaseModel):
     level: str
     created_at: datetime
     title: Optional[str] = None
+    translation: Optional[str] = None
     vocab: list[ArticleHistoryVocabItem]
     grammar: list[ArticleHistoryGrammarItem]
 

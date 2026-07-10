@@ -15,11 +15,12 @@ import {
   buttonGhost,
   maskedIconStyle,
 } from "@/components/buttonStyles";
-import type { AnalyzeResponse, TargetLang } from "@/lib/types";
+import type { AnalyzeResponse, TargetLang, TranslateSentenceResponse } from "@/lib/types";
 import { UI_STRINGS } from "@/lib/i18n";
 
 type Props = {
   data: AnalyzeResponse;
+  translation: TranslateSentenceResponse | null;
   error: string | null;
   analyzeLoading: boolean;
   onDeleteVocab: (expression: string) => void;
@@ -37,6 +38,7 @@ type Props = {
 
 export function ResultPanel({
   data,
+  translation,
   error,
   analyzeLoading: loading,
   onDeleteVocab,
@@ -53,6 +55,8 @@ export function ResultPanel({
 }: Props) {
   const tUI = UI_STRINGS[targetLang];
   const hasResult = data.vocab.length > 0 || data.grammar.length > 0;
+  const translationTitle = targetLang === "zh" ? "\u7ffb\u8bd1" : "Translation";
+  const translationEmptyText = targetLang === "zh" ? "\u6682\u65e0\u7ffb\u8bd1" : "No translation saved.";
   const [activeDeleteKey, setActiveDeleteKey] = useState<string | null>(null);
 
   return (
@@ -118,6 +122,19 @@ export function ResultPanel({
       {saveError ? <div style={errorBox}>{tUI.resultPanel.saveError}: {saveError}</div> : null}
       {saveSuccess ? <div style={{ ...successBox, ...(saveSuccessLeaving ? successBoxLeaving : null) }}>{saveSuccess}</div> : null}
       {exportError ? <div style={errorBox}>{tUI.resultPanel.exportPdf}{tUI.common.error}: {exportError}</div> : null}
+
+      <div style={translationSection}>
+        <div style={sectionTitle}>{translationTitle}</div>
+        <div style={translationBox}>
+          {loading ? (
+            <span style={emptyText}>{tUI.common.loading}</span>
+          ) : translation?.translation ? (
+            translation.translation
+          ) : (
+            <span style={emptyText}>{translationEmptyText}</span>
+          )}
+        </div>
+      </div>
 
       <div style={twoCols}>
         <div style={section}>
@@ -248,6 +265,20 @@ const section: React.CSSProperties = {
 
 const sectionTitle: React.CSSProperties = { fontWeight: 500, marginBottom: 8 };
 
+const translationSection: React.CSSProperties = {
+  marginBottom: 12,
+};
+
+const translationBox: React.CSSProperties = {
+  border: "1px solid var(--border)",
+  background: "var(--surface)",
+  borderRadius: 14,
+  padding: 10,
+  fontSize: 14,
+  lineHeight: 1.6,
+  whiteSpace: "pre-wrap",
+};
+
 const list: React.CSSProperties = {
   listStyle: "none",
   padding: 0,
@@ -303,6 +334,7 @@ const deleteItemBtnVisible: React.CSSProperties = {
 };
 
 const empty: React.CSSProperties = { opacity: 0.6, padding: 10 };
+const emptyText: React.CSSProperties = { opacity: 0.6 };
 const muted: React.CSSProperties = { opacity: 0.8, marginTop: 6, fontSize: 13, lineHeight: 1.5 };
 const mutedSmall: React.CSSProperties = { opacity: 0.65, marginTop: 6, fontSize: 12, lineHeight: 1.5 };
 const example: React.CSSProperties = { opacity: 0.85, marginTop: 6, fontStyle: "italic", fontSize: 13, lineHeight: 1.5 };

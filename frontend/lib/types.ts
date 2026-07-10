@@ -25,6 +25,7 @@ export type AnalyzeResponse = {
 export type ExportPdfRequest = {
   text: string;
   data: AnalyzeResponse;
+  translation?: string | null;
 };
 
 export type ExplainType = "vocab" | "grammar";
@@ -88,6 +89,7 @@ export type ArticleHistoryGrammarItem = {
 export type SaveArticleHistoryRequest = {
   text: string;
   level: Level;
+  translation?: string | null;
   vocab: ArticleHistoryVocabItem[];
   grammar: ArticleHistoryGrammarItem[];
 };
@@ -98,6 +100,7 @@ export type ArticleHistoryDetailResponse = {
   level: string;
   created_at: string;
   title?: string | null;
+  translation?: string | null;
   vocab: ArticleHistoryVocabItem[];
   grammar: ArticleHistoryGrammarItem[];
 };

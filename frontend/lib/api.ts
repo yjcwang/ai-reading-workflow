@@ -10,6 +10,7 @@ import type {
   GenerateTextResponse, 
   SaveArticleHistoryRequest,
   TargetLang,
+  TranslateSentenceResponse,
   VocabHistoryItemResponse} from "./types";
 
 
@@ -33,6 +34,18 @@ export async function analyze(text: string, level: Level, target_lang: TargetLan
    });
    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
    return (await resp.json()) as AnalyzeResponse;
+}
+
+export async function translate(text: string, target_lang: TargetLang): Promise<TranslateSentenceResponse> {
+  const BASE_URL = getBackendBaseUrl();
+
+  const resp = await fetch(BASE_URL + "/api/translate", {
+     method: "POST",
+     headers: { "Content-Type": "application/json" },
+     body: JSON.stringify({ text, target_lang }),
+   });
+   if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+   return (await resp.json()) as TranslateSentenceResponse;
 }
 
 export async function explain(mode: "word" | "sentence", selected_text: string, context: string, level: Level, target_lang: TargetLang): Promise<ExplainResponse> {

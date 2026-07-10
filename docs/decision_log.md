@@ -209,3 +209,13 @@ The project needed a simple way to run the full stack locally with Docker.
 - Daily run: `docker compose up`.
 - Code changes require rebuild; env-only backend changes usually require restart.
 
+## 2026-07-10 Persist Analyze Translation
+
+### Context
+Translation is useful during reading because it helps users understand the full text beyond extracted vocabulary and grammar, so the analyze result panel should show it directly after clicking Analyze Text.
+
+### Decision
+- Keep `/api/analyze` unchanged and add a separate `/api/translate` endpoint.
+- Save article-level `translation` with history records; existing rows keep `NULL`.
+- Include translation when loading history and exporting PDF.
+

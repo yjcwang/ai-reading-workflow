@@ -42,6 +42,7 @@ class HistoryService:
             text=req.text,
             level=req.level,
             title=title,
+            translation=req.translation,
         )
 
         self.repository.create_vocab_history_items(
@@ -66,6 +67,7 @@ class HistoryService:
             level=article.level,
             created_at=article.created_at,
             title=article.title,
+            translation=article.translation,
             vocab=req.vocab,
             grammar=req.grammar,
         )
@@ -182,6 +184,7 @@ class HistoryService:
             level=article.level,
             created_at=article.created_at,
             title=article.title,
+            translation=article.translation,
             vocab=[
                 ArticleHistoryVocabItem(
                     expression=item.expression,

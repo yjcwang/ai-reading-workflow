@@ -15,11 +15,13 @@ class HistoryRepository:
         text: str,
         level: str,
         title: str | None,
+        translation: str | None,
     ) -> ArticleHistory:
         article = ArticleHistory(
             text=text,
             level=level,
             title=title,
+            translation=translation,
         )
         session.add(article)
         # flush() pushes the INSERT now so article.id is available before commit().
