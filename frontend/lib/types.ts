@@ -76,6 +76,34 @@ export type GenerateTextResponse = {
   text: string;
 };
 
+export type AiChatRole = "user" | "assistant";
+
+export type AiChatMessage = {
+  id: string;
+  role: AiChatRole;
+  content: string;
+};
+
+export type AskAIContextType = "article" | "selected_text" | "vocab" | "grammar";
+
+export type AskAIRequest = {
+  question: string;
+  messages: Array<{
+    role: AiChatRole;
+    content: string;
+  }>;
+  context_type: AskAIContextType;
+  context_payload?: Record<string, unknown> | null;
+  article_text: string;
+  analysis: AnalyzeResponse;
+  level: Level;
+  target_lang: TargetLang;
+};
+
+export type AskAIResponse = {
+  answer: string;
+};
+
 export type ArticleHistoryVocabItem = {
   expression: string;
   reading?: string | null;

@@ -6,6 +6,7 @@ import loadingIcon from "@/icons/loading.svg";
 import deleteIcon from "@/icons/delete.svg";
 import downloadIcon from "@/icons/download.svg";
 import saveToHistoryIcon from "@/icons/save_result.svg";
+import aiIcon from "@/icons/ai.svg";
 import styles from "./InputPanel.module.css";
 import {
   buttonMd,
@@ -32,6 +33,8 @@ type Props = {
   onDeleteGrammar: (expression: string) => void;
   onSaveArticleHistory: () => void;
   onExportPdf: () => void;
+  onOpenAiChat: () => void;
+  aiChatDisabled: boolean;
   saving: boolean;
   saveError: string | null;
   saveSuccess: string | null;
@@ -51,6 +54,8 @@ export function ResultPanel({
   onDeleteGrammar,
   onSaveArticleHistory,
   onExportPdf,
+  onOpenAiChat,
+  aiChatDisabled,
   saving,
   saveError,
   saveSuccess,
@@ -76,6 +81,16 @@ export function ResultPanel({
           </div>
         </div>
         <div style={headerActions}>
+          <button
+            className="btn-interactive"
+            style={askAiBtn}
+            onClick={onOpenAiChat}
+            disabled={loading || aiChatDisabled}
+            title="Ask AI"
+          >
+            <span style={maskedIconStyle(aiIcon.src, 18)} aria-hidden="true" />
+            Ask AI
+          </button>
           <button
             className="btn-interactive"
             style={saveBtn}
@@ -335,6 +350,11 @@ const itemTitle: React.CSSProperties = {
 };
 
 const saveBtn: React.CSSProperties = {
+  ...buttonMd,
+  ...buttonTinted,
+};
+
+const askAiBtn: React.CSSProperties = {
   ...buttonMd,
   ...buttonTinted,
 };

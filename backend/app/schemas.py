@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field, field_serializer
-from typing import List, Optional, Literal, Union
+from typing import Any, List, Optional, Literal, Union
 from datetime import datetime, timezone
 
 
@@ -88,6 +88,26 @@ class GenerateTextResponse(BaseModel):
 
 class GenerateTitleResponse(BaseModel):
     title: str
+
+# AI chat ------------
+class ChatMessage(BaseModel):
+    role: Literal["user", "assistant"]
+    content: str = Field(..., min_length=1)
+
+
+class AskAIRequest(BaseModel):
+    question: str = Field(..., min_length=1)
+    messages: list[ChatMessage] = Field(default_factory=list)
+    context_type: Literal["article", "selected_text", "vocab", "grammar"] = "article"
+    context_payload: dict[str, Any] | None = None
+    article_text: str = ""
+    analysis: AnalyzeResponse
+    level: Optional[str] = Field(default="N2", description="e.g., N5-N1 or beginner/intermediate")
+    target_lang: str = "en"
+
+
+class AskAIResponse(BaseModel):
+    answer: str
 
 # database ------------
 class ArticleHistoryVocabItem(BaseModel):

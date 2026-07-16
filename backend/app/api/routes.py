@@ -8,6 +8,8 @@ from app.schemas import (
     ArticleHistoryItemResponse,
     AnalyzeRequest,
     AnalyzeResponse,
+    AskAIRequest,
+    AskAIResponse,
     ExplainRequest,
     ExplainResponse,
     ExportPDFRequest,
@@ -19,6 +21,7 @@ from app.schemas import (
     TranslateSentenceResponse,
     VocabHistoryItemResponse,
 )
+from app.services.ai_chat import answer_ai_chat
 from app.services.analyzer import analyze_text
 from app.services.explainer import explain_word, explain_sentence
 from app.services.pdf_exporter import build_pdf_bytes
@@ -62,6 +65,11 @@ def export_pdf_endpoint(req: ExportPDFRequest):
 @router.post("/generate-text", response_model=GenerateTextResponse)
 def generate_text_endpoint(req: GenerateTextRequest):
     return generate_text(req)
+
+
+@router.post("/ask-ai", response_model=AskAIResponse)
+def ask_ai_endpoint(req: AskAIRequest):
+    return answer_ai_chat(req)
 
 
 @router.post("/history/articles", response_model=ArticleHistoryDetailResponse)

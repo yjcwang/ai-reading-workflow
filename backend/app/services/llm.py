@@ -68,6 +68,10 @@ def _mock_json_output(prompt: str) -> str:
         data = {
             "title": "(Mock) Saved Reading Title"
         }
+    elif cleaned_prompt.startswith("###FEATURE:AI_CHAT###"):
+        data = {
+            "answer": "(Mock) This point is important because it connects the article context with the current analysis."
+        }
     else:
         preview = prompt[:50].replace("\n", " ")
         raise ValueError(

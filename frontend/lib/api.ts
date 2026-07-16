@@ -2,6 +2,8 @@ import type {
   AnalyzeResponse, 
   ArticleHistoryDetailResponse,
   ArticleHistoryItemResponse,
+  AskAIRequest,
+  AskAIResponse,
   ExportPdfRequest,
   Level,
   ExplainResponse, 
@@ -96,6 +98,19 @@ export async function generateText(
 
   if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
   return (await resp.json()) as GenerateTextResponse;
+}
+
+export async function askAi(request: AskAIRequest): Promise<AskAIResponse> {
+  const BASE_URL = getBackendBaseUrl();
+
+  const resp = await fetch(BASE_URL + "/api/ask-ai", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(request),
+  });
+
+  if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+  return (await resp.json()) as AskAIResponse;
 }
 
 export async function saveArticleHistory(

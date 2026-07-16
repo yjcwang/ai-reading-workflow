@@ -5,6 +5,7 @@ import styles from "./page.module.css";
 import { InputPanel } from "@/components/InputPanel";
 import { ResultPanel } from "@/components/ResultPanel";
 import { HistoryPanel } from "@/components/HistoryPanel";
+import { AiChatDrawer } from "@/components/AiChatDrawer";
 import { useTheme } from "@/hooks/useTheme";
 import { useTargetLang } from "@/hooks/useTargetLang";
 import { useExplainFeature, inferExplainMode } from "@/hooks/useExplainFeature";
@@ -12,6 +13,7 @@ import { useAnalyzeFeature } from "@/hooks/useAnalyzeFeature";
 import { useExportPdf } from "@/hooks/useExportPdf";
 import { useGenerateTextFeature } from "@/hooks/useGenerateTextFeature";
 import { useHistoryFeature } from "@/hooks/useHistoryFeature";
+import { useAiChatFeature } from "@/hooks/useAiChatFeature";
 import {
   addItemFromExplain,
   deleteGrammarByExpression,
@@ -50,11 +52,13 @@ export default function Page() {
     targetLang,
   });
   const historyFeature = useHistoryFeature(targetLang);
+  const aiChatFeature = useAiChatFeature();
   const exportFeature = useExportPdf({
     filename: "my-list.pdf",
   });
 
   async function handleAnalyzeRequest() {
+    aiChatFeature.resetChat();
     await analyzeFeature.handleAnalyzeRequest(text);
   }
 
@@ -99,6 +103,7 @@ export default function Page() {
     if (!articleHistory) return;
 
     applyArticleHistoryDetail(articleHistory);
+    aiChatFeature.resetChat();
     setHistoryOpen(false);
   }
 
@@ -166,6 +171,7 @@ export default function Page() {
     analyzeFeature.resetAnalyze();
     explainFeature.resetExplain();
     exportFeature.resetExport();
+    aiChatFeature.resetChat();
   }
 
   function handleLanguageChangeWithReset(newLang: typeof targetLang) {
@@ -244,6 +250,8 @@ export default function Page() {
           onDeleteGrammar={handleDeleteGrammar}
           onSaveArticleHistory={handleSaveCurrentArticleHistory}
           onExportPdf={handleExportPdf}
+          onOpenAiChat={() => aiChatFeature.setOpen(true)}
+          aiChatDisabled={!(analyzeFeature.lockedText?.trim() || text.trim())}
           saving={historyFeature.saveLoading}
           saveError={historyFeature.saveError}
           saveSuccess={historyFeature.saveSuccess}
@@ -275,6 +283,26 @@ export default function Page() {
           onSearchQueryChange={historyFeature.setHistorySearchQuery}
           onSearch={historyFeature.searchCurrentHistory}
           onClearSearch={historyFeature.clearHistorySearch}
+        />
+        <AiChatDrawer
+          open={aiChatFeature.open}
+          messages={aiChatFeature.messages}
+          loading={aiChatFeature.loading}
+          error={aiChatFeature.error}
+          targetLang={targetLang}
+          disabled={analyzeFeature.analyzeLoading}
+          onClose={() => aiChatFeature.setOpen(false)}
+          onSend={(question) =>
+            aiChatFeature.sendQuestion({
+              question,
+              articleText: analyzeFeature.lockedText?.trim() || text.trim(),
+              analysis: analyzeFeature.data,
+              level,
+              targetLang,
+              contextType: "article",
+              contextPayload: null,
+            })
+          }
         />
       </div>
     </main>
