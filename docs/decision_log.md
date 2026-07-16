@@ -227,4 +227,17 @@ Learners need a quick way to connect vocabulary and grammar cards in the result 
 ### Decision
 - Highlight matching text inside `LockedTextViewer` when hovering or focusing vocabulary and grammar cards in `ResultPanel`.
 
+## 2026-07-16 Add Article-Level AI Chat (Issue #28)
+
+### Context
+Learners need short follow-up Q&A around the current reading, selected text, and existing vocabulary/grammar cards without confusing it with the structured explain flow.
+
+### Decision
+- Add a side `Ask AI` drawer with article-level in-memory chat history.
+- Use `active context` for entry-specific focus: article, selected text, vocabulary card, or grammar card.
+- Keep global AI chat context limited to article text, analysis, level, target language, and recent messages; do not include translation by default.
+- Selecting text opens AI chat only; structured explain/card generation is triggered manually from the drawer.
+- Reuse the existing `ExplainModal` for generated explain cards and keep its add-to-list behavior.
+
+
 
