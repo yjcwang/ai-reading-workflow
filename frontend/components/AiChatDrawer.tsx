@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import Image from "next/image";
 import closeIcon from "@/icons/close.svg";
 import loadingIcon from "@/icons/loading.svg";
 import aiIcon from "@/icons/ai.svg";
 import chatContextIcon from "@/icons/chat_context.svg";
+import sendIcon from "@/icons/send.svg";
 import styles from "./InputPanel.module.css";
 import {
   buttonGhost,
@@ -16,6 +17,7 @@ import {
 } from "@/components/buttonStyles";
 import { UI_STRINGS } from "@/lib/i18n";
 import type { AiChatMessage, AskAIContextType, TargetLang } from "@/lib/types";
+import { usePresenceTransition } from "@/hooks/usePresenceTransition";
 
 type Props = {
   open: boolean;
@@ -47,8 +49,21 @@ export function AiChatDrawer({
   onGenerateExplainCards,
 }: Props) {
   const [draft, setDraft] = useState("");
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+  const { shouldRender, visible } = usePresenceTransition({
+    open,
+    exitMs: PANEL_TRANSITION_MS,
+  });
   const tUI = UI_STRINGS[targetLang].aiChat;
   const showGenerateCards = contextType === "selected_text" && !!onGenerateExplainCards;
+
+  // Grow with wrapped input until the composer reaches its maximum comfortable height.
+  function resizeTextarea(textarea: HTMLTextAreaElement) {
+    textarea.style.height = "auto";
+    const nextHeight = Math.min(textarea.scrollHeight, TEXTAREA_MAX_HEIGHT);
+    textarea.style.height = `${nextHeight}px`;
+    textarea.style.overflowY = textarea.scrollHeight > TEXTAREA_MAX_HEIGHT ? "auto" : "hidden";
+  }
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
@@ -56,13 +71,23 @@ export function AiChatDrawer({
     if (!question || loading || disabled) return;
 
     setDraft("");
+    if (textareaRef.current) {
+      textareaRef.current.style.height = `${TEXTAREA_MIN_HEIGHT}px`;
+      textareaRef.current.style.overflowY = "hidden";
+    }
     await onSend(question);
   }
 
-  if (!open) return null;
+  if (!shouldRender) return null;
 
   return (
-    <aside style={drawer} aria-label={tUI.title}>
+    <aside
+      style={{
+        ...panel,
+        ...(visible ? panelVisible : panelHidden),
+      }}
+      aria-label={tUI.title}
+    >
       <div style={header}>
         <div style={titleBlock}>
           <div style={titleRow}>
@@ -133,12 +158,16 @@ export function AiChatDrawer({
           </div>
         ) : null}
         <textarea
+          ref={textareaRef}
           value={draft}
-          onChange={(event) => setDraft(event.target.value)}
+          onChange={(event) => {
+            setDraft(event.target.value);
+            resizeTextarea(event.currentTarget);
+          }}
           placeholder={tUI.placeholder}
           disabled={loading || disabled}
           style={textarea}
-          rows={3}
+          rows={1}
         />
         <div style={composerActions}>
           {showGenerateCards ? (
@@ -168,8 +197,10 @@ export function AiChatDrawer({
             style={sendBtn}
             disabled={loading || disabled || draft.trim().length === 0}
             type="submit"
+            aria-label={tUI.send}
+            title={tUI.send}
           >
-            {tUI.send}
+            <span style={maskedIconStyle(sendIcon.src, 18)} aria-hidden="true" />
           </button>
         </div>
       </form>
@@ -177,28 +208,49 @@ export function AiChatDrawer({
   );
 }
 
-const drawer: React.CSSProperties = {
-  position: "fixed",
-  top: 0,
-  right: 0,
+const PANEL_TRANSITION_MS = 420;
+const TEXTAREA_MIN_HEIGHT = 44;
+const TEXTAREA_MAX_HEIGHT = 160;
+
+const panel: React.CSSProperties = {
+  position: "absolute",
+  top: "calc(100% + 10px)",
+  right: -200,
   zIndex: 80,
-  width: "min(420px, 100vw)",
-  height: "100dvh",
+  width: "min(480px, calc(100vw - 48px))",
+  height: "min(720px, calc(100dvh - 130px))",
+  minHeight: 420,
   display: "flex",
   flexDirection: "column",
   background: "var(--panel)",
-  borderLeft: "1px solid var(--border)",
-  boxShadow: "var(--shadow)",
+  border: "1px solid var(--border)",
+  borderRadius: 18,
+  boxShadow: "0 24px 60px rgba(0, 0, 0, 0.18)",
   color: "var(--text)",
+  overflow: "hidden",
+  transition: `transform ${PANEL_TRANSITION_MS}ms cubic-bezier(0.22, 1, 0.36, 1), opacity 320ms ease`,
+  willChange: "transform, opacity",
+};
+
+const panelVisible: React.CSSProperties = {
+  opacity: 1,
+  transform: "translateY(0)",
+  pointerEvents: "auto",
+};
+
+const panelHidden: React.CSSProperties = {
+  opacity: 0,
+  transform: "translateY(-18px)",
+  pointerEvents: "none",
 };
 
 const header: React.CSSProperties = {
   display: "flex",
   justifyContent: "space-between",
-  alignItems: "flex-start",
+  alignItems: "center",
   gap: 12,
   padding: 16,
-  borderBottom: "1px solid var(--border)",
+  
 };
 
 const titleBlock: React.CSSProperties = {
@@ -261,9 +313,18 @@ const messageList: React.CSSProperties = {
 };
 
 const emptyState: React.CSSProperties = {
-  opacity: 0.65,
-  fontSize: 14,
-  lineHeight: 1.5,
+  flex: 1,
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  alignSelf: "stretch",
+  maxWidth: 320,
+  margin: "0 auto",
+  color: "var(--text)",
+  fontSize: 24,
+  fontWeight: 500,
+  lineHeight: 1.35,
+  textAlign: "center",
 };
 
 const messageBubble: React.CSSProperties = {
@@ -307,13 +368,16 @@ const composer: React.CSSProperties = {
 
 const textarea: React.CSSProperties = {
   width: "100%",
-  resize: "vertical",
-  minHeight: 76,
-  maxHeight: 160,
+  height: TEXTAREA_MIN_HEIGHT,
+  minHeight: TEXTAREA_MIN_HEIGHT,
+  maxHeight: TEXTAREA_MAX_HEIGHT,
+  resize: "none",
+  overflowY: "hidden",
   borderRadius: 12,
   border: "1px solid var(--border-strong)",
   background: "var(--surface)",
   color: "var(--text)",
+  outline: "none",
   padding: 10,
   font: "inherit",
   lineHeight: 1.5,
@@ -333,6 +397,6 @@ const generateCardsBtn: React.CSSProperties = {
 };
 
 const sendBtn: React.CSSProperties = {
-  ...buttonSm,
+  ...iconButtonMd,
   ...buttonPrimary,
 };

@@ -36,6 +36,7 @@ type Props = {
   onSaveArticleHistory: () => void;
   onExportPdf: () => void;
   onOpenAiChat: () => void;
+  aiChatPanel: React.ReactNode;
   onAskAiForVocab: (item: VocabItem) => void;
   onAskAiForGrammar: (item: GrammarItem) => void;
   aiChatDisabled: boolean;
@@ -59,6 +60,7 @@ export function ResultPanel({
   onSaveArticleHistory,
   onExportPdf,
   onOpenAiChat,
+  aiChatPanel,
   onAskAiForVocab,
   onAskAiForGrammar,
   aiChatDisabled,
@@ -87,16 +89,19 @@ export function ResultPanel({
           </div>
         </div>
         <div style={headerActions}>
-          <button
-            className="btn-interactive"
-            style={askAiBtn}
-            onClick={onOpenAiChat}
-            disabled={loading || aiChatDisabled}
-            title={tUI.aiChat.askAi}
-          >
-            <span style={maskedIconStyle(aiIcon.src, 18)} aria-hidden="true" />
-            {tUI.aiChat.askAi}
-          </button>
+          <div style={askAiMenu}>
+            <button
+              className="btn-interactive"
+              style={askAiBtn}
+              onClick={onOpenAiChat}
+              disabled={loading || aiChatDisabled}
+              title={tUI.aiChat.askAi}
+            >
+              <span style={maskedIconStyle(aiIcon.src, 18)} aria-hidden="true" />
+              {tUI.aiChat.askAi}
+            </button>
+            {aiChatPanel}
+          </div>
           <button
             className="btn-interactive"
             style={saveBtn}
@@ -191,10 +196,21 @@ export function ResultPanel({
                   </div>
                   <button
                     className="btn-interactive"
-                    style={askItemBtn}
+                    style={{
+                      ...askItemBtn,
+                      ...(activeDeleteKey === `vocab:${v.expression}` ? deleteItemBtnVisible : deleteItemBtnHidden),
+                    }}
                     onClick={() => onAskAiForVocab(v)}
                     title={tUI.aiChat.askAi}
                     aria-label={tUI.aiChat.askAi}
+                    onFocus={() => {
+                      setActiveDeleteKey(`vocab:${v.expression}`);
+                      onActiveTextHighlightChange?.({ type: "vocab", expression: v.expression });
+                    }}
+                    onBlur={() => {
+                      setActiveDeleteKey((current) => (current === `vocab:${v.expression}` ? null : current));
+                      onActiveTextHighlightChange?.(null);
+                    }}
                   >
                     <span style={maskedIconStyle(aiIcon.src, 14)} aria-hidden="true" />
                   </button>
@@ -251,10 +267,21 @@ export function ResultPanel({
                   <div style={itemTitle}>{g.expression}</div>
                   <button
                     className="btn-interactive"
-                    style={askItemBtn}
+                    style={{
+                      ...askItemBtn,
+                      ...(activeDeleteKey === `grammar:${g.expression}` ? deleteItemBtnVisible : deleteItemBtnHidden),
+                    }}
                     onClick={() => onAskAiForGrammar(g)}
                     title={tUI.aiChat.askAi}
                     aria-label={tUI.aiChat.askAi}
+                    onFocus={() => {
+                      setActiveDeleteKey(`grammar:${g.expression}`);
+                      onActiveTextHighlightChange?.({ type: "grammar", expression: g.expression });
+                    }}
+                    onBlur={() => {
+                      setActiveDeleteKey((current) => (current === `grammar:${g.expression}` ? null : current));
+                      onActiveTextHighlightChange?.(null);
+                    }}
                   >
                     <span style={maskedIconStyle(aiIcon.src, 14)} aria-hidden="true" />
                   </button>
@@ -383,6 +410,10 @@ const askAiBtn: React.CSSProperties = {
   ...buttonTinted,
 };
 
+const askAiMenu: React.CSSProperties = {
+  position: "relative",
+};
+
 const exportBtn: React.CSSProperties = {
   ...buttonMd,
   ...buttonPrimary,
@@ -404,6 +435,7 @@ const askItemBtn: React.CSSProperties = {
   position: "absolute",
   top: 10,
   right: 44,
+  transition: "opacity 160ms ease",
 };
 
 const deleteItemBtnHidden: React.CSSProperties = {

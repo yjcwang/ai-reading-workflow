@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React from "react";
 import addIcon from "@/icons/add.svg";
 import closeIcon from "@/icons/close.svg";
 import {
@@ -33,38 +33,11 @@ export function ExplainModal({
   onClose, 
   onAdd,
   targetLang}: Props) {
-  const modalRef = useRef<HTMLDivElement | null>(null);
   const { shouldRender, visible } = usePresenceTransition({
     open,
     exitMs: MODAL_TRANSITION_MS,
   });
   const tUI = UI_STRINGS[targetLang];
-  
-  useEffect(() => {
-    function onKeyDown(e: KeyboardEvent) {
-      if (e.key === "Escape") onClose();
-    }
-
-    function onPointerDown(event: PointerEvent) {
-      const target = event.target;
-      if (!(target instanceof Node)) return;
-      if (modalRef.current?.contains(target)) return;
-
-      event.preventDefault();
-      event.stopPropagation();
-      onClose();
-    }
-
-    if (open) {
-      document.addEventListener("keydown", onKeyDown);
-      document.addEventListener("pointerdown", onPointerDown, true);
-    }
-
-    return () => {
-      document.removeEventListener("keydown", onKeyDown);
-      document.removeEventListener("pointerdown", onPointerDown, true);
-    };
-  }, [open, onClose]);
 
   if (!shouldRender) return null;
 
@@ -73,7 +46,6 @@ export function ExplainModal({
 
    return (
       <div
-        ref={modalRef}
         style={{
           ...modalCard,
           ...(visible ? modalCardVisible : modalCardHidden),

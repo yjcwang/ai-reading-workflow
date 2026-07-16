@@ -118,6 +118,11 @@ export default function Page() {
   }
 
   function handleOpenArticleAiChat() {
+    if (aiChatFeature.open) {
+      aiChatFeature.setOpen(false);
+      return;
+    }
+
     explainFeature.resetExplain();
     aiChatFeature.openWithContext({
       type: "article",
@@ -302,6 +307,30 @@ export default function Page() {
           onSaveArticleHistory={handleSaveCurrentArticleHistory}
           onExportPdf={handleExportPdf}
           onOpenAiChat={handleOpenArticleAiChat}
+          aiChatPanel={
+            <AiChatDrawer
+              open={aiChatFeature.open}
+              messages={aiChatFeature.messages}
+              loading={aiChatFeature.loading}
+              error={aiChatFeature.error}
+              targetLang={targetLang}
+              contextText={aiChatFeature.activeContext.text}
+              contextType={aiChatFeature.activeContext.type}
+              explainLoading={explainFeature.explainLoading}
+              disabled={analyzeFeature.analyzeLoading}
+              onClose={() => aiChatFeature.setOpen(false)}
+              onGenerateExplainCards={handleGenerateExplainCardsFromChat}
+              onSend={(question) =>
+                aiChatFeature.sendQuestion({
+                  question,
+                  articleText: analyzeFeature.lockedText?.trim() || text.trim(),
+                  analysis: analyzeFeature.data,
+                  level,
+                  targetLang,
+                })
+              }
+            />
+          }
           onAskAiForVocab={handleAskAiForVocab}
           onAskAiForGrammar={handleAskAiForGrammar}
           aiChatDisabled={!(analyzeFeature.lockedText?.trim() || text.trim())}
@@ -336,28 +365,6 @@ export default function Page() {
           onSearchQueryChange={historyFeature.setHistorySearchQuery}
           onSearch={historyFeature.searchCurrentHistory}
           onClearSearch={historyFeature.clearHistorySearch}
-        />
-        <AiChatDrawer
-          open={aiChatFeature.open}
-          messages={aiChatFeature.messages}
-          loading={aiChatFeature.loading}
-          error={aiChatFeature.error}
-          targetLang={targetLang}
-          contextText={aiChatFeature.activeContext.text}
-          contextType={aiChatFeature.activeContext.type}
-          explainLoading={explainFeature.explainLoading}
-          disabled={analyzeFeature.analyzeLoading}
-          onClose={() => aiChatFeature.setOpen(false)}
-          onGenerateExplainCards={handleGenerateExplainCardsFromChat}
-          onSend={(question) =>
-            aiChatFeature.sendQuestion({
-              question,
-              articleText: analyzeFeature.lockedText?.trim() || text.trim(),
-              analysis: analyzeFeature.data,
-              level,
-              targetLang,
-            })
-          }
         />
       </div>
     </main>
