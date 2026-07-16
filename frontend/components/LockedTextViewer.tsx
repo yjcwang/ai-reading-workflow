@@ -32,7 +32,6 @@ export function LockedTextViewer({
   onExplainRequest,
   disabled,
   explainLoading,
-  getMode,
   targetLang,
   activeHighlight,
 }: Props) {
@@ -53,11 +52,7 @@ export function LockedTextViewer({
   const explainBusyRef = useRef(false);
 
   const explainBusy = !!disabled || !!explainLoading || explainSubmitting;
-  const mode = getMode ? getMode(selectedText) : "word";
-  const explainBtnLabel =
-    mode === "sentence"
-      ? tUI.lockedTextViewer.explainBtnScentence
-      : tUI.lockedTextViewer.explainBtnWord;
+  const explainBtnLabel = tUI.aiChat.askAi;
 
   explainBusyRef.current = explainBusy;
   btnPosRef.current = btnPos;

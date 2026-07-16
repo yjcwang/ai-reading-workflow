@@ -18,9 +18,11 @@ import {
 } from "@/components/buttonStyles";
 import type {
   AnalyzeResponse,
+  GrammarItem,
   TargetLang,
   TextHighlight,
   TranslateSentenceResponse,
+  VocabItem,
 } from "@/lib/types";
 import { UI_STRINGS } from "@/lib/i18n";
 
@@ -34,6 +36,8 @@ type Props = {
   onSaveArticleHistory: () => void;
   onExportPdf: () => void;
   onOpenAiChat: () => void;
+  onAskAiForVocab: (item: VocabItem) => void;
+  onAskAiForGrammar: (item: GrammarItem) => void;
   aiChatDisabled: boolean;
   saving: boolean;
   saveError: string | null;
@@ -55,6 +59,8 @@ export function ResultPanel({
   onSaveArticleHistory,
   onExportPdf,
   onOpenAiChat,
+  onAskAiForVocab,
+  onAskAiForGrammar,
   aiChatDisabled,
   saving,
   saveError,
@@ -86,10 +92,10 @@ export function ResultPanel({
             style={askAiBtn}
             onClick={onOpenAiChat}
             disabled={loading || aiChatDisabled}
-            title="Ask AI"
+            title={tUI.aiChat.askAi}
           >
             <span style={maskedIconStyle(aiIcon.src, 18)} aria-hidden="true" />
-            Ask AI
+            {tUI.aiChat.askAi}
           </button>
           <button
             className="btn-interactive"
@@ -185,6 +191,15 @@ export function ResultPanel({
                   </div>
                   <button
                     className="btn-interactive"
+                    style={askItemBtn}
+                    onClick={() => onAskAiForVocab(v)}
+                    title={tUI.aiChat.askAi}
+                    aria-label={tUI.aiChat.askAi}
+                  >
+                    <span style={maskedIconStyle(aiIcon.src, 14)} aria-hidden="true" />
+                  </button>
+                  <button
+                    className="btn-interactive"
                     style={{
                       ...deleteItemBtn,
                       ...(activeDeleteKey === `vocab:${v.expression}` ? deleteItemBtnVisible : deleteItemBtnHidden),
@@ -234,6 +249,15 @@ export function ResultPanel({
                   }}
                 >
                   <div style={itemTitle}>{g.expression}</div>
+                  <button
+                    className="btn-interactive"
+                    style={askItemBtn}
+                    onClick={() => onAskAiForGrammar(g)}
+                    title={tUI.aiChat.askAi}
+                    aria-label={tUI.aiChat.askAi}
+                  >
+                    <span style={maskedIconStyle(aiIcon.src, 14)} aria-hidden="true" />
+                  </button>
                   <button
                     className="btn-interactive"
                     style={{
@@ -340,7 +364,7 @@ const item: React.CSSProperties = {
   borderRadius: 14,
   padding: 10,
   position: "relative",
-  paddingRight: 48,
+  paddingRight: 82,
 };
 
 const itemTitle: React.CSSProperties = {
@@ -372,6 +396,14 @@ const deleteItemBtn: React.CSSProperties = {
   top: 10,
   right: 10,
   transition: "opacity 160ms ease",
+};
+
+const askItemBtn: React.CSSProperties = {
+  ...iconButtonSm,
+  ...buttonGhost,
+  position: "absolute",
+  top: 10,
+  right: 44,
 };
 
 const deleteItemBtnHidden: React.CSSProperties = {

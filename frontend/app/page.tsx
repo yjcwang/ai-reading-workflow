@@ -14,6 +14,7 @@ import { useExportPdf } from "@/hooks/useExportPdf";
 import { useGenerateTextFeature } from "@/hooks/useGenerateTextFeature";
 import { useHistoryFeature } from "@/hooks/useHistoryFeature";
 import { useAiChatFeature } from "@/hooks/useAiChatFeature";
+import { UI_STRINGS } from "@/lib/i18n";
 import {
   addItemFromExplain,
   deleteGrammarByExpression,
@@ -23,9 +24,11 @@ import type {
   ArticleHistoryDetailResponse,
   ExplainWordResponse,
   GenerateTextRequest,
+  GrammarItem,
   Level,
   SaveArticleHistoryRequest,
   TextHighlight,
+  VocabItem,
 } from "@/lib/types";
 import { DEFAULT_GENERATE_REQUEST } from "@/lib/types";
 
@@ -40,6 +43,7 @@ export default function Page() {
 
   const { theme, toggleTheme } = useTheme();
   const { targetLang, handleLanguageChange } = useTargetLang();
+  const aiChatText = UI_STRINGS[targetLang].aiChat;
 
   const analyzeFeature = useAnalyzeFeature({
     level,
@@ -90,7 +94,54 @@ export default function Page() {
     selectedText: string;
     context: string;
   }) {
-    await explainFeature.handleExplainRequest(payload);
+    explainFeature.resetExplain();
+    aiChatFeature.openWithContext({
+      type: "selected_text",
+      label: `${aiChatText.contextSelectedText} · ${payload.selectedText}`,
+      payload: { selected_text: payload.selectedText },
+    });
+  }
+
+  async function handleGenerateExplainCardsFromChat() {
+    if (aiChatFeature.activeContext.type !== "selected_text") return;
+
+    const selectedText = aiChatFeature.activeContext.payload?.selected_text;
+    if (typeof selectedText !== "string" || !selectedText.trim()) return;
+
+    await explainFeature.handleExplainRequest(
+      {
+        selectedText,
+        context: analyzeFeature.lockedText?.trim() || text.trim(),
+      },
+      { openModal: true },
+    );
+  }
+
+  function handleOpenArticleAiChat() {
+    explainFeature.resetExplain();
+    aiChatFeature.openWithContext({
+      type: "article",
+      label: aiChatText.contextArticle,
+      payload: null,
+    });
+  }
+
+  function handleAskAiForVocab(item: VocabItem) {
+    explainFeature.resetExplain();
+    aiChatFeature.openWithContext({
+      type: "vocab",
+      label: `${aiChatText.contextVocabulary} · ${item.expression}`,
+      payload: item,
+    });
+  }
+
+  function handleAskAiForGrammar(item: GrammarItem) {
+    explainFeature.resetExplain();
+    aiChatFeature.openWithContext({
+      type: "grammar",
+      label: `${aiChatText.contextGrammar} · ${item.expression}`,
+      payload: item,
+    });
   }
 
   async function handleOpenHistory() {
@@ -250,7 +301,9 @@ export default function Page() {
           onDeleteGrammar={handleDeleteGrammar}
           onSaveArticleHistory={handleSaveCurrentArticleHistory}
           onExportPdf={handleExportPdf}
-          onOpenAiChat={() => aiChatFeature.setOpen(true)}
+          onOpenAiChat={handleOpenArticleAiChat}
+          onAskAiForVocab={handleAskAiForVocab}
+          onAskAiForGrammar={handleAskAiForGrammar}
           aiChatDisabled={!(analyzeFeature.lockedText?.trim() || text.trim())}
           saving={historyFeature.saveLoading}
           saveError={historyFeature.saveError}
@@ -290,8 +343,12 @@ export default function Page() {
           loading={aiChatFeature.loading}
           error={aiChatFeature.error}
           targetLang={targetLang}
+          contextLabel={aiChatFeature.activeContext.label}
+          contextType={aiChatFeature.activeContext.type}
+          explainLoading={explainFeature.explainLoading}
           disabled={analyzeFeature.analyzeLoading}
           onClose={() => aiChatFeature.setOpen(false)}
+          onGenerateExplainCards={handleGenerateExplainCardsFromChat}
           onSend={(question) =>
             aiChatFeature.sendQuestion({
               question,
@@ -299,8 +356,6 @@ export default function Page() {
               analysis: analyzeFeature.data,
               level,
               targetLang,
-              contextType: "article",
-              contextPayload: null,
             })
           }
         />

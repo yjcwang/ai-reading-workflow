@@ -13,7 +13,8 @@ import {
   iconButtonMd,
   maskedIconStyle,
 } from "@/components/buttonStyles";
-import type { AiChatMessage, TargetLang } from "@/lib/types";
+import { UI_STRINGS } from "@/lib/i18n";
+import type { AiChatMessage, AskAIContextType, TargetLang } from "@/lib/types";
 
 type Props = {
   open: boolean;
@@ -22,8 +23,12 @@ type Props = {
   error: string | null;
   disabled?: boolean;
   targetLang: TargetLang;
+  contextLabel: string;
+  contextType: AskAIContextType;
+  explainLoading?: boolean;
   onClose: () => void;
   onSend: (question: string) => Promise<void> | void;
+  onGenerateExplainCards?: () => Promise<void> | void;
 };
 
 export function AiChatDrawer({
@@ -33,14 +38,16 @@ export function AiChatDrawer({
   error,
   disabled,
   targetLang,
+  contextLabel,
+  contextType,
+  explainLoading,
   onClose,
   onSend,
+  onGenerateExplainCards,
 }: Props) {
   const [draft, setDraft] = useState("");
-  const title = targetLang === "zh" ? "Ask AI" : "Ask AI";
-  const contextLabel = targetLang === "zh" ? "Current article" : "Current article";
-  const placeholder = targetLang === "zh" ? "Ask about this reading..." : "Ask about this reading...";
-  const emptyText = targetLang === "zh" ? "Ask a short question about the current article." : "Ask a short question about the current article.";
+  const tUI = UI_STRINGS[targetLang].aiChat;
+  const showGenerateCards = contextType === "selected_text" && !!onGenerateExplainCards;
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
@@ -54,12 +61,12 @@ export function AiChatDrawer({
   if (!open) return null;
 
   return (
-    <aside style={drawer} aria-label={title}>
+    <aside style={drawer} aria-label={tUI.title}>
       <div style={header}>
         <div style={titleBlock}>
           <div style={titleRow}>
             <span style={maskedIconStyle(aiIcon.src, 18)} aria-hidden="true" />
-            <div style={titleText}>{title}</div>
+            <div style={titleText}>{tUI.title}</div>
           </div>
           <div style={contextText}>{contextLabel}</div>
         </div>
@@ -67,8 +74,8 @@ export function AiChatDrawer({
           className="btn-interactive"
           style={closeBtn}
           onClick={onClose}
-          aria-label="Close"
-          title="Close"
+          aria-label={tUI.close}
+          title={tUI.close}
         >
           <span style={maskedIconStyle(closeIcon.src, 18)} aria-hidden="true" />
         </button>
@@ -76,7 +83,7 @@ export function AiChatDrawer({
 
       <div style={messageList}>
         {messages.length === 0 ? (
-          <div style={emptyState}>{emptyText}</div>
+          <div style={emptyState}>{tUI.emptyText}</div>
         ) : (
           messages.map((message) => (
             <div
@@ -110,19 +117,43 @@ export function AiChatDrawer({
         <textarea
           value={draft}
           onChange={(event) => setDraft(event.target.value)}
-          placeholder={placeholder}
+          placeholder={tUI.placeholder}
           disabled={loading || disabled}
           style={textarea}
           rows={3}
         />
-        <button
-          className="btn-interactive"
-          style={sendBtn}
-          disabled={loading || disabled || draft.trim().length === 0}
-          type="submit"
-        >
-          Send
-        </button>
+        <div style={composerActions}>
+          {showGenerateCards ? (
+            <button
+              className="btn-interactive"
+              style={generateCardsBtn}
+              disabled={disabled || explainLoading}
+              type="button"
+              onClick={() => onGenerateExplainCards?.()}
+            >
+              {explainLoading ? (
+                <Image
+                  src={loadingIcon}
+                  alt=""
+                  width={16}
+                  height={16}
+                  className={styles.loadingSpin}
+                  aria-hidden="true"
+                />
+              ) : (
+                tUI.generateCards
+              )}
+            </button>
+          ) : null}
+          <button
+            className="btn-interactive"
+            style={sendBtn}
+            disabled={loading || disabled || draft.trim().length === 0}
+            type="submit"
+          >
+            {tUI.send}
+          </button>
+        </div>
       </form>
     </aside>
   );
@@ -246,8 +277,20 @@ const textarea: React.CSSProperties = {
   lineHeight: 1.5,
 };
 
+const composerActions: React.CSSProperties = {
+  display: "flex",
+  justifyContent: "flex-end",
+  alignItems: "center",
+  flexWrap: "wrap",
+  gap: 10,
+};
+
+const generateCardsBtn: React.CSSProperties = {
+  ...buttonSm,
+  ...buttonPrimary,
+};
+
 const sendBtn: React.CSSProperties = {
   ...buttonSm,
   ...buttonPrimary,
-  justifySelf: "end",
 };

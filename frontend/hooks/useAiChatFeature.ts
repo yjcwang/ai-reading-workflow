@@ -10,6 +10,12 @@ import type {
   TargetLang,
 } from "@/lib/types";
 
+export type AiChatContext = {
+  type: AskAIContextType;
+  label: string;
+  payload?: Record<string, unknown> | null;
+};
+
 type SendQuestionInput = {
   question: string;
   articleText: string;
@@ -27,8 +33,18 @@ function createMessageId() {
 export function useAiChatFeature() {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<AiChatMessage[]>([]);
+  const [activeContext, setActiveContext] = useState<AiChatContext>({
+    type: "article",
+    label: "",
+    payload: null,
+  });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  function openWithContext(context: AiChatContext) {
+    setActiveContext(context);
+    setOpen(true);
+  }
 
   async function sendQuestion(input: SendQuestionInput) {
     const question = input.question.trim();
@@ -49,8 +65,8 @@ export function useAiChatFeature() {
       const response = await askAi({
         question,
         messages: history.map(({ role, content }) => ({ role, content })),
-        context_type: input.contextType ?? "article",
-        context_payload: input.contextPayload ?? null,
+        context_type: input.contextType ?? activeContext.type,
+        context_payload: input.contextPayload ?? activeContext.payload ?? null,
         article_text: input.articleText,
         analysis: input.analysis,
         level: input.level,
@@ -72,6 +88,11 @@ export function useAiChatFeature() {
 
   function resetChat() {
     setOpen(false);
+    setActiveContext({
+      type: "article",
+      label: "",
+      payload: null,
+    });
     setMessages([]);
     setLoading(false);
     setError(null);
@@ -80,6 +101,8 @@ export function useAiChatFeature() {
   return {
     open,
     setOpen,
+    activeContext,
+    openWithContext,
     messages,
     loading,
     error,

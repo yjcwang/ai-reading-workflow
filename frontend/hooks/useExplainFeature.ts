@@ -27,7 +27,10 @@ export function useExplainFeature({
   const [explainError, setExplainError] = useState<string | null>(null);
   const [explainData, setExplainData] = useState<ExplainResponse | null>(null);
 
-  async function handleExplainRequest(payload: ExplainPayload) {
+  async function handleExplainRequest(
+    payload: ExplainPayload,
+    options?: { openModal?: boolean },
+  ): Promise<ExplainResponse | null> {
     setExplainOpen(false);
     setExplainLoading(true);
     setExplainError(null);
@@ -44,18 +47,21 @@ export function useExplainFeature({
         targetLang,
       );
 
-      if (res.kind === "sentence") {
-        setExplainData({
+      const nextData =
+        res.kind === "sentence"
+          ? {
           ...res,
           sentence_jp: payload.selectedText,
-        });
-      } else {
-        setExplainData(res);
-      }
-      setExplainOpen(true);
+        }
+          : res;
+
+      setExplainData(nextData);
+      setExplainOpen(options?.openModal === false ? false : true);
+      return nextData;
     } catch (e: unknown) {
       setExplainError(e instanceof Error ? e.message : "Unknown error");
-      setExplainOpen(true);
+      setExplainOpen(options?.openModal === false ? false : true);
+      return null;
     } finally {
       setExplainLoading(false);
     }
