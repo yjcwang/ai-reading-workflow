@@ -20,6 +20,7 @@ import {
 import type {
   AnalyzeResponse,
   GrammarItem,
+  ModelConfigResponse,
   TargetLang,
   TextHighlight,
   TranslateSentenceResponse,
@@ -48,6 +49,7 @@ type Props = {
   exporting: boolean;
   exportError: string | null;
   targetLang: TargetLang;
+  modelConfig: ModelConfigResponse | null;
   onActiveTextHighlightChange?: (highlight: TextHighlight | null) => void;
 };
 
@@ -72,6 +74,7 @@ export function ResultPanel({
   exporting,
   exportError,
   targetLang,
+  modelConfig,
   onActiveTextHighlightChange,
 }: Props) {
   const tUI = UI_STRINGS[targetLang];
@@ -88,6 +91,20 @@ export function ResultPanel({
           <div style={{ opacity: 0.7, fontSize: 13 }}>
           {data.vocab.length} {tUI.common.word} · {data.grammar.length} {tUI.common.grammar}
           </div>
+          {modelConfig ? (
+            <details style={modelDetails}>
+              <summary className="model-config-summary" style={modelSummary}>
+                {modelConfig.analyzer}
+              </summary>
+              <div style={modelPopover}>
+                <ModelRow label="Analyze" value={modelConfig.analyzer} />
+                <ModelRow label="Translate" value={modelConfig.translator} />
+                <ModelRow label="Explain" value={modelConfig.explainer} />
+                <ModelRow label="AI Chat" value={modelConfig.ai_chat} />
+                <ModelRow label="Generator" value={modelConfig.text_generator} />
+              </div>
+            </details>
+          ) : null}
         </div>
         <div style={headerActions}>
           <div style={askAiMenu}>
@@ -322,6 +339,15 @@ export function ResultPanel({
   );
 }
 
+function ModelRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div style={modelRow}>
+      <span style={modelLabel}>{label}</span>
+      <span>{value}</span>
+    </div>
+  );
+}
+
 const card: React.CSSProperties = {
   height: "100%",
   overflowY: "auto",
@@ -343,6 +369,45 @@ const titleBlock: React.CSSProperties = {
   flexDirection: "column",
   gap: 4,
   minWidth: 0,
+};
+
+const modelDetails: React.CSSProperties = {
+  position: "relative",
+  width: "fit-content",
+};
+
+const modelSummary: React.CSSProperties = {
+  color: "var(--text)",
+  opacity: 0.62,
+  fontSize: 12,
+  cursor: "pointer",
+  userSelect: "none",
+};
+
+const modelPopover: React.CSSProperties = {
+  position: "absolute",
+  top: "calc(100% + 8px)",
+  left: 0,
+  zIndex: 30,
+  width: 270,
+  display: "grid",
+  gap: 9,
+  padding: 12,
+  background: "var(--panel)",
+  border: "1px solid var(--border)",
+  borderRadius: 12,
+  boxShadow: "var(--shadow)",
+  fontSize: 12,
+};
+
+const modelRow: React.CSSProperties = {
+  display: "grid",
+  gridTemplateColumns: "78px minmax(0, 1fr)",
+  gap: 12,
+};
+
+const modelLabel: React.CSSProperties = {
+  opacity: 0.58,
 };
 
 const headerActions: React.CSSProperties = {

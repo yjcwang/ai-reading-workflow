@@ -259,7 +259,7 @@ LLM_STRATEGY_MAP: Dict[str, Callable] = {
 }
 
 
-def _model_name_for_provider(provider: str) -> str:
+def get_model_name_for_provider(provider: str) -> str:
     """Return the configured model name used for observability records."""
     if provider == "mock":
         return "mock"
@@ -319,7 +319,7 @@ def call_llm_with_retry(
             f"Supported providers are: [{valid_providers}]"
         )
 
-    model_name = _model_name_for_provider(provider)
+    model_name = get_model_name_for_provider(provider)
     input_chars = len((system_prompt or "") + (user_prompt or ""))
     input_tokens_est = max(1, input_chars // 4)
     raw_content = None

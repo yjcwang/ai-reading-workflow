@@ -10,6 +10,7 @@ import type {
   GrammarHistoryItemResponse,
   GenerateTextRequest,
   GenerateTextResponse, 
+  ModelConfigResponse,
   SaveArticleHistoryRequest,
   TargetLang,
   TranslateSentenceResponse,
@@ -111,6 +112,14 @@ export async function askAi(request: AskAIRequest): Promise<AskAIResponse> {
 
   if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
   return (await resp.json()) as AskAIResponse;
+}
+
+export async function getModelConfig(): Promise<ModelConfigResponse> {
+  const BASE_URL = getBackendBaseUrl();
+  const resp = await fetch(BASE_URL + "/api/model-config");
+
+  if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+  return (await resp.json()) as ModelConfigResponse;
 }
 
 export async function saveArticleHistory(

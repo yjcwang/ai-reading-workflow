@@ -105,6 +105,14 @@ export type AskAIResponse = {
   answer: string;
 };
 
+export type ModelConfigResponse = {
+  analyzer: string;
+  translator: string;
+  explainer: string;
+  ai_chat: string;
+  text_generator: string;
+};
+
 export type ArticleHistoryVocabItem = {
   expression: string;
   reading?: string | null;

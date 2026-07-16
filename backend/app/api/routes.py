@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, Query
 from fastapi.responses import Response
 from sqlmodel import Session
 
+from app.config import settings
 from app.db.session import get_session
 from app.schemas import (
     ArticleHistoryDetailResponse,
@@ -16,6 +17,7 @@ from app.schemas import (
     GenerateTextRequest,
     GenerateTextResponse,
     GrammarHistoryItemResponse,
+    ModelConfigResponse,
     SaveArticleHistoryRequest,
     TranslateRequest,
     TranslateSentenceResponse,
@@ -26,12 +28,25 @@ from app.services.analyzer import analyze_text
 from app.services.explainer import explain_word, explain_sentence
 from app.services.pdf_exporter import build_pdf_bytes
 from app.services.history_service import HistoryService
+from app.services.llm import get_model_name_for_provider
 from app.services.text_generator import generate_text
 from app.services.translator import translate_sentence
 
 # Controller layer: receives HTTP requests and delegates actual work to services.
 router = APIRouter()
 history_service = HistoryService()
+
+
+@router.get("/model-config", response_model=ModelConfigResponse)
+def model_config_endpoint():
+    """Expose only model names used by frontend status labels."""
+    return ModelConfigResponse(
+        analyzer=get_model_name_for_provider(settings.LLM_PROVIDER_ANALYZER),
+        translator=get_model_name_for_provider(settings.LLM_PROVIDER_TRANSLATOR),
+        explainer=get_model_name_for_provider(settings.LLM_PROVIDER_EXPLAINER),
+        ai_chat=get_model_name_for_provider(settings.LLM_PROVIDER_AI_CHAT),
+        text_generator=get_model_name_for_provider(settings.LLM_PROVIDER_TEXT_GENERATOR),
+    )
 
 
 @router.post("/analyze", response_model=AnalyzeResponse)

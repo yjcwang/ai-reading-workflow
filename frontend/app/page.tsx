@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styles from "./page.module.css";
 import { InputPanel } from "@/components/InputPanel";
 import { ResultPanel } from "@/components/ResultPanel";
@@ -15,6 +15,7 @@ import { useGenerateTextFeature } from "@/hooks/useGenerateTextFeature";
 import { useHistoryFeature } from "@/hooks/useHistoryFeature";
 import { useAiChatFeature } from "@/hooks/useAiChatFeature";
 import { UI_STRINGS } from "@/lib/i18n";
+import { getModelConfig } from "@/lib/api";
 import {
   addItemFromExplain,
   deleteGrammarByExpression,
@@ -26,6 +27,7 @@ import type {
   GenerateTextRequest,
   GrammarItem,
   Level,
+  ModelConfigResponse,
   SaveArticleHistoryRequest,
   TextHighlight,
   VocabItem,
@@ -40,6 +42,7 @@ export default function Page() {
   );
   const [historyOpen, setHistoryOpen] = useState(false);
   const [activeTextHighlight, setActiveTextHighlight] = useState<TextHighlight | null>(null);
+  const [modelConfig, setModelConfig] = useState<ModelConfigResponse | null>(null);
 
   const { theme, toggleTheme } = useTheme();
   const { targetLang, handleLanguageChange } = useTargetLang();
@@ -60,6 +63,12 @@ export default function Page() {
   const exportFeature = useExportPdf({
     filename: "my-list.pdf",
   });
+
+  useEffect(() => {
+    getModelConfig()
+      .then(setModelConfig)
+      .catch(() => setModelConfig(null));
+  }, []);
 
   async function handleAnalyzeRequest() {
     aiChatFeature.resetChat();
@@ -316,6 +325,7 @@ export default function Page() {
               targetLang={targetLang}
               contextText={aiChatFeature.activeContext.text}
               contextType={aiChatFeature.activeContext.type}
+              modelName={modelConfig?.ai_chat}
               explainLoading={explainFeature.explainLoading}
               disabled={analyzeFeature.analyzeLoading}
               onClose={() => aiChatFeature.setOpen(false)}
@@ -341,6 +351,7 @@ export default function Page() {
           exporting={exportFeature.exporting}
           exportError={exportFeature.exportError}
           targetLang={targetLang}
+          modelConfig={modelConfig}
           onActiveTextHighlightChange={setActiveTextHighlight}
         />
         <HistoryPanel

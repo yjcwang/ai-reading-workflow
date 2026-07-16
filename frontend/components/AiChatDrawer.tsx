@@ -28,6 +28,7 @@ type Props = {
   targetLang: TargetLang;
   contextText: string;
   contextType: AskAIContextType;
+  modelName?: string;
   explainLoading?: boolean;
   onClose: () => void;
   onSend: (question: string) => Promise<void> | void;
@@ -43,6 +44,7 @@ export function AiChatDrawer({
   targetLang,
   contextText,
   contextType,
+  modelName,
   explainLoading,
   onClose,
   onSend,
@@ -170,38 +172,41 @@ export function AiChatDrawer({
           rows={1}
         />
         <div style={composerActions}>
-          {showGenerateCards ? (
+          {modelName ? <span style={chatModelName}>{modelName}</span> : null}
+          <div style={composerButtons}>
+            {showGenerateCards ? (
+              <button
+                className="btn-interactive"
+                style={generateCardsBtn}
+                disabled={disabled || explainLoading}
+                type="button"
+                onClick={() => onGenerateExplainCards?.()}
+              >
+                {explainLoading ? (
+                  <Image
+                    src={loadingIcon}
+                    alt=""
+                    width={16}
+                    height={16}
+                    className={styles.loadingSpin}
+                    aria-hidden="true"
+                  />
+                ) : (
+                  tUI.generateCards
+                )}
+              </button>
+            ) : null}
             <button
               className="btn-interactive"
-              style={generateCardsBtn}
-              disabled={disabled || explainLoading}
-              type="button"
-              onClick={() => onGenerateExplainCards?.()}
+              style={sendBtn}
+              disabled={loading || disabled || draft.trim().length === 0}
+              type="submit"
+              aria-label={tUI.send}
+              title={tUI.send}
             >
-              {explainLoading ? (
-                <Image
-                  src={loadingIcon}
-                  alt=""
-                  width={16}
-                  height={16}
-                  className={styles.loadingSpin}
-                  aria-hidden="true"
-                />
-              ) : (
-                tUI.generateCards
-              )}
+              <span style={maskedIconStyle(sendIcon.src, 18)} aria-hidden="true" />
             </button>
-          ) : null}
-          <button
-            className="btn-interactive"
-            style={sendBtn}
-            disabled={loading || disabled || draft.trim().length === 0}
-            type="submit"
-            aria-label={tUI.send}
-            title={tUI.send}
-          >
-            <span style={maskedIconStyle(sendIcon.src, 18)} aria-hidden="true" />
-          </button>
+          </div>
         </div>
       </form>
     </aside>
@@ -385,10 +390,26 @@ const textarea: React.CSSProperties = {
 
 const composerActions: React.CSSProperties = {
   display: "flex",
-  justifyContent: "flex-end",
+  justifyContent: "space-between",
   alignItems: "center",
   flexWrap: "wrap",
   gap: 10,
+};
+
+const chatModelName: React.CSSProperties = {
+  minWidth: 0,
+  fontSize: 12,
+  opacity: 0.58,
+  overflow: "hidden",
+  textOverflow: "ellipsis",
+  whiteSpace: "nowrap",
+};
+
+const composerButtons: React.CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  gap: 10,
+  marginLeft: "auto",
 };
 
 const generateCardsBtn: React.CSSProperties = {

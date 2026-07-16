@@ -109,6 +109,14 @@ class AskAIRequest(BaseModel):
 class AskAIResponse(BaseModel):
     answer: str
 
+
+class ModelConfigResponse(BaseModel):
+    analyzer: str
+    translator: str
+    explainer: str
+    ai_chat: str
+    text_generator: str
+
 # database ------------
 class ArticleHistoryVocabItem(BaseModel):
     expression: str
