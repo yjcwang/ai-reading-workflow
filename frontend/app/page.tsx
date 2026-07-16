@@ -97,7 +97,7 @@ export default function Page() {
     explainFeature.resetExplain();
     aiChatFeature.openWithContext({
       type: "selected_text",
-      label: `${aiChatText.contextSelectedText} · ${payload.selectedText}`,
+      text: payload.selectedText,
       payload: { selected_text: payload.selectedText },
     });
   }
@@ -121,7 +121,7 @@ export default function Page() {
     explainFeature.resetExplain();
     aiChatFeature.openWithContext({
       type: "article",
-      label: aiChatText.contextArticle,
+      text: "",
       payload: null,
     });
   }
@@ -130,7 +130,7 @@ export default function Page() {
     explainFeature.resetExplain();
     aiChatFeature.openWithContext({
       type: "vocab",
-      label: `${aiChatText.contextVocabulary} · ${item.expression}`,
+      text: item.expression,
       payload: item,
     });
   }
@@ -139,7 +139,7 @@ export default function Page() {
     explainFeature.resetExplain();
     aiChatFeature.openWithContext({
       type: "grammar",
-      label: `${aiChatText.contextGrammar} · ${item.expression}`,
+      text: item.expression,
       payload: item,
     });
   }
@@ -343,7 +343,7 @@ export default function Page() {
           loading={aiChatFeature.loading}
           error={aiChatFeature.error}
           targetLang={targetLang}
-          contextLabel={aiChatFeature.activeContext.label}
+          contextText={aiChatFeature.activeContext.text}
           contextType={aiChatFeature.activeContext.type}
           explainLoading={explainFeature.explainLoading}
           disabled={analyzeFeature.analyzeLoading}

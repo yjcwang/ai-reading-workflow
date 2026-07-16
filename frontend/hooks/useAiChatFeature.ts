@@ -12,7 +12,7 @@ import type {
 
 export type AiChatContext = {
   type: AskAIContextType;
-  label: string;
+  text: string;
   payload?: Record<string, unknown> | null;
 };
 
@@ -35,7 +35,7 @@ export function useAiChatFeature() {
   const [messages, setMessages] = useState<AiChatMessage[]>([]);
   const [activeContext, setActiveContext] = useState<AiChatContext>({
     type: "article",
-    label: "",
+    text: "",
     payload: null,
   });
   const [loading, setLoading] = useState(false);
@@ -54,6 +54,7 @@ export function useAiChatFeature() {
       id: createMessageId(),
       role: "user",
       content: question,
+      contextText: activeContext.text,
     };
     const history = messages;
 
@@ -90,7 +91,7 @@ export function useAiChatFeature() {
     setOpen(false);
     setActiveContext({
       type: "article",
-      label: "",
+      text: "",
       payload: null,
     });
     setMessages([]);

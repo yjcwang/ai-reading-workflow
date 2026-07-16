@@ -82,6 +82,7 @@ export type AiChatMessage = {
   id: string;
   role: AiChatRole;
   content: string;
+  contextText?: string;
 };
 
 export type AskAIContextType = "article" | "selected_text" | "vocab" | "grammar";

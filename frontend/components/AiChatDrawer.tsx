@@ -5,6 +5,7 @@ import Image from "next/image";
 import closeIcon from "@/icons/close.svg";
 import loadingIcon from "@/icons/loading.svg";
 import aiIcon from "@/icons/ai.svg";
+import chatContextIcon from "@/icons/chat_context.svg";
 import styles from "./InputPanel.module.css";
 import {
   buttonGhost,
@@ -23,7 +24,7 @@ type Props = {
   error: string | null;
   disabled?: boolean;
   targetLang: TargetLang;
-  contextLabel: string;
+  contextText: string;
   contextType: AskAIContextType;
   explainLoading?: boolean;
   onClose: () => void;
@@ -38,7 +39,7 @@ export function AiChatDrawer({
   error,
   disabled,
   targetLang,
-  contextLabel,
+  contextText,
   contextType,
   explainLoading,
   onClose,
@@ -68,7 +69,6 @@ export function AiChatDrawer({
             <span style={maskedIconStyle(aiIcon.src, 18)} aria-hidden="true" />
             <div style={titleText}>{tUI.title}</div>
           </div>
-          <div style={contextText}>{contextLabel}</div>
         </div>
         <button
           className="btn-interactive"
@@ -93,7 +93,16 @@ export function AiChatDrawer({
                 ...(message.role === "user" ? userBubble : assistantBubble),
               }}
             >
-              {message.content}
+              {message.role === "user" && message.contextText ? (
+                <div style={messageContext} title={message.contextText}>
+                  <span
+                    style={maskedIconStyle(chatContextIcon.src, 15)}
+                    aria-hidden="true"
+                  />
+                  <strong style={contextValueText}>{message.contextText}</strong>
+                </div>
+              ) : null}
+              <div>{message.content}</div>
             </div>
           ))
         )}
@@ -114,6 +123,15 @@ export function AiChatDrawer({
       {error ? <div style={errorBox}>{error}</div> : null}
 
       <form style={composer} onSubmit={handleSubmit}>
+        {contextText ? (
+          <div style={contextRow} title={contextText}>
+            <span
+              style={maskedIconStyle(chatContextIcon.src, 16)}
+              aria-hidden="true"
+            />
+            <strong style={contextValueText}>{contextText}</strong>
+          </div>
+        ) : null}
         <textarea
           value={draft}
           onChange={(event) => setDraft(event.target.value)}
@@ -198,9 +216,33 @@ const titleText: React.CSSProperties = {
   fontWeight: 700,
 };
 
-const contextText: React.CSSProperties = {
+const contextRow: React.CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  gap: 6,
   fontSize: 13,
-  opacity: 0.7,
+  lineHeight: 1.45,
+  color: "var(--text)",
+  whiteSpace: "nowrap",
+  overflow: "hidden",
+  textOverflow: "ellipsis",
+};
+
+const messageContext: React.CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  gap: 5,
+  minWidth: 0,
+  marginBottom: 5,
+  fontSize: 12,
+  opacity: 0.78,
+  whiteSpace: "nowrap",
+  overflow: "hidden",
+};
+
+const contextValueText: React.CSSProperties = {
+  overflow: "hidden",
+  textOverflow: "ellipsis",
 };
 
 const closeBtn: React.CSSProperties = {
