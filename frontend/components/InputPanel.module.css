@@ -1,10 +1,8 @@
 .card {
   position: relative;
   overflow: visible;
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 14px;
+  min-width: 0;
+  min-height: 0;
 }
 
 .rowBetween {

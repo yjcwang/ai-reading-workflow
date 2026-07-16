@@ -11,6 +11,7 @@ import styles from "./InputPanel.module.css";
 import {
   buttonMd,
   buttonPrimary,
+  buttonSecondary,
   buttonTinted,
   iconButtonSm,
   buttonGhost,
@@ -102,6 +103,7 @@ export function ResultPanel({
             </button>
             {aiChatPanel}
           </div>
+          <span style={headerActionDivider} aria-hidden="true" />
           <button
             className="btn-interactive"
             style={saveBtn}
@@ -181,6 +183,7 @@ export function ResultPanel({
               data.vocab.map((v) => (
                 <li
                   key={v.expression}
+                  className="result-card-interactive"
                   style={item}
                   onMouseEnter={() => {
                     setActiveDeleteKey(`vocab:${v.expression}`);
@@ -254,6 +257,7 @@ export function ResultPanel({
               data.grammar.map((g) => (
                 <li
                   key={g.expression}
+                  className="result-card-interactive"
                   style={item}
                   onMouseEnter={() => {
                     setActiveDeleteKey(`grammar:${g.expression}`);
@@ -319,13 +323,10 @@ export function ResultPanel({
 }
 
 const card: React.CSSProperties = {
-  background: "var(--panel)",
-  border: "1px solid var(--border)",
-  borderRadius: 16,
-  padding: 14,
   height: "100%",
   overflowY: "auto",
   minHeight: 0,
+  minWidth: 0,
 };
 
 const rowBetween: React.CSSProperties = {
@@ -347,7 +348,15 @@ const titleBlock: React.CSSProperties = {
 const headerActions: React.CSSProperties = {
   display: "flex",
   flexWrap: "wrap",
+  alignItems: "center",
   gap: 10,
+};
+
+const headerActionDivider: React.CSSProperties = {
+  width: 1,
+  height: 24,
+  background: "var(--border)",
+  opacity: 0.7,
 };
 
 const twoCols: React.CSSProperties = {
@@ -392,6 +401,7 @@ const item: React.CSSProperties = {
   padding: 10,
   position: "relative",
   paddingRight: 82,
+  transition: "transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease",
 };
 
 const itemTitle: React.CSSProperties = {
@@ -402,7 +412,7 @@ const itemTitle: React.CSSProperties = {
 
 const saveBtn: React.CSSProperties = {
   ...buttonMd,
-  ...buttonTinted,
+  ...buttonSecondary,
 };
 
 const askAiBtn: React.CSSProperties = {
