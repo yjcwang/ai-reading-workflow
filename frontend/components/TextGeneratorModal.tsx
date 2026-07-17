@@ -6,8 +6,8 @@ import closeIcon from "@/icons/close.svg";
 import aiIcon from "@/icons/ai.svg";
 import {
   buttonMd,
+  buttonAi,
   buttonGhost,
-  buttonTinted,
   iconButtonMd,
   maskedIconStyle,
 } from "@/components/buttonStyles";
@@ -151,7 +151,7 @@ export function TextGeneratorModal({
         )}
         <button
           style={confirmBtn}
-          className="btn-interactive"
+          className="btn-interactive ai-button"
           onClick={onGenerate}
           disabled={!generateRequest.topic.trim() || analyzeLoading || generateLoading}
           title={generateLoading ? tUI.generator.generating : tUI.generator.generateBtn}
@@ -188,7 +188,7 @@ const closeBtn: React.CSSProperties = {
 
 const confirmBtn: React.CSSProperties = {
   ...buttonMd,
-  ...buttonTinted,
+  ...buttonAi,
 };
 
 const errorText: React.CSSProperties = {

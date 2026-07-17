@@ -5,7 +5,7 @@ import Image from "next/image";
 import loadingIcon from "@/icons/loading.svg";
 import aiIcon from "@/icons/ai.svg";
 import styles from "./InputPanel.module.css";
-import { buttonSm, buttonMd, maskedIconStyle} from "@/components/buttonStyles";
+import { buttonAi, buttonSm, buttonMd, maskedIconStyle} from "@/components/buttonStyles";
 import { findHighlightQuery as findTextHighlightQuery } from "@/lib/text-highlight-helpers";
 import { UI_STRINGS } from "@/lib/i18n";
 import { TargetLang, TextHighlight } from "@/lib/types";
@@ -243,7 +243,7 @@ export function LockedTextViewer({
         <button
           onClick={handleExplainClick}
           disabled={explainBusy}
-          className="btn-interactive"
+          className="btn-interactive ai-button"
           style={{
             ...(isCoarsePointer ? mobileExplainBtn : explainBtn),
             ...(!isCoarsePointer ? { top: btnPos.top, left: btnPos.left } : null),
@@ -316,20 +316,28 @@ function renderHighlightedText(
   return nodes;
 }
 
+const floatingAiGlass: React.CSSProperties = {
+  background: "linear-gradient(135deg, rgba(var(--accent-rgb), 0.3), rgba(var(--accent-rgb), 0.16)), rgba(var(--panel-rgb), 0.72)",
+  WebkitBackdropFilter: "blur(14px) saturate(140%)",
+  backdropFilter: "blur(14px) saturate(140%)",
+  border: "1px solid rgba(var(--accent-rgb), 0.35)",
+  boxShadow: "0 8px 28px rgba(20, 35, 70, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.45)",
+};
+
 const explainBtn: React.CSSProperties = {
   ...buttonSm,
+  ...buttonAi,
+  ...floatingAiGlass,
   position: "fixed",
   zIndex: 9999,
   fontWeight: 600,
-  background: "var(--accent-soft)",
-  color: "var(--text)",
-  border: "1px solid var(--border)",
   opacity: 1,
-  boxShadow: "0 6px 18px rgba(0,0,0,0.12)",
 };
 
 const mobileExplainBtn: React.CSSProperties = {
   ...buttonMd,
+  ...buttonAi,
+  ...floatingAiGlass,
   position: "fixed",
   left: "50%",
   bottom: "calc(env(safe-area-inset-bottom, 0px) + 30px)",
@@ -337,19 +345,12 @@ const mobileExplainBtn: React.CSSProperties = {
   zIndex: 9999,
   minWidth: 168,
   fontWeight: 600,
-  background: "var(--accent-soft)",
-  color: "var(--text)",
-  border: "1px solid var(--border)",
-  boxShadow: "0 12px 30px rgba(0,0,0,0.22)",
 };
 
 const explainBtnBusy: React.CSSProperties = {
   minWidth: 44,
   minHeight: 36,
   padding: "8px 12px",
-  background: "var(--accent-soft)",
-  border: "1px solid var(--border)",
-  boxShadow: "0 8px 24px rgba(0,0,0,0.2)",
   opacity: 1,
   cursor: "default",
 };

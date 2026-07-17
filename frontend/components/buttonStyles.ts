@@ -66,6 +66,14 @@ export const buttonTinted: CSSProperties = {
   border: "1px solid var(--border)",
 };
 
+// Shared visual language for AI actions: a soft accent gradient with restrained depth.
+export const buttonAi: CSSProperties = {
+  background: "linear-gradient(135deg, rgba(var(--accent-rgb), 0.22), rgba(var(--accent-rgb), 0.09))",
+  color: "var(--text)",
+  border: "1px solid rgba(var(--accent-rgb), 0.32)",
+  boxShadow: "0 10px 28px rgba(var(--accent-rgb), 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.16)",
+};
+
 // 危险按钮外观：带风险提示的删除/危险操作按钮。
 export const buttonDanger: CSSProperties = {
   background: "rgba(120, 32, 32, 0.08)",

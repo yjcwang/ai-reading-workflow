@@ -10,9 +10,9 @@ import aiIcon from "@/icons/ai.svg";
 import styles from "./InputPanel.module.css";
 import {
   buttonMd,
+  buttonAi,
   buttonPrimary,
   buttonSecondary,
-  buttonTinted,
   iconButtonSm,
   buttonGhost,
   maskedIconStyle,
@@ -82,6 +82,25 @@ export function ResultPanel({
   const translationTitle = targetLang === "zh" ? "\u7ffb\u8bd1" : "Translation";
   const translationEmptyText = targetLang === "zh" ? "\u6682\u65e0\u7ffb\u8bd1" : "No translation saved.";
   const [activeDeleteKey, setActiveDeleteKey] = useState<string | null>(null);
+  const isEmpty = !loading
+    && !error
+    && !translation?.translation
+    && data.vocab.length === 0
+    && data.grammar.length === 0;
+
+  // Keep the initial result panel focused on the next action instead of empty result scaffolding.
+  if (isEmpty) {
+    return (
+      <div style={{ ...card, ...emptyState }}>
+        <div style={emptyIllustration} aria-hidden="true">
+          <span style={emptyIllustrationGlow} />
+          <span style={maskedIconStyle(aiIcon.src, 42)} />
+        </div>
+        <div style={emptyStateTitle}>{tUI.resultPanel.emptyTitle}</div>
+        <div style={emptyStateDescription}>{tUI.resultPanel.emptyDescription}</div>
+      </div>
+    );
+  }
 
   return (
     <div style={card}>
@@ -109,7 +128,7 @@ export function ResultPanel({
         <div style={headerActions}>
           <div style={askAiMenu}>
             <button
-              className="btn-interactive"
+              className="btn-interactive ai-button result-header-ai-button"
               style={askAiBtn}
               onClick={onOpenAiChat}
               disabled={loading || aiChatDisabled}
@@ -215,7 +234,7 @@ export function ResultPanel({
                     {v.expression} {v.reading ? <span style={muted}>({v.reading})</span> : null}
                   </div>
                   <button
-                    className="btn-interactive"
+                    className="btn-interactive ai-button result-card-ai-button"
                     style={{
                       ...askItemBtn,
                       ...(activeDeleteKey === `vocab:${v.expression}` ? deleteItemBtnVisible : deleteItemBtnHidden),
@@ -287,7 +306,7 @@ export function ResultPanel({
                 >
                   <div style={itemTitle}>{g.expression}</div>
                   <button
-                    className="btn-interactive"
+                    className="btn-interactive ai-button result-card-ai-button"
                     style={{
                       ...askItemBtn,
                       ...(activeDeleteKey === `grammar:${g.expression}` ? deleteItemBtnVisible : deleteItemBtnHidden),
@@ -353,6 +372,8 @@ const card: React.CSSProperties = {
   overflowY: "auto",
   minHeight: 0,
   minWidth: 0,
+  paddingTop: 12,
+  boxSizing: "border-box",
 };
 
 const rowBetween: React.CSSProperties = {
@@ -482,7 +503,7 @@ const saveBtn: React.CSSProperties = {
 
 const askAiBtn: React.CSSProperties = {
   ...buttonMd,
-  ...buttonTinted,
+  ...buttonAi,
 };
 
 const askAiMenu: React.CSSProperties = {
@@ -495,22 +516,25 @@ const exportBtn: React.CSSProperties = {
   gap: 6,
 };
 
+const itemActionTransition = "opacity 160ms ease, transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease, background-color 0.2s ease, filter 0.2s ease";
+
 const deleteItemBtn: React.CSSProperties = {
   ...iconButtonSm,
   ...buttonGhost,
   position: "absolute",
   top: 10,
   right: 10,
-  transition: "opacity 160ms ease",
+  transition: itemActionTransition,
 };
 
 const askItemBtn: React.CSSProperties = {
   ...iconButtonSm,
-  ...buttonGhost,
+  ...buttonAi,
   position: "absolute",
+  zIndex: 2,
   top: 10,
   right: 44,
-  transition: "opacity 160ms ease",
+  transition: itemActionTransition,
 };
 
 const deleteItemBtnHidden: React.CSSProperties = {
@@ -525,6 +549,56 @@ const deleteItemBtnVisible: React.CSSProperties = {
 
 const empty: React.CSSProperties = { opacity: 0.6, padding: 10 };
 const emptyText: React.CSSProperties = { opacity: 0.6 };
+const emptyState: React.CSSProperties = {
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "center",
+  paddingTop: "clamp(32px, 8vw, 96px)",
+  paddingRight: "clamp(32px, 8vw, 96px)",
+  paddingBottom: "clamp(32px, 8vw, 96px)",
+  paddingLeft: "clamp(32px, 8vw, 96px)",
+  textAlign: "center",
+};
+
+const emptyIllustration: React.CSSProperties = {
+  position: "relative",
+  display: "grid",
+  placeItems: "center",
+  width: 96,
+  height: 96,
+  marginBottom: 24,
+  border: "1px solid rgba(var(--accent-rgb), 0.28)",
+  borderRadius: 28,
+  background: "rgba(var(--accent-rgb), 0.12)",
+  color: "var(--accent)",
+  boxShadow: "0 18px 48px rgba(var(--accent-rgb), 0.14)",
+  overflow: "hidden",
+};
+
+const emptyIllustrationGlow: React.CSSProperties = {
+  position: "absolute",
+  width: 72,
+  height: 72,
+  borderRadius: "50%",
+  background: "rgba(var(--accent-rgb), 0.14)",
+  filter: "blur(16px)",
+};
+
+const emptyStateTitle: React.CSSProperties = {
+  marginBottom: 10,
+  fontSize: 20,
+  fontWeight: 700,
+  letterSpacing: "-0.01em",
+};
+
+const emptyStateDescription: React.CSSProperties = {
+  maxWidth: 420,
+  fontSize: 14,
+  lineHeight: 1.7,
+  opacity: 0.62,
+};
+
 const muted: React.CSSProperties = { opacity: 0.8, marginTop: 6, fontSize: 13, lineHeight: 1.5 };
 const mutedSmall: React.CSSProperties = { opacity: 0.65, marginTop: 6, fontSize: 12, lineHeight: 1.5 };
 const example: React.CSSProperties = { opacity: 0.85, marginTop: 6, fontStyle: "italic", fontSize: 13, lineHeight: 1.5 };

@@ -172,6 +172,32 @@ body {
   filter: grayscale(0.5);
 }
 
+/* AI actions share the same soft glow used by the guided empty state. */
+.ai-button > span {
+  color: var(--accent);
+}
+
+.ai-button:hover:not(:disabled) {
+  border-color: rgba(var(--accent-rgb), 0.52) !important;
+  box-shadow:
+    0 12px 30px rgba(var(--accent-rgb), 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+}
+
+.ai-button:disabled {
+  box-shadow: none !important;
+}
+
+/* Card AI actions reuse the neighboring delete button's hover shadow exactly. */
+.result-card-ai-button:hover:not(:disabled) {
+  box-shadow: 0 0 15px rgba(var(--accent-rgb), 0.35) !important;
+}
+
+/* Header actions sit next to a scroll boundary, so avoid moving them into its clipped area. */
+.result-header-ai-button:hover:not(:disabled) {
+  transform: scale(1.03);
+}
+
 /* Keep result cards visually connected to the existing button hover language. */
 .result-card-interactive:hover {
   transform: translateY(-1px);

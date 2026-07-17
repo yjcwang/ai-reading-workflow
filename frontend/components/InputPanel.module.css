@@ -78,6 +78,7 @@
   width: 100%;
   height: 320px;
   resize: vertical;
+  font: inherit;
   border-radius: 14px;
   padding: 12px;
   border: 1px solid var(--border-strong);

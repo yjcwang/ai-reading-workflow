@@ -12,9 +12,8 @@ import helpIcon from "@/icons/help.svg";
 import aiIcon from "@/icons/ai.svg";
 import {
   buttonMd,
-  buttonPrimary,
+  buttonAi,
   buttonSecondary,
-  buttonTinted,
   iconButtonMd,
   maskedIconStyle,
 } from "@/components/buttonStyles";
@@ -166,7 +165,7 @@ export function InputPanel({
             <div className={styles.generatorMenu}>
               {/* AI generator popover is anchored below this trigger button. */}
               <button
-                className="btn-interactive"
+                className="btn-interactive ai-button"
                 style={generatorBtn}
                 onClick={() => setGenerateModalOpen((prev) => !prev)}
                 disabled={analyzeLoading || generateLoading}
@@ -277,7 +276,7 @@ export function InputPanel({
             disabled={analyzeLoading}
           />
           <div className={styles.actionRow}>
-            <button className="btn-interactive" style={analyzeBtn} onClick={onConfirm} disabled={!canConfirm}>
+            <button className="btn-interactive ai-button" style={analyzeBtn} onClick={onConfirm} disabled={!canConfirm}>
               {analyzeLoading ? (
                 <Image
                   src={loadingIcon}
@@ -383,7 +382,7 @@ const historyBtn: React.CSSProperties = {
 
 const generatorBtn: React.CSSProperties = {
   ...buttonMd,
-  ...buttonTinted,
+  ...buttonAi,
 };
 
 const themeBtn: React.CSSProperties = {
@@ -398,7 +397,7 @@ const clearBtn: React.CSSProperties = {
 
 const analyzeBtn: React.CSSProperties = {
   ...buttonMd,
-  ...buttonPrimary,
+  ...buttonAi,
 };
 
 const loadingBtn: React.CSSProperties = {
