@@ -58,7 +58,13 @@ def _mock_json_output(prompt: str) -> str:
         }
     elif cleaned_prompt.startswith("###FEATURE:TRANSLATOR###"):
         data = {
-            "translation": "(Mock) This is a translated text."
+            "translation": "(Mock) This is a translated text.",
+            "segments": [
+                {
+                    "source_text": "",
+                    "translation": "(Mock) This is a translated text."
+                }
+            ]
         }
     elif cleaned_prompt.startswith("###FEATURE:TEXT_GENERATOR###"):
         data = {

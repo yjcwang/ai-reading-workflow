@@ -22,10 +22,16 @@ export type AnalyzeResponse = {
   grammar: GrammarItem[];
 };
 
-export type TextHighlight = {
-  type: "vocab" | "grammar";
-  expression: string;
-};
+export type TextHighlight =
+  | {
+      type: "vocab" | "grammar";
+      expression: string;
+    }
+  | {
+      type: "translation";
+      start: number;
+      end: number;
+    };
 
 export type ExportPdfRequest = {
   text: string;
@@ -46,6 +52,14 @@ export type ExplainWordResponse = {
 };
 
 export type TranslateSentenceResponse = {
+  translation: string;
+  segments?: TranslationSegment[];
+};
+
+export type TranslationSegment = {
+  source_text: string;
+  source_start: number;
+  source_end: number;
   translation: string;
 };
 

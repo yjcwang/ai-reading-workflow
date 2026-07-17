@@ -253,5 +253,10 @@ Move the Dockerized backend from Render to GCP while keeping the existing Vercel
 - Vercel deploys automatically; Cloud Run requires a new build and deploy after backend changes.
 - `/tmp/app.db` is temporary, and the public API currently has no authentication or rate limiting.
 
+## 2026-07-17 Link Translation Segments to Source Text
 
+### Decision
+- Extend the translation schema and LLM structured output with source-aligned translation segments.
+- Highlight matching source and translation segments together on hover or focus.
+- Keep plain translation as the fallback when segment mapping is unavailable.
 

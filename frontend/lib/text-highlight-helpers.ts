@@ -8,6 +8,8 @@ export function findHighlightQuery(
   text: string,
   highlight?: TextHighlight | null,
 ): string {
+  if (highlight?.type === "translation") return "";
+
   const expression = highlight?.expression.trim();
   if (!expression) return "";
 

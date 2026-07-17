@@ -61,15 +61,16 @@ export function LockedTextViewer({
     () => findTextHighlightQuery(text, activeHighlight),
     [text, activeHighlight],
   );
+  const hasActiveHighlight = highlightQuery || activeHighlight?.type === "translation";
 
   useEffect(() => {
-    if (!highlightQuery) return;
+    if (!hasActiveHighlight) return;
 
     const highlighted = boxRef.current?.querySelector<HTMLElement>(
       "[data-active-text-highlight='true']",
     );
     highlighted?.scrollIntoView({ block: "nearest", inline: "nearest" });
-  }, [highlightQuery]);
+  }, [hasActiveHighlight, activeHighlight]);
 
   useEffect(() => {
     if (typeof window === "undefined" || !window.matchMedia) return;
@@ -236,7 +237,7 @@ export function LockedTextViewer({
           userSelect: explainBusy ? "none" : style?.userSelect,
         }}
       >
-        {renderHighlightedText(text, highlightQuery)}
+        {renderHighlightedText(text, highlightQuery, activeHighlight)}
       </div>
 
       {btnPos && (
@@ -281,7 +282,24 @@ export function LockedTextViewer({
 function renderHighlightedText(
   text: string,
   query: string,
+  highlight?: TextHighlight | null,
 ): React.ReactNode {
+  if (highlight?.type === "translation") {
+    const start = Math.max(0, Math.min(highlight.start, text.length));
+    const end = Math.max(start, Math.min(highlight.end, text.length));
+    if (start === end) return text;
+
+    return (
+      <>
+        {text.slice(0, start)}
+        <mark data-active-text-highlight="true" style={highlightMark}>
+          {text.slice(start, end)}
+        </mark>
+        {text.slice(end)}
+      </>
+    );
+  }
+
   if (!query) return text;
 
   const nodes: React.ReactNode[] = [];

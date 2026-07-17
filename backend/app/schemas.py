@@ -52,8 +52,16 @@ class ExplainWordResponse(BaseModel):
     example: str             
     notes: Optional[str] = None   
 
+class TranslationSegment(BaseModel):
+    source_text: str
+    source_start: int
+    source_end: int
+    translation: str
+
+
 class TranslateSentenceResponse(BaseModel):
-    translation: str        
+    translation: str
+    segments: List[TranslationSegment] = Field(default_factory=list)
 
 class TranslateRequest(BaseModel):
     text: str = Field(..., min_length=1, description="Japanese text to translate")

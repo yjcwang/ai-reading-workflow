@@ -213,6 +213,17 @@ body {
   box-shadow: 0 0 15px rgba(var(--accent-rgb), 0.35);
 }
 
+/* Keep the active translation segment visibly linked to its source sentence. */
+.translation-segment-interactive {
+  transition: background-color 140ms ease, box-shadow 140ms ease;
+}
+
+.translation-segment-interactive:hover,
+.translation-segment-interactive:focus-visible {
+  background: rgba(var(--accent-rgb), 0.28);
+  box-shadow: 0 0 0 2px rgba(var(--accent-rgb), 0.14);
+}
+
 .model-config-summary {
   list-style: none;
 }

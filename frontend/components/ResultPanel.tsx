@@ -200,7 +200,35 @@ export function ResultPanel({
           {loading ? (
             <span style={emptyText}>{tUI.common.loading}</span>
           ) : translation?.translation ? (
-            translation.translation
+            translation.segments?.length ? (
+              translation.segments.map((segment, index) => (
+                <span
+                  key={`${segment.source_start}-${segment.source_end}-${index}`}
+                  className="translation-segment-interactive"
+                  style={translationSegment}
+                  tabIndex={0}
+                  onMouseEnter={() => onActiveTextHighlightChange?.({
+                    type: "translation",
+                    start: segment.source_start,
+                    end: segment.source_end,
+                  })}
+                  onMouseLeave={() => onActiveTextHighlightChange?.(null)}
+                  onFocus={() => onActiveTextHighlightChange?.({
+                    type: "translation",
+                    start: segment.source_start,
+                    end: segment.source_end,
+                  })}
+                  onBlur={() => onActiveTextHighlightChange?.(null)}
+                  onClick={() => onActiveTextHighlightChange?.({
+                    type: "translation",
+                    start: segment.source_start,
+                    end: segment.source_end,
+                  })}
+                >
+                  {segment.translation}{index < translation.segments!.length - 1 ? " " : ""}
+                </span>
+              ))
+            ) : translation.translation
           ) : (
             <span style={emptyText}>{translationEmptyText}</span>
           )}
@@ -469,6 +497,12 @@ const translationBox: React.CSSProperties = {
   fontSize: 14,
   lineHeight: 1.6,
   whiteSpace: "pre-wrap",
+};
+
+const translationSegment: React.CSSProperties = {
+  borderRadius: 3,
+  cursor: "pointer",
+  outlineColor: "rgba(var(--accent-rgb), 0.65)",
 };
 
 const list: React.CSSProperties = {
