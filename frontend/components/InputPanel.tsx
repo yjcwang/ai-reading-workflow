@@ -8,6 +8,7 @@ import clearIcon from "@/icons/clear.svg";
 import lightIcon from "@/icons/light.svg";
 import darkIcon from "@/icons/dark.svg";
 import historyIcon from "@/icons/history.svg";
+import helpIcon from "@/icons/help.svg";
 import aiIcon from "@/icons/ai.svg";
 import {
   buttonMd,
@@ -71,6 +72,7 @@ type Props = {
   targetLang: TargetLang;
   onLanguageChange: (lang: TargetLang) => void;
   onOpenHistory: () => void;
+  onOpenGuide: () => void;
   activeTextHighlight: TextHighlight | null;
 };
 
@@ -96,6 +98,7 @@ export function InputPanel({
   targetLang, 
   onLanguageChange,
   onOpenHistory,
+  onOpenGuide,
   activeTextHighlight,
   generateRequest: generateRequest,
   onGenerateRequestChange: onGenerateRequestChange,
@@ -205,6 +208,15 @@ export function InputPanel({
           )}
         </div>
         <div className={styles.rightTools}>
+          <button
+            className="btn-interactive"
+            style={themeBtn}
+            onClick={onOpenGuide}
+            aria-label={targetLang === "zh" ? "打开使用指南" : "Open quick guide"}
+            title={targetLang === "zh" ? "使用指南" : "Quick guide"}
+          >
+            <span aria-hidden="true" style={maskedIconStyle(helpIcon.src, 18)} />
+          </button>
           {/* Toggle Theme Light/Dark*/}
           <button
             className="btn-interactive"

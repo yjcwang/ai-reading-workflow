@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import styles from "./page.module.css";
 import { InputPanel } from "@/components/InputPanel";
 import { ResultPanel } from "@/components/ResultPanel";
 import { HistoryPanel } from "@/components/HistoryPanel";
 import { AiChatDrawer } from "@/components/AiChatDrawer";
+import { OnboardingGuide } from "@/components/OnboardingGuide";
 import { useTheme } from "@/hooks/useTheme";
 import { useTargetLang } from "@/hooks/useTargetLang";
 import { useExplainFeature, inferExplainMode } from "@/hooks/useExplainFeature";
@@ -35,6 +36,7 @@ import type {
 import { DEFAULT_GENERATE_REQUEST } from "@/lib/types";
 
 export default function Page() {
+  const [guideOpen, setGuideOpen] = useState(false);
   const [level, setLevel] = useState<Level>("N2");
   const [text, setText] = useState("");
   const [generateRequest, setGenerateRequest] = useState<GenerateTextRequest>(
@@ -68,6 +70,21 @@ export default function Page() {
     getModelConfig()
       .then(setModelConfig)
       .catch(() => setModelConfig(null));
+  }, []);
+
+  useEffect(() => {
+    const openTimer = window.setTimeout(() => {
+      if (window.localStorage.getItem("ai-reading-onboarding:v1") !== "complete") {
+        setGuideOpen(true);
+      }
+    }, 0);
+
+    return () => window.clearTimeout(openTimer);
+  }, []);
+
+  const handleCloseGuide = useCallback(() => {
+    window.localStorage.setItem("ai-reading-onboarding:v1", "complete");
+    setGuideOpen(false);
   }, []);
 
   async function handleAnalyzeRequest() {
@@ -276,6 +293,11 @@ export default function Page() {
 
   return (
     <main className={styles.page}>
+      <OnboardingGuide
+        open={guideOpen}
+        targetLang={targetLang}
+        onClose={handleCloseGuide}
+      />
       <div className={styles.grid}>
         <InputPanel
           level={level}
@@ -299,6 +321,7 @@ export default function Page() {
           targetLang={targetLang}
           onLanguageChange={handleLanguageChangeWithReset}
           onOpenHistory={handleOpenHistory}
+          onOpenGuide={() => setGuideOpen(true)}
           activeTextHighlight={activeTextHighlight}
           generateRequest={generateRequest}
           onGenerateRequestChange={handleGenerateRequestChange}
