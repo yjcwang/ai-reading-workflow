@@ -83,7 +83,7 @@
 .secondaryButton { border: 1px solid var(--border) !important; background: transparent; color: var(--text); }
 
 /* Shared abstract illustration elements intentionally avoid mirroring the real UI. */
-.workflow, .analyzeFlow, .knowledgeFlow, .chatFlow { position: relative; z-index: 1; }
+.workflow, .sourceFlow, .combinedFlow, .chatFlow { position: relative; z-index: 1; }
 .workflow { display: flex; flex-direction: column; align-items: center; gap: 7px; }
 .articleCard { width: 210px; padding: 18px; border: 1px solid var(--border); border-radius: 14px; background: var(--panel); box-shadow: var(--shadow); }
 .paperHeader { display: flex; gap: 5px; margin-bottom: 15px; }
@@ -97,22 +97,37 @@
 .miniCards { display: flex; gap: 9px; }
 .miniCards span { display: grid; place-items: center; width: 48px; height: 36px; border: 1px solid var(--border); border-radius: 11px; background: var(--panel); font-size: 13px; font-weight: 700; box-shadow: var(--shadow); }
 
-.analyzeFlow { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+.sourceFlow { display: flex; align-items: center; width: 92%; gap: 13px; }
+.sourceOption { display: flex; flex: 1; min-width: 0; flex-direction: column; gap: 10px; }
+.sourceOption .articleCard { width: 100%; min-height: 190px; }
+.sourceLabel { padding-left: 2px; font-size: 12px; font-weight: 700; opacity: .62; }
+.orDivider { display: grid; place-items: center; flex: 0 0 30px; width: 30px; height: 30px; border: 1px solid var(--border); border-radius: 50%; background: var(--panel); font-size: 10px; opacity: .62; }
+.generatorOption { min-height: 222px; padding: 16px; border: 1px solid rgba(var(--accent-rgb), .3); border-radius: 14px; background: var(--panel); box-shadow: var(--shadow); }
+.generatorTitle { display: flex; align-items: center; gap: 9px; font-size: 12px; }
+.generatorTitle .spark { width: 30px; height: 30px; border-radius: 9px; }
+.generatorTitle .spark > span { width: 16px !important; height: 16px !important; }
+.topicField { padding: 10px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); font-size: 11px; opacity: .8; }
+.styleTags { display: flex; flex-wrap: wrap; gap: 5px; }
+.styleTags span { padding: 4px 7px; border: 1px solid var(--border); border-radius: 99px; font-size: 9px; opacity: .66; }
+.styleTags span:first-child { border-color: rgba(var(--accent-rgb), .4); background: rgba(var(--accent-rgb), .12); color: var(--accent); opacity: 1; }
+.generateMiniButton { align-self: flex-start; margin-top: auto; padding: 7px 11px; border: 1px solid rgba(var(--accent-rgb), .32); border-radius: 10px; background: linear-gradient(135deg, rgba(var(--accent-rgb), .22), rgba(var(--accent-rgb), .09)); font-size: 10px; font-weight: 600; }
+
 .levels { display: flex; gap: 7px; }
 .levels span, .chatTags span { padding: 5px 10px; border: 1px solid var(--border); border-radius: 99px; background: var(--panel); font-size: 11px; opacity: .6; }
 .levels .activeLevel { border-color: rgba(var(--accent-rgb), .5); background: rgba(var(--accent-rgb), .14); color: var(--accent); opacity: 1; }
-.analyzeButton { display: flex; align-items: center; gap: 7px; padding: 10px 22px; border-radius: 14px; background: var(--text); color: var(--text-invert); font-size: 13px; font-weight: 600; box-shadow: var(--shadow); }
 .analyzeButton span { color: var(--accent); }
 
-.knowledgeFlow { width: 100%; height: 330px; }
-.knowledgeFlow > .spark { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
-.knowledgeCard { position: absolute; display: flex; flex-direction: column; gap: 8px; min-width: 130px; padding: 14px; border: 1px solid var(--border); border-radius: 14px; background: var(--panel); box-shadow: var(--shadow); }
-.knowledgeCard strong { margin-bottom: 3px; color: var(--accent); font-size: 12px; }
-.knowledgeCard span { font-size: 12px; opacity: .74; }
-.knowledgeCard i { display: block; width: 100%; height: 5px; border-radius: 9px; background: color-mix(in srgb, var(--text) 10%, transparent); }
-.vocabCard { top: 17px; left: 18px; transform: rotate(-2deg); }
-.grammarCard { top: 25px; right: 16px; transform: rotate(2deg); }
-.translationCard { bottom: 19px; left: 50%; width: 165px; transform: translateX(-50%); }
+.combinedFlow { display: flex; align-items: center; width: 92%; gap: 13px; }
+.combinedInput { display: flex; flex: 0 0 178px; flex-direction: column; align-items: center; gap: 10px; }
+.combinedInput .articleCard { width: 178px; padding: 14px; }
+.combinedAction { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.flowArrow { color: var(--accent); font-size: 18px; opacity: .7; }
+.combinedResults { display: flex; flex: 1; min-width: 0; flex-direction: column; gap: 8px; }
+.resultMiniCard { display: flex; flex-direction: column; gap: 5px; padding: 11px 12px; border: 1px solid var(--border); border-radius: 12px; background: var(--panel); box-shadow: var(--shadow); }
+.resultMiniCard strong { color: var(--accent); font-size: 11px; }
+.resultMiniCard span { font-size: 11px; opacity: .74; }
+.resultMiniCard i { display: block; width: 100%; height: 4px; border-radius: 9px; background: color-mix(in srgb, var(--text) 10%, transparent); }
+.resultMiniCard i:last-child { width: 62%; }
 
 .chatFlow { display: flex; align-items: center; width: 88%; }
 .chatFlow .articleCard { flex: 0 0 185px; transform: rotate(-2deg); }
@@ -148,12 +163,19 @@
   .chatFlow .articleCard { flex-basis: 145px; padding: 12px; }
   .chatCard { flex-basis: 165px; }
   .jpLine { font-size: 10px; }
+  .sourceFlow { width: 96%; gap: 8px; transform: scale(.94); }
+  .sourceOption .articleCard { min-height: 180px; padding: 12px; }
+  .generatorOption { min-height: 210px; padding: 12px; }
+  .orDivider { flex-basis: 25px; width: 25px; height: 25px; }
+  .combinedFlow { width: 96%; gap: 8px; transform: scale(.92); }
+  .combinedInput { flex-basis: 150px; }
+  .combinedInput .articleCard { width: 150px; }
+  .resultMiniCard { padding: 9px; }
 }
 
 @media (max-width: 390px) {
   .visual { min-height: 245px; }
   .chatFlow { transform: scale(.88); }
-  .knowledgeFlow { transform: scale(.86); }
   .footer { gap: 10px; }
   .primaryButton { padding-inline: 12px; }
 }
