@@ -239,5 +239,19 @@ Learners need short follow-up Q&A around the current reading, selected text, and
 - Selecting text opens AI chat only; structured explain/card generation is triggered manually from the drawer.
 - Reuse the existing `ExplainModal` for generated explain cards and keep its add-to-list behavior.
 
+## 2026-07-17 Migrate Backend Deployment from Render to GCP Cloud Run
+
+### Context
+Move the Dockerized backend from Render to GCP while keeping the existing Vercel frontend.
+
+### Decision
+- Keep the GitHub-connected frontend on Vercel and point `NEXT_PUBLIC_BACKEND_URL` to Cloud Run.
+- Build `backend/Dockerfile` with Cloud Build, store it in Artifact Registry `ai-reading-images`, and deploy service `ai-reading-workflow` in `europe-west3`.
+- Keep backend releases manual and store `GEMINI_API_KEY` in Secret Manager.
+
+### Consequences
+- Vercel deploys automatically; Cloud Run requires a new build and deploy after backend changes.
+- `/tmp/app.db` is temporary, and the public API currently has no authentication or rate limiting.
+
 
 
