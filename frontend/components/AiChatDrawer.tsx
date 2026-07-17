@@ -9,8 +9,8 @@ import chatContextIcon from "@/icons/chat_context.svg";
 import sendIcon from "@/icons/send.svg";
 import styles from "./InputPanel.module.css";
 import {
+  buttonAi,
   buttonGhost,
-  buttonPrimary,
   buttonSm,
   iconButtonMd,
   maskedIconStyle,
@@ -93,8 +93,7 @@ export function AiChatDrawer({
       <div style={header}>
         <div style={titleBlock}>
           <div style={titleRow}>
-            <span style={maskedIconStyle(aiIcon.src, 18)} aria-hidden="true" />
-            <div style={titleText}>{tUI.title}</div>
+            
           </div>
         </div>
         <button
@@ -110,7 +109,9 @@ export function AiChatDrawer({
 
       <div style={messageList}>
         {messages.length === 0 ? (
-          <div style={emptyState}>{tUI.emptyText}</div>
+          <div style={emptyState}>
+            <div style={emptyStateText}>{tUI.emptyText}</div>
+          </div>
         ) : (
           messages.map((message) => (
             <div
@@ -169,6 +170,7 @@ export function AiChatDrawer({
           placeholder={tUI.placeholder}
           disabled={loading || disabled}
           style={textarea}
+          className="ai-chat-input"
           rows={1}
         />
         <div style={composerActions}>
@@ -176,7 +178,7 @@ export function AiChatDrawer({
           <div style={composerButtons}>
             {showGenerateCards ? (
               <button
-                className="btn-interactive"
+                className="btn-interactive ai-button"
                 style={generateCardsBtn}
                 disabled={disabled || explainLoading}
                 type="button"
@@ -269,8 +271,16 @@ const titleRow: React.CSSProperties = {
   gap: 8,
 };
 
-const titleText: React.CSSProperties = {
-  fontWeight: 700,
+const titleIcon: React.CSSProperties = {
+  display: "grid",
+  placeItems: "center",
+  width: 40,
+  height: 40,
+  border: "1px solid rgba(var(--accent-rgb), 0.28)",
+  borderRadius: 13,
+  background: "rgba(var(--accent-rgb), 0.13)",
+  color: "var(--accent)",
+  boxShadow: "0 8px 24px rgba(var(--accent-rgb), 0.13)",
 };
 
 const contextRow: React.CSSProperties = {
@@ -320,16 +330,33 @@ const messageList: React.CSSProperties = {
 const emptyState: React.CSSProperties = {
   flex: 1,
   display: "flex",
+  flexDirection: "column",
   alignItems: "center",
   justifyContent: "center",
   alignSelf: "stretch",
   maxWidth: 320,
   margin: "0 auto",
-  color: "var(--text)",
-  fontSize: 24,
-  fontWeight: 500,
-  lineHeight: 1.35,
   textAlign: "center",
+};
+
+const emptyStateIcon: React.CSSProperties = {
+  display: "grid",
+  placeItems: "center",
+  width: 82,
+  height: 82,
+  marginBottom: 20,
+  border: "1px solid rgba(var(--accent-rgb), 0.28)",
+  borderRadius: 24,
+  background: "linear-gradient(135deg, rgba(var(--accent-rgb), 0.22), rgba(var(--accent-rgb), 0.09))",
+  color: "var(--accent)",
+  boxShadow: "0 16px 42px rgba(var(--accent-rgb), 0.16)",
+};
+
+const emptyStateText: React.CSSProperties = {
+  color: "var(--text)",
+  fontSize: 22,
+  fontWeight: 600,
+  lineHeight: 1.35,
 };
 
 const messageBubble: React.CSSProperties = {
@@ -343,15 +370,16 @@ const messageBubble: React.CSSProperties = {
 
 const userBubble: React.CSSProperties = {
   alignSelf: "flex-end",
-  background: "var(--text)",
-  color: "var(--text-invert)",
+  background: "var(--surface)",
+  color: "var(--text)",
 };
 
 const assistantBubble: React.CSSProperties = {
   alignSelf: "flex-start",
-  background: "var(--surface)",
+  background: "linear-gradient(135deg, rgba(var(--accent-rgb), 0.24), rgba(var(--accent-rgb), 0.12))",
   color: "var(--text)",
-  border: "1px solid var(--border)",
+  border: "1px solid rgba(var(--accent-rgb), 0.28)",
+  boxShadow: "0 8px 24px rgba(var(--accent-rgb), 0.08)",
 };
 
 const errorBox: React.CSSProperties = {
@@ -379,7 +407,7 @@ const textarea: React.CSSProperties = {
   resize: "none",
   overflowY: "hidden",
   borderRadius: 12,
-  border: "1px solid var(--border-strong)",
+  border: "none",
   background: "var(--surface)",
   color: "var(--text)",
   outline: "none",
@@ -414,10 +442,13 @@ const composerButtons: React.CSSProperties = {
 
 const generateCardsBtn: React.CSSProperties = {
   ...buttonSm,
-  ...buttonPrimary,
+  ...buttonAi,
 };
 
 const sendBtn: React.CSSProperties = {
   ...iconButtonMd,
-  ...buttonPrimary,
+  background: "var(--accent)",
+  color: "var(--text-invert)",
+  border: "1px solid rgba(var(--accent-rgb), 0.72)",
+  boxShadow: "0 8px 22px rgba(var(--accent-rgb), 0.25)",
 };

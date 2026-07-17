@@ -198,6 +198,14 @@ body {
   transform: scale(1.03);
 }
 
+.ai-chat-input {
+  transition: border-color 180ms ease, box-shadow 180ms ease, background-color 180ms ease;
+}
+
+.ai-chat-input:focus {
+  box-shadow: none;
+}
+
 /* Keep result cards visually connected to the existing button hover language. */
 .result-card-interactive:hover {
   transform: translateY(-1px);
