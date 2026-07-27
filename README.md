@@ -34,7 +34,7 @@ More screenshots: [`docs/screenshot/screenshots.md`](docs/screenshot/screenshots
 
 * Analyze Japanese text into vocabulary and grammar lists for a selected JLPT level
 * Generate Japanese reading passages by topic, level, length, and style
-* Explain selected words or sentences in context
+* Chat with AI about the current article, selected text, vocabulary, or grammar, and turn useful explanations into study cards
 * Edit, save, reload, search, and delete reading history
 * Export study results as PDF
 * Switch output language between English and Chinese
