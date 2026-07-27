@@ -92,12 +92,29 @@ export function ResultPanel({
   if (isEmpty) {
     return (
       <div style={{ ...card, ...emptyState }}>
-        <div style={emptyIllustration} aria-hidden="true">
-          <span style={emptyIllustrationGlow} />
-          <span style={maskedIconStyle(aiIcon.src, 42)} />
+        <div style={emptyContent}>
+          <div style={emptyEyebrow}>
+            <span style={emptyEyebrowIcon} aria-hidden="true">文</span>
+            {tUI.resultPanel.emptyEyebrow}
+          </div>
+          <div style={emptyStateTitle}>{tUI.resultPanel.emptyTitle}</div>
+          <div style={emptyStateDescription}>{tUI.resultPanel.emptyDescription}</div>
+          <div style={emptyFeatureList}>
+            <EmptyFeature
+              icon="訳"
+              title={translationTitle}
+            />
+            <EmptyFeature
+              icon="語"
+              title={tUI.resultPanel.vocabTitle}
+            />
+            <EmptyFeature
+              icon="型"
+              title={tUI.resultPanel.grammarTitle}
+            />
+          </div>
         </div>
-        <div style={emptyStateTitle}>{tUI.resultPanel.emptyTitle}</div>
-        <div style={emptyStateDescription}>{tUI.resultPanel.emptyDescription}</div>
+        
       </div>
     );
   }
@@ -195,7 +212,7 @@ export function ResultPanel({
       {exportError ? <div style={errorBox}>{tUI.resultPanel.exportPdf}{tUI.common.error}: {exportError}</div> : null}
 
       <div style={translationSection}>
-        <div style={sectionTitle}>{translationTitle}</div>
+        <SectionTitle icon="訳" title={translationTitle} />
         <div style={translationBox}>
           {loading ? (
             <span style={emptyText}>{tUI.common.loading}</span>
@@ -237,7 +254,7 @@ export function ResultPanel({
 
       <div style={twoCols}>
         <div style={section}>
-          <div style={sectionTitle}>{tUI.resultPanel.vocabTitle}</div>
+          <SectionTitle icon="語" title={tUI.resultPanel.vocabTitle} />
           <ul style={list}>
             {loading ? (
               <li style={empty}>{tUI.common.loading}</li>
@@ -311,7 +328,7 @@ export function ResultPanel({
         </div>
 
         <div style={section}>
-          <div style={sectionTitle}>{tUI.resultPanel.grammarTitle}</div>
+          <SectionTitle icon="型" title={tUI.resultPanel.grammarTitle} />
           <ul style={list}>
             {loading ? (
               <li style={empty}>{tUI.common.loading}</li>
@@ -391,6 +408,24 @@ function ModelRow({ label, value }: { label: string; value: string }) {
     <div style={modelRow}>
       <span style={modelLabel}>{label}</span>
       <span>{value}</span>
+    </div>
+  );
+}
+
+function EmptyFeature({ icon, title }: { icon: string; title: string }) {
+  return (
+    <div style={emptyFeature}>
+      <span style={emptyFeatureIcon} aria-hidden="true">{icon}</span>
+      <strong style={emptyFeatureTitle}>{title}</strong>
+    </div>
+  );
+}
+
+function SectionTitle({ icon, title }: { icon: string; title: string }) {
+  return (
+    <div style={sectionTitle}>
+      <span style={sectionTitleIcon} aria-hidden="true">{icon}</span>
+      <span>{title}</span>
     </div>
   );
 }
@@ -483,7 +518,24 @@ const section: React.CSSProperties = {
   minWidth: 0,
 };
 
-const sectionTitle: React.CSSProperties = { fontWeight: 500, marginBottom: 8 };
+const sectionTitle: React.CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  gap: 10,
+  marginBottom: 10,
+  fontWeight: 600,
+};
+
+const sectionTitleIcon: React.CSSProperties = {
+  width: 26,
+  color: "var(--accent)",
+  fontSize: 22,
+  fontWeight: 650,
+  lineHeight: 1,
+  textAlign: "center",
+  flexShrink: 0,
+  opacity: 0.78,
+};
 
 const translationSection: React.CSSProperties = {
   marginBottom: 12,
@@ -584,54 +636,83 @@ const deleteItemBtnVisible: React.CSSProperties = {
 const empty: React.CSSProperties = { opacity: 0.6, padding: 10 };
 const emptyText: React.CSSProperties = { opacity: 0.6 };
 const emptyState: React.CSSProperties = {
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "center",
-  justifyContent: "center",
-  paddingTop: "clamp(32px, 8vw, 96px)",
-  paddingRight: "clamp(32px, 8vw, 96px)",
-  paddingBottom: "clamp(32px, 8vw, 96px)",
-  paddingLeft: "clamp(32px, 8vw, 96px)",
-  textAlign: "center",
-};
-
-const emptyIllustration: React.CSSProperties = {
   position: "relative",
   display: "grid",
-  placeItems: "center",
-  width: 96,
-  height: 96,
-  marginBottom: 24,
-  border: "1px solid rgba(var(--accent-rgb), 0.28)",
-  borderRadius: 28,
-  background: "rgba(var(--accent-rgb), 0.12)",
-  color: "var(--accent)",
-  boxShadow: "0 18px 48px rgba(var(--accent-rgb), 0.14)",
-  overflow: "hidden",
+  alignItems: "center",
+  paddingTop: "clamp(48px, 8vw, 112px)",
+  paddingRight: "clamp(44px, 8vw, 112px)",
+  paddingBottom: "clamp(48px, 8vw, 112px)",
+  paddingLeft: "clamp(44px, 8vw, 112px)",
+  overflowX: "hidden",
+  overflowY: "hidden",
 };
 
-const emptyIllustrationGlow: React.CSSProperties = {
-  position: "absolute",
-  width: 72,
-  height: 72,
-  borderRadius: "50%",
-  background: "rgba(var(--accent-rgb), 0.14)",
-  filter: "blur(16px)",
+const emptyContent: React.CSSProperties = {
+  position: "relative",
+  zIndex: 1,
+  width: "min(590px, 86%)",
+  textAlign: "left",
+};
+
+const emptyEyebrow: React.CSSProperties = {
+  display: "inline-flex",
+  alignItems: "center",
+  gap: 7,
+  marginBottom: 20,
+  color: "var(--accent)",
+  fontSize: 12,
+  fontWeight: 700,
+  letterSpacing: "0.12em",
+};
+
+const emptyEyebrowIcon: React.CSSProperties = {
+  fontSize: 17,
+  lineHeight: 1,
 };
 
 const emptyStateTitle: React.CSSProperties = {
-  marginBottom: 10,
-  fontSize: 20,
-  fontWeight: 700,
-  letterSpacing: "-0.01em",
+  maxWidth: 520,
+  marginBottom: 16,
+  fontSize: "clamp(34px, 4vw, 50px)",
+  fontWeight: 600,
+  lineHeight: 1.22,
+  letterSpacing: "0.01em",
 };
 
 const emptyStateDescription: React.CSSProperties = {
-  maxWidth: 420,
-  fontSize: 14,
-  lineHeight: 1.7,
-  opacity: 0.62,
+  maxWidth: 500,
+  fontSize: 15,
+  lineHeight: 1.8,
+  opacity: 0.58,
 };
+
+const emptyFeatureList: React.CSSProperties = {
+  display: "grid",
+  gap: 18,
+  marginTop: 34,
+};
+
+const emptyFeature: React.CSSProperties = {
+  display: "grid",
+  gridTemplateColumns: "30px minmax(0, 1fr)",
+  alignItems: "start",
+  gap: 13,
+};
+
+const emptyFeatureIcon: React.CSSProperties = {
+  color: "var(--accent)",
+  fontSize: 19,
+  fontWeight: 600,
+  lineHeight: 1.35,
+  opacity: 0.78,
+};
+
+const emptyFeatureTitle: React.CSSProperties = {
+  display: "block",
+  fontSize: 14,
+  fontWeight: 650,
+};
+
 
 const muted: React.CSSProperties = { opacity: 0.8, marginTop: 6, fontSize: 13, lineHeight: 1.5 };
 const mutedSmall: React.CSSProperties = { opacity: 0.65, marginTop: 6, fontSize: 12, lineHeight: 1.5 };
