@@ -14,8 +14,8 @@
 * Database: SQLite
 
 ## Demo
-
-- [Demo 视频链接](https://youtu.be/NV0gn7CtJrc)
+- [Demo 网页 (推荐)](https://ai-reading-workflow.vercel.app/)
+- [Demo 视频链接 (旧版)](https://youtu.be/NV0gn7CtJrc)
 
 <p align="center">
   <img src="./docs/screenshot/ai-generator.png" alt="Main Interface and AI Text Generator" width="880"/>

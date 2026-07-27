@@ -7,10 +7,10 @@ Built with FastAPI, Next.js, Docker, and multi-provider LLM integration.
 ## Tech Stack
 
 * Frontend: Next.js, React, TypeScript
-* Backend: FastAPI, Pydantic, SQLModel
+* Backend: Python, FastAPI, Pydantic, SQLModel
 * LLM APIs: Gemini, DeepSeek, Ollama
-* Infrastructure: Docker Compose, Langfuse
-* Evaluation: Custom dataset & LLM benchmarking
+* Infrastructure: Docker Compose, Google Cloud Run, Vercel
+* Observability & Evaluation: Langfuse, LLM benchmarking with Custom dataset
 * Database: SQLite
 
 ## Demo
