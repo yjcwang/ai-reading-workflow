@@ -12,9 +12,12 @@ Base URL in local development:
 
 | Method | Path | Purpose |
 | --- | --- | --- |
+| `GET` | `/api/model-config` | Return the model name used by each AI feature. |
 | `POST` | `/api/analyze` | Analyze Japanese text into vocabulary and grammar items. |
+| `POST` | `/api/translate` | Translate Japanese text into the selected output language. |
 | `POST` | `/api/explain` | Explain a selected word or sentence in context. |
 | `POST` | `/api/generate-text` | Generate a Japanese reading passage. |
+| `POST` | `/api/ask-ai` | Answer a question using the current article, analysis, and active learning context. |
 | `POST` | `/api/export_pdf` | Export the current text and analysis result as a PDF file. |
 | `POST` | `/api/history/articles` | Save an analyzed reading session. |
 | `GET` | `/api/history/articles` | List saved reading sessions. |
