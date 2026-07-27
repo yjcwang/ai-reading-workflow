@@ -14,8 +14,8 @@ Built with FastAPI, Next.js, Docker, and multi-provider LLM integration.
 * Database: SQLite
 
 ## Demo
-
-- [Demo Video Link Here](https://youtu.be/NV0gn7CtJrc)
+- [Demo Website (recommended)](https://ai-reading-workflow.vercel.app/)
+- [Demo Video Link Here (old version)](https://youtu.be/NV0gn7CtJrc)
 
 <p align="center">
   <img src="./docs/screenshot/ai-generator.png" alt="Main Interface and AI Text Generator" width="880"/>
